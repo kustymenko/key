@@ -1,0 +1,73 @@
+import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { ROWS, lettersOf } from '../src/keyboard/layouts.js';
+import { FINGERS, fingerOf } from '../src/keyboard/fingers.js';
+import { deltaE, tint, contrast } from '../src/design/color-utils.js';
+
+const css = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
+const vars = Object.fromEntries([...css.matchAll(/--([\w-]+):\s*(#[0-9a-fA-F]{6})/g)].map((m) => [m[1], m[2]]));
+const kinds = ['normal', 'protanopia', 'deuteranopia', 'tritanopia'];
+
+describe('карта пальців', () => {
+  it('кожна клавіша має рівно один відомий палець', () => {
+    const ids = new Set(FINGERS.map((f) => f.id));
+    for (const key of ROWS.flat()) {
+      expect(ids.has(fingerOf(key.code)), key.code).toBe(true);
+    }
+  });
+
+  it('літери української розкладки: 32 літери без повторів (без Ґ)', () => {
+    const l = lettersOf('ua').map((k) => k.ua);
+    expect(l.length).toBe(32);
+    expect(new Set(l).size).toBe(32);
+  });
+
+  it('літери англійської розкладки: 26 без повторів', () => {
+    const l = lettersOf('en').map((k) => k.en);
+    expect(new Set(l).size).toBe(26);
+  });
+
+  it('коди клавіш не повторюються', () => {
+    const codes = ROWS.flat().map((k) => k.code);
+    expect(new Set(codes).size).toBe(codes.length);
+  });
+
+  it('основний ряд: правильні пальці', () => {
+    const want = { KeyA: 'lp', KeyS: 'lr', KeyD: 'lm', KeyF: 'li', KeyJ: 'ri', KeyK: 'rm', KeyL: 'rr', Semicolon: 'rp', Space: 'th' };
+    for (const [code, f] of Object.entries(want)) expect(fingerOf(code)).toBe(f);
+  });
+});
+
+describe('кольори', () => {
+  const order = ['lp', 'lr', 'lm', 'li', 'ri', 'rm', 'rr', 'rp'];
+  const finger = order.map((f) => vars[`finger-${f}`]);
+
+  it('сусідні пальці розрізняються (звичайний зір і дальтонізм)', () => {
+    for (let i = 0; i < 7; i++) {
+      for (const k of kinds) expect(deltaE(finger[i], finger[i + 1], k), `${order[i]}-${order[i + 1]} ${k}`).toBeGreaterThan(30);
+    }
+  });
+
+  it('сусідні бліді відтінки теж розрізняються', () => {
+    for (let i = 0; i < 7; i++) {
+      for (const k of kinds) expect(deltaE(tint(finger[i], 0.6), tint(finger[i + 1], 0.6), k), `${order[i]}-${order[i + 1]} ${k}`).toBeGreaterThan(12);
+    }
+  });
+
+  it('кольори інтерфейсу не схожі на кольори пальців', () => {
+    const ui = Object.entries(vars).filter(([k]) => k.startsWith('ui-') && !['ui-bg', 'ui-card', 'ui-text', 'ui-key-text', 'ui-line'].includes(k) || k === 'ui-main');
+    for (const [name, hex] of ui) {
+      for (const f of finger) expect(deltaE(hex, f), `${name} vs ${f}`).toBeGreaterThan(30);
+    }
+  });
+
+  it('контраст тексту інтерфейсу не менше 4.5', () => {
+    expect(contrast(vars['ui-main'], '#ffffff')).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(vars['ui-text'], vars['ui-bg'])).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(vars['ui-text-soft'], vars['ui-bg'])).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it('символи на блідих клавішах читаються (контраст ≥ 4.5)', () => {
+    for (const f of finger) expect(contrast(vars['ui-key-text'], tint(f, 0.6))).toBeGreaterThanOrEqual(4.5);
+  });
+});

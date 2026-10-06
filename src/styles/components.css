@@ -1,0 +1,104 @@
+/* ---------- Кнопки ---------- */
+.btn {
+  --depth: 6px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+  min-height: var(--tap); min-width: var(--tap); padding: 0 28px;
+  font-weight: 800; font-size: 26px; line-height: 1;
+  border-radius: var(--radius); border: 3px solid var(--ui-main);
+  background: var(--ui-card); color: var(--ui-main);
+  box-shadow: 0 var(--depth) 0 var(--ui-main);
+  transition: transform .08s, box-shadow .08s;
+}
+.btn:active, .btn[aria-pressed='true'] { transform: translateY(calc(var(--depth) - 2px)); box-shadow: 0 2px 0 var(--ui-main); }
+.btn.primary { background: var(--ui-main); color: #fff; box-shadow: 0 var(--depth) 0 #121b25; border-color: #121b25; }
+.btn.primary:active { box-shadow: 0 2px 0 #121b25; }
+.btn.big { min-height: 88px; padding: 0 48px; font-size: 38px; --depth: 8px; }
+.btn.round { padding: 0; border-radius: 50%; width: var(--tap); height: var(--tap); }
+.btn.seg { box-shadow: none; border-radius: 0; margin: 0; }
+.btn.seg[aria-pressed='true'] { background: var(--ui-main); color: #fff; transform: none; }
+.segmented { display: inline-flex; border-radius: var(--radius); overflow: hidden; border: 3px solid var(--ui-main); box-shadow: 0 6px 0 var(--ui-main); }
+.segmented .btn { border: 0; }
+.segmented .btn + .btn { border-left: 3px solid var(--ui-main); }
+
+/* ---------- Зірочки: форма, а не колір ---------- */
+.stars { display: inline-flex; gap: 4px; }
+.star polygon { fill: var(--ui-main); stroke: var(--ui-main); }
+.star.is-off polygon { fill: none; stroke: var(--ui-text-soft); stroke-dasharray: 0; }
+.pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 22px 6px 14px; min-height: var(--tap); background: var(--ui-card); border: 3px solid var(--ui-line); border-radius: 999px; font-size: 32px; font-weight: 800; }
+
+/* ---------- Підказка-бульбашка ---------- */
+.bubble {
+  display: inline-flex; align-items: center; gap: 16px; padding: 10px 14px 10px 28px;
+  background: var(--ui-card); border: 3px solid var(--ui-main); border-radius: 28px; font-size: 34px; font-weight: 800; position: relative;
+}
+.bubble::before {
+  content: ''; position: absolute; left: -17px; top: 50%; width: 28px; height: 28px; background: var(--ui-card);
+  border-left: 3px solid var(--ui-main); border-bottom: 3px solid var(--ui-main); transform: translateY(-50%) rotate(45deg);
+}
+
+/* ---------- Клавіші ---------- */
+.f-lp { --c: var(--finger-lp); } .f-lr { --c: var(--finger-lr); } .f-lm { --c: var(--finger-lm); } .f-li { --c: var(--finger-li); }
+.f-ri { --c: var(--finger-ri); } .f-rm { --c: var(--finger-rm); } .f-rr { --c: var(--finger-rr); } .f-rp { --c: var(--finger-rp); }
+.f-th { --c: var(--finger-th); }
+
+.kb { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+.kb-row { display: flex; gap: 8px; justify-content: center; }
+.key {
+  --h: 66px;
+  position: relative; flex: 1 1 0; height: var(--h); min-width: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: color-mix(in srgb, var(--c) 40%, white);
+  border: 2px solid color-mix(in srgb, var(--c) 60%, white);
+  border-radius: 12px;
+  box-shadow: 0 5px 0 color-mix(in srgb, var(--c) 55%, #8d98a5);
+  color: var(--ui-key-text); font-weight: 800; font-size: 28px;
+}
+.key.is-service { font-size: 22px; background: color-mix(in srgb, var(--c) 28%, white); }
+.key.is-space { flex: 0 0 60%; }
+.key-label { pointer-events: none; }
+
+/* Наступна клавіша: насичений колір + товста обвідка + світіння */
+.key.is-next {
+  background: var(--c); border-color: var(--ui-main); color: var(--ink, var(--ui-text));
+  outline: 6px solid var(--ui-main); outline-offset: 3px;
+  box-shadow: 0 5px 0 var(--ui-main), 0 0 0 14px rgb(43 58 74 / .16);
+  z-index: 2; font-size: 34px;
+  animation: breathe 1.8s ease-in-out infinite;
+}
+/* Після помилки: подвійна обвідка + м'яке підстрибування */
+.key.is-next.is-error {
+  outline: 5px solid var(--ui-main); outline-offset: 3px;
+  box-shadow: 0 5px 0 var(--ui-main), 0 0 0 8px #fff, 0 0 0 14px var(--ui-main);
+  animation: hop 1.4s ease-in-out 2;
+}
+@keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+@keyframes hop { 0%, 60%, 100% { transform: translateY(0); } 15% { transform: translateY(-12px); } 30% { transform: translateY(0); } 40% { transform: translateY(-7px); } 50% { transform: translateY(0); } }
+
+/* Без руху: лишаються статичні обвідки і стрілка-вказівник */
+@media (prefers-reduced-motion: reduce) {
+  .key.is-next, .key.is-next.is-error, .finger.is-active { animation: none !important; }
+  .key.is-next::before {
+    content: '▼'; position: absolute; top: -36px; left: 50%; transform: translateX(-50%); font-size: 24px; color: var(--ui-main);
+  }
+}
+
+/* ---------- Схема долонь ---------- */
+.hands { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.hands-pair { display: flex; gap: 10px; }
+.hand { width: 150px; height: auto; overflow: visible; }
+.hand-right { transform: scaleX(-1); }
+.palm { fill: #fff; stroke: var(--ui-main); stroke-width: 4; stroke-linejoin: round; }
+.finger {
+  fill: color-mix(in srgb, var(--c) 40%, white); stroke: var(--ui-main); stroke-width: 4;
+  transform-box: fill-box; transform-origin: center bottom;
+}
+.finger.is-active { fill: var(--c); stroke-width: 7; animation: breathe 1.8s ease-in-out infinite; }
+.hands.is-error .finger.is-active { animation: hop 1.4s ease-in-out 2; }
+.hands-caption { font-size: 24px; font-weight: 800; padding: 4px 16px; background: var(--ui-card); border: 3px solid var(--ui-main); border-radius: 14px; }
+
+/* ---------- Заголовок з клавіш ---------- */
+.title { display: flex; flex-wrap: nowrap; gap: 6px; margin: 0; }
+.title-key {
+  display: inline-grid; place-items: center; width: 60px; height: 72px; font-size: 40px; font-weight: 800; color: var(--ui-main);
+  background: var(--ui-card); border: 3px solid var(--ui-main); border-radius: 16px; box-shadow: 0 7px 0 var(--ui-main);
+}
