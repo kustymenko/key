@@ -28,7 +28,7 @@ export function mapScreen() {
       <div class="node-disc">${inner}</div><div class="node-stars">${under}</div></div>`;
   }).join('');
   const cur = NODES.find((n) => n.state === 'current');
-  return `<div class="screen screen-map">
+  return `<div class="screen screen-map theme-warm">
     <div class="topbar">${homeButton()}<div class="topbar-spacer"></div>${totalStars(8)}</div>
     <svg class="map-path" viewBox="0 0 1366 768" aria-hidden="true"><path d="${PATH}"/></svg>
     ${nodes}

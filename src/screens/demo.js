@@ -1,5 +1,5 @@
 import { klavik, EMOTIONS } from '../character/klavik.js';
-import { AVATARS } from '../character/avatars.js';
+import { AVATARS, AVATAR_NAMES } from '../character/avatars.js';
 import { keyboard, hands } from '../keyboard/onscreen.js';
 import { FINGERS, fingerOf } from '../keyboard/fingers.js';
 import { stars, icons } from '../design/icons.js';
@@ -12,7 +12,11 @@ const TITLE = 'Клавіатурка'.toUpperCase().split('');
 const CAPTIONS = { joy: 'Радіє', cheer: 'Підбадьорює', think: 'Думає', rest: 'Відпочиває' };
 const FINGER_VARS = ['lp', 'lr', 'lm', 'li', 'ri', 'rm', 'rr', 'rp'];
 const UI_SWATCHES = [
-  ['--ui-bg', 'Фон'], ['--ui-card', 'Картки'], ['--ui-main', 'Головний'], ['--ui-text', 'Текст'], ['--ui-text-soft', 'Другорядний'], ['--ui-line', 'Рамки'],
+  ['#f2f4f6', 'Фон'], ['#ffffff', 'Картки'], ['#2b3a4a', 'Головний'], ['#1b2430', 'Текст'], ['#5b6672', 'Другорядний'], ['#c9d0d8', 'Рамки'],
+];
+
+const WARM_SWATCHES = [
+  ['--warm-bg', 'Тепле тло'], ['--warm-accent', 'Кнопка «Грай»'], ['--warm-gold', 'Зірочки'], ['--warm-done', 'Пройдено'], ['--warm-line', 'Стежка'], ['--warm-text-soft', 'Другорядний'],
 ];
 
 const frame = (hash, title, html) =>
@@ -21,7 +25,7 @@ const frame = (hash, title, html) =>
 export function demoPage(state) {
   const { layout, level } = state;
   const next = 'KeyJ';
-  return `<main class="demo">
+  return `<main class="demo theme-warm"><div class="demo-wrap">
   <section class="hero">
     <div class="hero-klavik">${klavik('joy', 250)}</div>
     <div class="hero-main">
@@ -35,13 +39,14 @@ export function demoPage(state) {
     <h2>Клавик — помічник</h2>
     <div class="emotions">${EMOTIONS.map((e) => `<figure class="emotion">${klavik(e, 170)}<figcaption>${CAPTIONS[e]}</figcaption></figure>`).join('')}</div>
     <h3>Тваринки для карток</h3>
-    <div class="emotions">${['fox', 'hedgehog', 'cat', 'bear'].map((a) => `<figure class="emotion small">${AVATARS[a](110)}</figure>`).join('')}</div>
+    <div class="avatars">${Object.keys(AVATARS).map((a) => `<figure class="avatar-card" style="margin:0">${AVATARS[a](120)}<span>${AVATAR_NAMES[a]}</span></figure>`).join('')}</div>
   </section>
 
   <section class="block">
     <h2>Кнопки</h2>
     <div class="row">
       ${btn({ label: 'Грай', icon: 'play', kind: 'primary' })}
+      <span class="theme-neutral btn-note">${btn({ label: 'Грай', icon: 'play', kind: 'primary' })}</span>
       ${btn({ label: 'Додому', icon: 'home', kind: 'light' })}
       ${btn({ label: 'Пауза', icon: 'pause', kind: 'light' })}
       <button class="btn round light" aria-label="Послухати">${icons.speaker(32)}</button>
@@ -53,15 +58,17 @@ export function demoPage(state) {
       </div>
       <div class="stars-demo">${stars(3)}${stars(2)}${stars(1)}</div>
     </div>
-    <p class="note">Кнопки великі (від 64 пікселів), з іконкою; при натисканні «втискаються».</p>
+    <p class="note">Кнопки великі (від 64 пікселів), з іконкою; при натисканні «втискаються». Перша «Грай» — тепла (карта, вибір дитини), друга — нейтральна (екрани з клавіатурою).</p>
   </section>
 
   <section class="block">
     <h2>Кольори</h2>
-    <h3>Пальці — лише для пальців</h3>
+    <h3>Пальці: насичений і блідий колір (використовуємо лише для пальців)</h3>
     <div class="swatches">${FINGER_VARS.map((f) => `<div class="swatch"><span class="chip f-${f}"></span><span class="chip pale f-${f}"></span><span>${FINGERS.find((x) => x.id === f).name}</span></div>`).join('')}</div>
-    <h3>Інтерфейс — окрема спокійна гама</h3>
-    <div class="swatches ui">${UI_SWATCHES.map(([v, n]) => `<div class="swatch"><span class="chip" style="background:var(${v})"></span><span>${n}</span></div>`).join('')}</div>
+    <h3>Екрани з клавіатурою (вправа, уроки, ігри) — спокійна нейтральна гама</h3>
+    <div class="swatches ui">${UI_SWATCHES.map(([v, n]) => `<div class="swatch"><span class="chip" style="background:${v}"></span><span>${n}</span></div>`).join('')}</div>
+    <h3>Екрани без клавіатури (вибір дитини, карта, досягнення) — тепла гама</h3>
+    <div class="swatches warm">${WARM_SWATCHES.map(([v, n]) => `<div class="swatch"><span class="chip" style="background:var(${v})"></span><span>${n}</span></div>`).join('')}</div>
   </section>
 
   <section class="block">
@@ -73,9 +80,9 @@ export function demoPage(state) {
       </div>
     </div>
     <h3>Наступна клавіша — обвідка і світіння</h3>
-    <div class="kb-demo">${keyboard({ layout, next, hint: 'next' })}${hands({ active: fingerOf(next), hint: 'next' })}</div>
+    <div class="kb-demo theme-neutral">${keyboard({ layout, next, hint: 'next' })}${hands({ active: fingerOf(next), hint: 'next' })}</div>
     <h3>Підказка після помилки — подвійна обвідка і підстрибування</h3>
-    <div class="kb-demo">${keyboard({ layout, next, hint: 'error' })}${hands({ active: fingerOf(next), hint: 'error' })}</div>
+    <div class="kb-demo theme-neutral">${keyboard({ layout, next, hint: 'error' })}${hands({ active: fingerOf(next), hint: 'error' })}</div>
   </section>
 
   <section class="block">
@@ -87,5 +94,5 @@ export function demoPage(state) {
       ${frame('exercise-error', 'Вправа: підказка після помилки', exerciseScreen({ hint: 'error', layout }))}
     </div>
   </section>
-</main>`;
+</div></main>`;
 }

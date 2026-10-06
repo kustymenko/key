@@ -2,7 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { ROWS, lettersOf } from '../src/keyboard/layouts.js';
 import { FINGERS, fingerOf } from '../src/keyboard/fingers.js';
-import { deltaE, tint, contrast } from '../src/design/color-utils.js';
+import { AVATAR_COLORS } from '../src/character/avatars.js';
+import { deltaE, contrast, labOf } from '../src/design/color-utils.js';
 
 const css = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
 const vars = Object.fromEntries([...css.matchAll(/--([\w-]+):\s*(#[0-9a-fA-F]{6})/g)].map((m) => [m[1], m[2]]));
@@ -48,10 +49,35 @@ describe('кольори', () => {
     }
   });
 
-  it('сусідні бліді відтінки теж розрізняються', () => {
-    for (let i = 0; i < 7; i++) {
-      for (const k of kinds) expect(deltaE(tint(finger[i], 0.6), tint(finger[i + 1], 0.6), k), `${order[i]}-${order[i + 1]} ${k}`).toBeGreaterThan(12);
+  const pale = order.map((f) => vars[`finger-${f}-pale`]);
+
+  it('усі бліді відтінки клавіш існують і не збігаються з насиченими', () => {
+    for (const p of pale) expect(p).toMatch(/^#[0-9a-f]{6}$/i);
+    order.forEach((f, i) => expect(pale[i]).not.toBe(finger[i]));
+  });
+
+  it('БУДЬ-ЯКІ два бліді відтінки розрізняються (звичайний зір і дальтонізм)', () => {
+    for (let i = 0; i < 8; i++) {
+      for (let j = i + 1; j < 8; j++) {
+        for (const k of kinds) {
+          expect(deltaE(pale[i], pale[j], k), `${order[i]}-${order[j]} ${k}`).toBeGreaterThan(12);
+        }
+      }
     }
+  });
+
+  it('сусідні бліді відтінки розрізняються ще краще', () => {
+    for (let i = 0; i < 7; i++) {
+      for (const k of kinds) expect(deltaE(pale[i], pale[i + 1], k), `${order[i]}-${order[i + 1]} ${k}`).toBeGreaterThan(20);
+    }
+  });
+
+  it('бліді відтінки лишаються того ж тону, що й насичені (±25° за відтінком)', () => {
+    const hue = (hex) => { const [, a, b] = labOf(hex); return (Math.atan2(b, a) * 180) / Math.PI; };
+    pale.forEach((p, i) => {
+      const d = Math.abs(((hue(p) - hue(finger[i]) + 540) % 360) - 180);
+      expect(d, order[i]).toBeLessThanOrEqual(25);
+    });
   });
 
   it('кольори інтерфейсу не схожі на кольори пальців', () => {
@@ -68,6 +94,34 @@ describe('кольори', () => {
   });
 
   it('символи на блідих клавішах читаються (контраст ≥ 4.5)', () => {
-    for (const f of finger) expect(contrast(vars['ui-key-text'], tint(f, 0.6))).toBeGreaterThanOrEqual(4.5);
+    for (const f of pale) expect(contrast(vars['ui-key-text'], f)).toBeGreaterThanOrEqual(4.5);
+  });
+
+  describe('тепла гама (екрани без клавіатури)', () => {
+    const warm = Object.entries(vars).filter(([k]) => k.startsWith('warm-') && !['warm-bg', 'warm-line'].includes(k));
+
+    it('тепла гама не повторює кольори пальців (ΔE ≥ 14)', () => {
+      for (const [name, hex] of warm) {
+        for (const f of finger) expect(deltaE(hex, f), `${name} vs ${f}`).toBeGreaterThanOrEqual(14);
+      }
+    });
+
+    it('кольори тварин не повторюють кольори пальців (ΔE ≥ 14)', () => {
+      for (const [name, hex] of Object.entries(AVATAR_COLORS)) {
+        for (const f of finger) expect(deltaE(hex, f), `${name} ${hex} vs ${f}`).toBeGreaterThanOrEqual(14);
+      }
+    });
+
+    it('аватарів не менше 8 і всі різні за кольором', () => {
+      const colors = Object.values(AVATAR_COLORS);
+      expect(colors.length).toBeGreaterThanOrEqual(8);
+      expect(new Set(colors).size).toBe(colors.length);
+    });
+
+    it('контраст тепла: кнопка і «пройдено» з білим, текст на тлі ≥ 4.5', () => {
+      expect(contrast(vars['warm-accent'], '#ffffff')).toBeGreaterThanOrEqual(4.5);
+      expect(contrast(vars['warm-done'], '#ffffff')).toBeGreaterThanOrEqual(4.5);
+      expect(contrast(vars['warm-text-soft'], vars['warm-bg'])).toBeGreaterThanOrEqual(4.5);
+    });
   });
 });
