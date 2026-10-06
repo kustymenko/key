@@ -32,7 +32,13 @@ export function demoPage(state) {
     <div class="hero-main">
       <h1 class="title" aria-label="Клавіатурка">${TITLE.map((c) => `<span class="title-key">${c}</span>`).join('')}</h1>
       <p class="lead">Друкуємо разом з Клавиком!</p>
-      <div class="row">${btn({ label: 'Грай', icon: 'play', kind: 'primary', size: 'big' })}</div>
+      <div class="row">
+        <a class="btn primary big" href="#lesson" style="text-decoration:none">${icons.play(32)}<span>Урок 1</span></a>
+        <div class="segmented" role="group" aria-label="Курс">
+          <button class="btn seg" data-layout="ua" aria-pressed="${layout === 'ua'}">Українська</button>
+          <button class="btn seg" data-layout="en" aria-pressed="${layout === 'en'}">English</button>
+        </div>
+      </div>
     </div>
   </section>
 
