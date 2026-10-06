@@ -19,7 +19,7 @@ for (const layout of ['ua', 'en']) for (const level of ['1-2', '3-4']) for (cons
 const problems = [];
 
 async function play(page, { layout, level, id }) {
-  await page.goto(base);
+  await page.goto(`${base}#demo`);
   await page.click(`[data-layout="${layout}"]`);
   await page.click(`[data-level="${level}"]`);
   await page.click('[data-openall="1"]');

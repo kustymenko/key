@@ -3,7 +3,7 @@
 // minLevel '3-4' — урок прихований для 1–2 класу (Shift і розділові знаки).
 
 const L = (id, letters, label, extra = {}) => ({ id, letters, label, kind: 'letters', what: letters.map((c) => c.toUpperCase()).join(' і '), ...extra });
-const REVIEW = (id, label) => ({ id, letters: [], label, kind: 'review', what: null });
+const REVIEW = (id, label, title) => ({ id, letters: [], label, kind: 'review', what: null, title });
 const KEYS = { what: 'нові клавіші' }; // уроки, де серед нових клавіш є розділовий знак
 
 export const COURSE = {
@@ -12,7 +12,7 @@ export const COURSE = {
     L(2, ['в', 'л'], 'В Л'),
     L(3, ['і', 'д'], 'І Д'),
     L(4, ['ф', 'ж'], 'Ф Ж'),
-    REVIEW(5, 'ФІВА'),
+    REVIEW(5, 'ФІВА', 'повторення'),
     L(6, ['п', 'р'], 'П Р'),
     L(7, ['є'], 'Є'),
     L(8, ['к', 'е'], 'К Е'),
@@ -26,16 +26,16 @@ export const COURSE = {
     L(16, ['й', 'з'], 'Й З'),
     L(17, ['х', 'ї'], 'Х Ї'),
     L(18, ['я', '.'], 'Я .', KEYS),
-    REVIEW(19, 'Усі'),
-    { id: 20, letters: [], intro: ['К', 'Н'], label: 'Аа', kind: 'shift', what: 'великі літери', minLevel: '3-4' },
-    { id: 21, letters: [','], label: ', .', kind: 'punct', what: 'кому і крапку', minLevel: '3-4' },
+    REVIEW(19, 'Усі', 'усі літери'),
+    { id: 20, letters: [], intro: ['К', 'Н'], label: 'Аа', kind: 'shift', what: 'великі літери', title: 'великі літери', minLevel: '3-4' },
+    { id: 21, letters: [','], label: ', .', kind: 'punct', what: 'кому і крапку', title: 'кома і крапка', minLevel: '3-4' },
   ],
   en: [
     L(1, ['f', 'j'], 'F J'),
     L(2, ['d', 'k'], 'D K'),
     L(3, ['s', 'l'], 'S L'),
     L(4, ['a', ';'], 'A ;', KEYS),
-    REVIEW(5, 'ASDF'),
+    REVIEW(5, 'ASDF', 'повторення'),
     L(6, ['g', 'h'], 'G H'),
     L(7, ['e', 'i'], 'E I'),
     L(8, ['r', 'u'], 'R U'),
@@ -47,8 +47,8 @@ export const COURSE = {
     L(14, ['c', ','], 'C ,', KEYS),
     L(15, ['x', '.'], 'X .', KEYS),
     L(16, ['z', '/'], 'Z /', KEYS),
-    { id: 17, letters: [], intro: ['F', 'J'], label: 'Aa', kind: 'shift', what: 'великі літери', minLevel: '3-4' },
-    { id: 18, letters: [], label: 'Abc.', kind: 'sentences', what: 'речення', minLevel: '3-4' },
+    { id: 17, letters: [], intro: ['F', 'J'], label: 'Aa', kind: 'shift', what: 'великі літери', title: 'великі літери', minLevel: '3-4' },
+    { id: 18, letters: [], label: 'Abc.', kind: 'sentences', what: 'речення', title: 'речення', minLevel: '3-4' },
   ],
 };
 
@@ -79,4 +79,16 @@ export function nextLesson(layout, level, id) {
   const list = lessonsFor(layout, level);
   const i = list.findIndex((l) => l.id === id);
   return i >= 0 ? list[i + 1] ?? null : null;
+}
+
+// Повна назва уроку для Клавика: «Урок 7: літера Є», «Урок 2: літери В і Л», «Урок 5: повторення»
+export function lessonTitle(layout, lesson) {
+  const head = `Урок ${lesson.id}: `;
+  if (lesson.title) return head + lesson.title;
+  const letters = lesson.letters.filter((c) => !isPunct(c)).map((c) => c.toUpperCase());
+  const marks = lesson.letters.filter(isPunct).map(keyNameNom);
+  const parts = [];
+  if (letters.length) parts.push(`${letters.length > 1 ? 'літери' : 'літера'} ${letters.join(' і ')}`);
+  if (marks.length) parts.push(marks.join(' і '));
+  return head + parts.join(' і ');
 }

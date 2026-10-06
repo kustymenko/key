@@ -1,7 +1,10 @@
 import { klavik } from '../character/klavik.js';
 import { icons, stars } from '../design/icons.js';
-import { btn, homeButton, totalStars } from './common.js';
-import { lessonsFor } from '../lessons/course.js';
+import { btn, homeButton, totalStars, speakButton } from './common.js';
+import { lessonsFor, lessonTitle } from '../lessons/course.js';
+import { spokenTitle } from '../audio/lessonSpeech.js';
+import { speak } from '../audio/speech.js';
+import { totalStars as starsOf } from '../storage/badges.js';
 
 const COLS = 7; // вузлів у ряду; ряди йдуть зміїкою
 const X0 = 130;
@@ -46,16 +49,23 @@ export function mapScreen(state = { layout: 'ua', level: '1-2', progress: { ua: 
       ? `<span class="node-lock">${icons.lock(44)}</span>`
       : `<span class="node-label ${n.label.length > 3 ? 'is-small' : ''}">${n.label}</span>`;
     const under = n.state === 'locked' ? '' : stars(n.stars, 3, 30);
-    const label = n.state === 'locked' ? `Урок ${n.id}: закритий` : `Урок ${n.id}: ${n.label}`;
+    const label = n.state === 'locked' ? `Урок ${n.id}: закритий` : lessonTitle(state.layout, n);
     return `<button class="node is-${n.state}" style="left:${n.x}px;top:${n.y}px" data-lesson-id="${n.id}" aria-label="${label}" ${n.state === 'locked' ? 'disabled' : ''}>
       <span class="node-disc">${inner}</span><span class="node-stars">${under}</span></button>`;
   }).join('');
   const cur = nodes.find((n) => n.state === 'current') ?? nodes[nodes.length - 1];
-  const total = nodes.reduce((sum, n) => sum + n.stars, 0);
+  const total = starsOf({ progress: state.progress ?? {} });
+  const title = lessonTitle(state.layout, cur);
+  const course = ['ua', 'en'].map((l) => `<button class="btn seg" data-course="${l}" aria-pressed="${state.layout === l}">${l === 'ua' ? 'УКР' : 'ENG'}</button>`).join('');
+  // З профілем зірочки — це кнопка «Мої досягнення»; у демо — просто лічильник
+  const starsBtn = state.profileId
+    ? `<button class="btn light stars-btn" data-go="achievements" aria-label="Мої досягнення: зірочок ${total}">${stars(1, 1, 36)}<b>${total}</b></button>`
+    : totalStars(total);
   return `<div class="screen screen-map theme-warm">
     <div class="topbar">${homeButton()}<div class="topbar-spacer"></div>
-      ${btn({ label: 'Грай', icon: 'play', kind: 'primary', attrs: `data-lesson-id="${cur.id}"` })}${totalStars(total)}</div>
-    <div class="map-head" aria-hidden="true">${klavik('cheer', 104)}<div class="bubble map-title"><span class="bubble-text">Урок ${cur.id}</span></div></div>
+      <div class="segmented map-course" role="group" aria-label="Курс">${course}</div>
+      ${btn({ label: 'Грай', icon: 'play', kind: 'primary', attrs: `data-lesson-id="${cur.id}"` })}${starsBtn}</div>
+    <div class="map-head"><div class="map-klavik" aria-hidden="true">${klavik('cheer', 104)}</div><div class="bubble map-title ${title.length > 22 ? 'is-long' : ''}" data-say="${spokenTitle(state.layout, cur)}"><span class="bubble-text">${title}</span>${speakButton('data-say-btn')}</div></div>
     <svg class="map-path" viewBox="0 0 1366 768" aria-hidden="true"><path d="${pathFor(nodes)}"/></svg>
     ${html}
   </div>`;
@@ -63,12 +73,17 @@ export function mapScreen(state = { layout: 'ua', level: '1-2', progress: { ua: 
 
 // Натискання на урок або «Грай» відкриває урок
 export function mountMap(root, state) {
+  const say = root.querySelector('[data-say]');
+  const timer = setTimeout(() => say && speak(say.dataset.say), 500); // Клавик називає урок
   const onClick = (e) => {
+    if (e.target.closest('[data-say-btn]')) return speak(say.dataset.say);
+    const c = e.target.closest('[data-course]');
+    if (c) return state.setLayout(c.dataset.course);
     const b = e.target.closest('[data-lesson-id]');
     if (!b || b.disabled) return;
     state.lessonId = Number(b.dataset.lessonId);
-    location.hash = 'lesson';
+    state.go('lesson');
   };
   root.addEventListener('click', onClick);
-  return () => root.removeEventListener('click', onClick);
+  return () => { clearTimeout(timer); root.removeEventListener('click', onClick); };
 }

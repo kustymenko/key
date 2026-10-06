@@ -20,6 +20,8 @@ const WARM_SWATCHES = [
   ['--warm-bg', 'Тепле тло'], ['--warm-accent', 'Кнопка «Грай»'], ['--warm-gold', 'Зірочки'], ['--warm-done', 'Пройдено'], ['--warm-line', 'Стежка'], ['--warm-text-soft', 'Другорядний'],
 ];
 
+const SAMPLE_KIDS = [{ id: 'a', name: 'Соня', avatar: 'fox' }, { id: 'b', name: 'Максим', avatar: 'frog' }, { id: 'c', name: 'Ліза', avatar: 'rabbit' }];
+
 const frame = (hash, title, html) =>
   `<a class="frame" href="#${hash}" aria-label="${title}"><div class="frame-clip"><div class="frame-scale">${html}</div></div><span class="frame-title">${title}</span></a>`;
 
@@ -107,7 +109,7 @@ export function demoPage(state) {
   <section class="block">
     <h2>Ескізи екранів <small>(натисни, щоб відкрити на весь екран)</small></h2>
     <div class="frames">
-      ${frame('profiles', 'Хто ти?', profilesScreen())}
+      ${frame('profiles', 'Хто ти?', profilesScreen({ profiles: SAMPLE_KIDS }))}
       ${frame('map', 'Карта пригод', mapScreen(state))}
       ${frame('keyboard', 'Спробуй клавіатуру', keyboardScreen({ layout }))}
       ${frame('exercise', 'Вправа', exerciseScreen({ layout }))}

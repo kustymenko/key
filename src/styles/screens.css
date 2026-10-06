@@ -29,7 +29,7 @@
 
 /* ---------- Екрани (сцена 1366×768) ---------- */
 .screen { position: relative; width: 1366px; height: 768px; background: var(--ui-bg); overflow: hidden; }
-.topbar { position: absolute; left: 0; right: 0; top: 0; padding: 20px 36px; display: flex; align-items: center; gap: 24px; }
+.topbar { z-index: 3; position: absolute; left: 0; right: 0; top: 0; padding: 20px 36px; display: flex; align-items: center; gap: 24px; }
 .topbar-spacer { flex: 1; }
 .progress-dots { flex: 1; display: flex; justify-content: center; gap: 18px; }
 .dot { width: 22px; height: 22px; border-radius: 50%; border: 3px solid var(--ui-main); background: transparent; }
@@ -39,20 +39,22 @@
 .screen-profiles { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 36px; }
 .profiles-head { display: flex; align-items: center; gap: 36px; }
 .profiles-head .bubble { font-size: 64px; padding: 18px 22px 18px 44px; border-radius: 44px; }
-.profile-cards { display: flex; gap: 32px; }
+.profile-cards { display: flex; flex-wrap: wrap; justify-content: center; gap: 32px; }
+.profile-cards.is-m { gap: 24px; max-width: 1180px; }
+.profile-cards.is-s { gap: 18px; max-width: 1240px; }
 .profile-card { width: 250px; height: 270px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: var(--ui-card); border: 4px solid var(--ui-main); border-radius: 32px; box-shadow: 0 10px 0 var(--ui-main); }
 .profile-card.is-new { border-style: dashed; box-shadow: none; color: var(--ui-main); }
 .profile-name { font-size: 36px; font-weight: 800; }
 
 /* Карта пригод */
-.map-path { position: absolute; inset: 0; width: 100%; height: 100%; }
+.map-path { pointer-events: none; position: absolute; inset: 0; width: 100%; height: 100%; }
 .map-path path { fill: none; stroke: var(--ui-line); stroke-width: 22; stroke-linecap: round; stroke-dasharray: 2 38; }
 .node { position: absolute; width: 128px; height: 128px; margin: -64px 0 0 -64px; padding: 0; border: 0; background: none; font: inherit; color: inherit; cursor: pointer; }
 .node:disabled { cursor: default; }
 .node-label.is-small { font-size: 28px; }
 .node-disc { position: absolute; left: 0; top: 0; width: 128px; height: 128px; border-radius: 50%; display: grid; place-items: center; background: var(--ui-card); border: 5px solid var(--ui-main); font-weight: 800; font-size: 38px; }
 .node.is-done .node-disc { background: var(--node-done, var(--ui-main)); border-color: var(--ui-main); color: #fff; }
-.node.is-current .node-disc { border-color: var(--accent, var(--ui-main)); width: 160px; height: 160px; left: -16px; top: -16px; font-size: 48px; outline: 6px solid var(--accent, var(--ui-main)); outline-offset: 8px; box-shadow: 0 0 0 22px rgb(255 194 26 / .28); }
+.node.is-current .node-disc { border-color: var(--accent, var(--ui-main)); width: 160px; height: 160px; left: -16px; top: -16px; font-size: 48px; border-width: 8px; box-shadow: 0 0 0 16px rgb(255 194 26 / .32); }
 .node.is-locked .node-disc { border: 4px dashed var(--ui-text-soft); background: var(--ui-bg); color: var(--ui-text-soft); }
 .node-stars { position: absolute; left: 4px; width: 120px; top: 138px; display: flex; justify-content: center; }
 .node.is-current .node-stars { top: 160px; }
@@ -120,13 +122,14 @@
 .task-line.is-long .tk { gap: 0; }
 .task-line.is-long .task-ch { min-width: 0; height: 62px; font-size: 46px; padding: 0 3px 3px; border-bottom: 5px solid transparent; border-radius: 10px; }
 .task-line.is-long .task-ch.is-current { border: 4px solid var(--ui-main); border-bottom-width: 6px; padding: 0 3px; }
+.task-line.is-long.is-tight .task-ch { height: 52px; font-size: 38px; }
 .task-line.is-long .task-ch.is-space { min-width: 16px; font-size: 34px; color: transparent; }
 .task-line.is-long .task-ch.is-space.is-current { color: var(--ui-text-soft); min-width: 28px; }
 
 /* Кінець уроку (тепла гама, без клавіатури) */
 .screen-done { display: flex; align-items: center; justify-content: center; }
 .done-main { display: flex; align-items: center; gap: 56px; }
-.done-col { display: flex; flex-direction: column; align-items: flex-start; gap: 20px; max-width: 780px; }
+.done-col { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; max-width: 780px; }
 .done-bubble { font-size: 46px; padding: 14px 32px; }
 .done-bubble::before { display: none; }
 .done-buttons { display: flex; gap: 20px; flex-wrap: wrap; }
@@ -144,5 +147,76 @@
 @media (prefers-reduced-motion: reduce) { .done-stars .star { animation: none; } }
 
 /* Карта: заголовок з Клавиком */
-.map-head { position: absolute; left: 340px; top: 6px; display: flex; align-items: center; gap: 22px; }
-.map-title { font-size: 36px; padding: 8px 24px; }
+.map-head { z-index: 4; position: absolute; left: 258px; max-width: 520px; top: 6px; display: flex; align-items: center; gap: 22px; }
+.map-title { font-size: 32px; padding: 6px 14px 6px 22px; line-height: 1.1; }
+
+/* Хто ти?: розмір карток залежить від кількості дітей */
+.screen-profiles { position: relative; }
+.screen-profiles.is-m, .screen-profiles.is-s { gap: 20px; }
+.screen-profiles.is-m .profiles-head .bubble, .screen-profiles.is-s .profiles-head .bubble { font-size: 52px; }
+.profile-card.is-m { width: 200px; height: 200px; border-radius: 28px; gap: 6px; }
+.profile-card.is-m .profile-name { font-size: 30px; }
+.profile-card.is-s { width: 168px; height: 150px; border-radius: 24px; gap: 2px; box-shadow: 0 7px 0 var(--ui-main); }
+.profile-card.is-s .profile-name { font-size: 26px; }
+.profile-name { max-width: 92%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.save-warn { position: absolute; left: 0; right: 0; bottom: 18px; display: flex; justify-content: center; align-items: center; gap: 10px; font-size: 22px; font-weight: 800; color: var(--ui-text-soft); }
+
+/* Новий друг: ім'я → тваринка → клас */
+.new-main, .adult-main { position: absolute; inset: 90px 0 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 34px; }
+.new-head { display: flex; align-items: center; gap: 30px; }
+.new-head .bubble { font-size: 56px; padding: 14px 24px 14px 40px; }
+.name-input { width: 640px; height: 110px; padding: 0 28px; font: inherit; font-size: 64px; font-weight: 800; text-align: center; color: var(--ui-text); background: var(--ui-card); border: 4px solid var(--ui-main); border-radius: 28px; box-shadow: 0 8px 0 var(--ui-main); }
+.name-input:focus { outline: 6px solid var(--warm-gold); outline-offset: 4px; }
+.btn:disabled { opacity: .45; box-shadow: none; transform: translateY(4px); cursor: default; }
+.avatar-picks { display: flex; align-items: center; gap: 26px; }
+.avatar-pick { width: 196px; height: 220px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font: inherit; font-size: 28px; font-weight: 800; color: var(--ui-text); background: var(--ui-card); border: 4px solid var(--ui-line); border-radius: 28px; }
+.avatar-pick[aria-pressed='true'] { border-color: var(--ui-main); box-shadow: 0 0 0 8px var(--warm-gold); }
+.level-picks { display: flex; gap: 40px; }
+.level-pick { width: 300px; height: 230px; display: flex; flex-direction: column; align-items: center; justify-content: center; font: inherit; color: var(--ui-text); background: var(--ui-card); border: 4px solid var(--ui-main); border-radius: 36px; box-shadow: 0 10px 0 var(--ui-main); }
+.level-pick b { font-size: 110px; line-height: 1; }
+.level-pick span { font-size: 38px; font-weight: 800; color: var(--ui-text-soft); }
+.level-pick:active { transform: translateY(8px); box-shadow: 0 2px 0 var(--ui-main); }
+
+/* Мої досягнення */
+.ach-me { position: absolute; left: 50px; top: 100px; width: 400px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.ach-name { font-size: 52px; font-weight: 800; max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chip-stats { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+.chip-stat { display: flex; align-items: center; gap: 12px; padding: 6px 20px; min-height: 64px; background: var(--ui-card); border: 3px solid var(--ui-line); border-radius: 999px; font-size: 26px; font-weight: 800; }
+.chip-stat b { font-size: 36px; }
+.chip-stat span { color: var(--ui-text-soft); }
+.chip-letter { display: inline-grid; place-items: center; width: 38px; height: 38px; border: 3px solid var(--ui-main); border-radius: 10px; font-size: 24px !important; }
+.ach-stats { margin-top: 4px; }
+.ach-stats .stat { min-width: 150px; padding: 4px 14px 6px; }
+.ach-stats .stat b { font-size: 36px; }
+.ach-badges { position: absolute; left: 500px; top: 110px; right: 40px; }
+.ach-title { margin: 0 0 14px; font-size: 40px; }
+.ach-title small { font-size: 26px; color: var(--ui-text-soft); font-weight: 800; margin-left: 10px; }
+.badge-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 12px; }
+.badge-cell { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px; min-height: 190px; }
+.badge-cell b { font-size: 26px; line-height: 1.15; }
+.badge-cell span { font-size: 22px; line-height: 1.15; color: var(--ui-text-soft); max-width: 190px; }
+.badge-cell.is-locked b { font-size: 24px; color: var(--ui-text-soft); line-height: 1.15; max-width: 190px; }
+.ach-klavik { position: absolute; left: 62px; bottom: 28px; display: none; }
+
+/* Для дорослого */
+.adult-head { display: flex; align-items: center; gap: 18px; }
+.adult-head h2 { margin: 0; font-size: 52px; }
+.adult-sum { margin: 0; font-size: 96px; font-weight: 800; }
+.sum-input { width: 280px; height: 100px; font-size: 64px; }
+.adult-note { margin: 0; min-height: 34px; font-size: 26px; font-weight: 800; color: var(--ui-text-soft); }
+.adult-who { display: flex; align-items: center; gap: 24px; }
+.adult-block { display: flex; align-items: center; gap: 24px; }
+.adult-label { font-size: 32px; font-weight: 800; }
+.confirm-layer { background: var(--warm-bg); }
+.confirm-text { margin: 0; max-width: 900px; text-align: center; font-size: 44px; font-weight: 800; line-height: 1.2; }
+
+/* Карта: заголовок уроку; кінець уроку: значки */
+.map-klavik { flex: none; }
+.map-title.is-long { font-size: 26px; max-width: 330px; }
+.map-title .btn.round { flex: none; width: 52px; min-width: 52px; height: 52px; min-height: 52px; }
+.map-course .btn.seg { padding: 0 16px; min-width: 0; font-size: 24px; }
+.stars-btn { padding: 0 22px 0 14px; font-size: 32px; gap: 8px; }
+.done-badges { display: flex; align-items: center; gap: 14px; padding: 4px 20px 4px 14px; background: var(--ui-card); border: 3px solid var(--ui-line); border-radius: 28px; }
+.done-badges-title { font-size: 26px; font-weight: 800; }
+.new-badge { display: flex; align-items: center; gap: 10px; font-size: 24px; font-weight: 800; }
+.badge-pop svg { animation: pop .5s cubic-bezier(.3, 1.6, .5, 1) both; }
