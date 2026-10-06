@@ -1,0 +1,73 @@
+/* ---------- Демо-сторінка ---------- */
+.demo { max-width: 1240px; margin: 0 auto; padding: 32px 32px 80px; display: flex; flex-direction: column; gap: 40px; }
+.hero { display: flex; align-items: center; gap: 40px; padding: 32px 40px; background: var(--ui-card); border-radius: 32px; border: 3px solid var(--ui-line); }
+.hero-main { display: flex; flex-direction: column; gap: 22px; }
+.lead { font-size: 32px; font-weight: 800; color: var(--ui-text-soft); }
+.block { display: flex; flex-direction: column; gap: 20px; }
+.block h2 small { font-size: 20px; color: var(--ui-text-soft); font-weight: 600; }
+.row { display: flex; flex-wrap: wrap; gap: 24px; align-items: center; }
+.note { color: var(--ui-text-soft); }
+.emotions { display: flex; flex-wrap: wrap; gap: 24px; }
+.emotion { margin: 0; padding: 16px 20px; background: var(--ui-card); border: 3px solid var(--ui-line); border-radius: 24px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.emotion.small { padding: 12px; }
+.emotion figcaption { font-weight: 800; font-size: 24px; }
+.stars-demo { display: flex; gap: 24px; }
+.swatches { display: flex; flex-wrap: wrap; gap: 16px; }
+.swatch { display: flex; align-items: center; gap: 10px; background: var(--ui-card); border: 3px solid var(--ui-line); border-radius: 16px; padding: 8px 14px 8px 8px; }
+.chip { width: 40px; height: 40px; border-radius: 10px; background: var(--c); border: 2px solid var(--ui-main); }
+.chip.pale { background: color-mix(in srgb, var(--c) 40%, white); }
+.swatches.ui .chip { border-color: var(--ui-line); }
+.kb-demo { display: flex; align-items: center; gap: 28px; padding: 24px 28px; background: var(--ui-card); border: 3px solid var(--ui-line); border-radius: 28px; }
+.kb-demo .kb { flex: 1; }
+.kb-demo .hands { flex: none; }
+.kb-demo .hand { width: 150px; }
+
+.frames { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; }
+.frame { display: flex; flex-direction: column; gap: 10px; text-decoration: none; color: inherit; font-weight: 800; font-size: 24px; }
+.frame-clip { position: relative; width: 100%; aspect-ratio: 1366 / 768; overflow: hidden; border: 3px solid var(--ui-main); border-radius: 20px; background: var(--ui-bg); box-shadow: 0 6px 0 var(--ui-main) }
+.frame-scale { position: absolute; left: 0; top: 0; width: 1366px; height: 768px; transform-origin: top left; pointer-events: none; }
+
+/* ---------- Екрани (сцена 1366×768) ---------- */
+.screen { position: relative; width: 1366px; height: 768px; background: var(--ui-bg); overflow: hidden; }
+.topbar { position: absolute; left: 0; right: 0; top: 0; padding: 20px 36px; display: flex; align-items: center; gap: 24px; }
+.topbar-spacer { flex: 1; }
+.progress-dots { flex: 1; display: flex; justify-content: center; gap: 18px; }
+.dot { width: 22px; height: 22px; border-radius: 50%; border: 3px solid var(--ui-main); background: transparent; }
+.dot.is-on { background: var(--ui-main); }
+
+/* Хто ти? */
+.screen-profiles { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 36px; }
+.profiles-head { display: flex; align-items: center; gap: 36px; }
+.profiles-head .bubble { font-size: 64px; padding: 18px 22px 18px 44px; border-radius: 44px; }
+.profile-cards { display: flex; gap: 32px; }
+.profile-card { width: 250px; height: 270px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: var(--ui-card); border: 4px solid var(--ui-main); border-radius: 32px; box-shadow: 0 10px 0 var(--ui-main); }
+.profile-card.is-new { border-style: dashed; box-shadow: none; color: var(--ui-main); }
+.profile-name { font-size: 36px; font-weight: 800; }
+
+/* Карта пригод */
+.map-path { position: absolute; inset: 0; width: 100%; height: 100%; }
+.map-path path { fill: none; stroke: var(--ui-line); stroke-width: 22; stroke-linecap: round; stroke-dasharray: 2 38; }
+.node { position: absolute; width: 0; height: 0; }
+.node-disc { position: absolute; left: -64px; top: -64px; width: 128px; height: 128px; border-radius: 50%; display: grid; place-items: center; background: var(--ui-card); border: 5px solid var(--ui-main); font-weight: 800; font-size: 38px; }
+.node.is-done .node-disc { background: var(--ui-main); color: #fff; }
+.node.is-current .node-disc { width: 160px; height: 160px; left: -80px; top: -80px; font-size: 48px; outline: 6px solid var(--ui-main); outline-offset: 8px; box-shadow: 0 0 0 22px rgb(43 58 74 / .12); }
+.node.is-locked .node-disc { border: 4px dashed var(--ui-text-soft); background: var(--ui-bg); color: var(--ui-text-soft); }
+.node-stars { position: absolute; left: -60px; width: 120px; top: 74px; display: flex; justify-content: center; }
+.node.is-current .node-stars { top: 96px; }
+.map-klavik { position: absolute; }
+.map-play { position: absolute; right: 56px; bottom: 36px; }
+.map-play .btn { min-width: 260px; }
+
+/* Вправа */
+.screen-exercise { display: flex; flex-direction: column; }
+.task-card { position: absolute; left: 36px; right: 36px; top: 112px; height: 250px; display: flex; align-items: center; gap: 28px; padding: 0 48px 0 32px; background: var(--ui-card); border: 4px solid var(--ui-main); border-radius: 36px; box-shadow: 0 10px 0 var(--ui-main); }
+.task-main { flex: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 18px; }
+.task-text { display: flex; gap: 22px; }
+.task-ch { min-width: 110px; height: 118px; display: grid; place-items: center; font-size: 104px; font-weight: 800; line-height: 1; padding-bottom: 14px; border-bottom: 10px solid transparent; }
+.task-ch.is-done { color: var(--ui-text-soft); }
+.task-ch.is-current { border: 6px solid var(--ui-main); border-bottom-width: 12px; border-radius: 22px; background: var(--ui-bg); padding-bottom: 8px; }
+.play-row { position: absolute; left: 36px; right: 36px; top: 410px; display: flex; align-items: center; gap: 26px; }
+.play-row .kb { flex: none; width: 900px; }
+.play-row .hands { flex: 1; }
+.play-row .hand { width: 170px; }
+.screen-exercise .key { --h: 72px; }

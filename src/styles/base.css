@@ -1,0 +1,26 @@
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  font-family: var(--font);
+  font-weight: 600;
+  font-size: var(--fs-body);
+  line-height: 1.35;
+  color: var(--ui-text);
+  background: var(--ui-bg);
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, p { margin: 0; }
+h2 { font-size: var(--fs-h2); font-weight: 800; }
+h3 { font-size: 24px; font-weight: 800; color: var(--ui-text-soft); }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 5px solid var(--ui-main); outline-offset: 4px; }
+.icon { flex: none; }
+
+/* Режим «один екран»: сцена 1366×768 масштабується під вікно */
+body.is-screen { overflow: hidden; }
+.stage { position: fixed; left: 50%; top: 50%; width: 1366px; height: 768px; transform-origin: center center; }
+.back-link {
+  position: fixed; left: 12px; bottom: 8px; z-index: 5; font-size: 20px; font-weight: 800;
+  color: var(--ui-text-soft); background: var(--ui-card); border-radius: 12px; padding: 6px 12px; text-decoration: none;
+  border: 2px solid var(--ui-line);
+}

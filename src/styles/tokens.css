@@ -1,0 +1,36 @@
+/* Токени дизайну. Дві окремі гами: --ui-* (інтерфейс) і --finger-* (лише пальці).
+   Кольори пальців зарезервовані: в інтерфейсі їх не використовуємо. */
+:root {
+  /* Інтерфейс: нейтральна, майже безбарвна гама */
+  --ui-bg: #f2f4f6;
+  --ui-card: #ffffff;
+  --ui-main: #2b3a4a;
+  --ui-main-hover: #1f2c3a;
+  --ui-text: #1b2430;
+  --ui-text-soft: #5b6672;
+  --ui-line: #c9d0d8;
+  --ui-key-text: #1b2430;
+
+  /* Пальці: насичені кольори (набір Окабе–Іто + фіолетовий) */
+  --finger-lp: #cc79a7;
+  --finger-lr: #f0e442;
+  --finger-lm: #009e73;
+  --finger-li: #6a3d9a;
+  --finger-ri: #e69f00;
+  --finger-rm: #0072b2;
+  --finger-rr: #d55e00;
+  --finger-rp: #56b4e9;
+  --finger-th: #b8c0c8;
+
+  /* Шрифт */
+  --font: 'Nunito', system-ui, sans-serif;
+
+  /* Розміри (kids-ux: завдання 56px+, решта 20px+, кнопки 64px+) */
+  --fs-body: 22px;
+  --fs-h1: 56px;
+  --fs-h2: 32px;
+  --fs-task: 64px;
+  --tap: 64px;
+  --gap: 16px;
+  --radius: 18px;
+}

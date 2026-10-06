@@ -1,0 +1,91 @@
+import { klavik, EMOTIONS } from '../character/klavik.js';
+import { AVATARS } from '../character/avatars.js';
+import { keyboard, hands } from '../keyboard/onscreen.js';
+import { FINGERS, fingerOf } from '../keyboard/fingers.js';
+import { stars, icons } from '../design/icons.js';
+import { btn } from './common.js';
+import { profilesScreen } from './profiles.js';
+import { mapScreen } from './map.js';
+import { exerciseScreen } from './exercise.js';
+
+const TITLE = 'Клавіатурка'.toUpperCase().split('');
+const CAPTIONS = { joy: 'Радіє', cheer: 'Підбадьорює', think: 'Думає', rest: 'Відпочиває' };
+const FINGER_VARS = ['lp', 'lr', 'lm', 'li', 'ri', 'rm', 'rr', 'rp'];
+const UI_SWATCHES = [
+  ['--ui-bg', 'Фон'], ['--ui-card', 'Картки'], ['--ui-main', 'Головний'], ['--ui-text', 'Текст'], ['--ui-text-soft', 'Другорядний'], ['--ui-line', 'Рамки'],
+];
+
+const frame = (hash, title, html) =>
+  `<a class="frame" href="#${hash}" aria-label="${title}"><div class="frame-clip"><div class="frame-scale">${html}</div></div><span class="frame-title">${title}</span></a>`;
+
+export function demoPage(state) {
+  const { layout, level } = state;
+  const next = 'KeyJ';
+  return `<main class="demo">
+  <section class="hero">
+    <div class="hero-klavik">${klavik('joy', 250)}</div>
+    <div class="hero-main">
+      <h1 class="title" aria-label="Клавіатурка">${TITLE.map((c) => `<span class="title-key">${c}</span>`).join('')}</h1>
+      <p class="lead">Друкуємо разом з Клавиком!</p>
+      <div class="row">${btn({ label: 'Грай', icon: 'play', kind: 'primary', size: 'big' })}</div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>Клавик — помічник</h2>
+    <div class="emotions">${EMOTIONS.map((e) => `<figure class="emotion">${klavik(e, 170)}<figcaption>${CAPTIONS[e]}</figcaption></figure>`).join('')}</div>
+    <h3>Тваринки для карток</h3>
+    <div class="emotions">${['fox', 'hedgehog', 'cat', 'bear'].map((a) => `<figure class="emotion small">${AVATARS[a](110)}</figure>`).join('')}</div>
+  </section>
+
+  <section class="block">
+    <h2>Кнопки</h2>
+    <div class="row">
+      ${btn({ label: 'Грай', icon: 'play', kind: 'primary' })}
+      ${btn({ label: 'Додому', icon: 'home', kind: 'light' })}
+      ${btn({ label: 'Пауза', icon: 'pause', kind: 'light' })}
+      <button class="btn round light" aria-label="Послухати">${icons.speaker(32)}</button>
+    </div>
+    <div class="row">
+      <div class="segmented" role="group" aria-label="Рівень">
+        <button class="btn seg" data-level="1-2" aria-pressed="${level === '1-2'}">1–2 клас</button>
+        <button class="btn seg" data-level="3-4" aria-pressed="${level === '3-4'}">3–4 клас</button>
+      </div>
+      <div class="stars-demo">${stars(3)}${stars(2)}${stars(1)}</div>
+    </div>
+    <p class="note">Кнопки великі (від 64 пікселів), з іконкою; при натисканні «втискаються».</p>
+  </section>
+
+  <section class="block">
+    <h2>Кольори</h2>
+    <h3>Пальці — лише для пальців</h3>
+    <div class="swatches">${FINGER_VARS.map((f) => `<div class="swatch"><span class="chip f-${f}"></span><span class="chip pale f-${f}"></span><span>${FINGERS.find((x) => x.id === f).name}</span></div>`).join('')}</div>
+    <h3>Інтерфейс — окрема спокійна гама</h3>
+    <div class="swatches ui">${UI_SWATCHES.map(([v, n]) => `<div class="swatch"><span class="chip" style="background:var(${v})"></span><span>${n}</span></div>`).join('')}</div>
+  </section>
+
+  <section class="block">
+    <h2>Екранна клавіатура</h2>
+    <div class="row">
+      <div class="segmented" role="group" aria-label="Розкладка">
+        <button class="btn seg" data-layout="ua" aria-pressed="${layout === 'ua'}">Українська</button>
+        <button class="btn seg" data-layout="en" aria-pressed="${layout === 'en'}">English</button>
+      </div>
+    </div>
+    <h3>Наступна клавіша — обвідка і світіння</h3>
+    <div class="kb-demo">${keyboard({ layout, next, hint: 'next' })}${hands({ active: fingerOf(next), hint: 'next' })}</div>
+    <h3>Підказка після помилки — подвійна обвідка і підстрибування</h3>
+    <div class="kb-demo">${keyboard({ layout, next, hint: 'error' })}${hands({ active: fingerOf(next), hint: 'error' })}</div>
+  </section>
+
+  <section class="block">
+    <h2>Ескізи екранів <small>(натисни, щоб відкрити на весь екран)</small></h2>
+    <div class="frames">
+      ${frame('profiles', 'Хто ти?', profilesScreen())}
+      ${frame('map', 'Карта пригод', mapScreen())}
+      ${frame('exercise', 'Вправа', exerciseScreen({ layout }))}
+      ${frame('exercise-error', 'Вправа: підказка після помилки', exerciseScreen({ hint: 'error', layout }))}
+    </div>
+  </section>
+</main>`;
+}
