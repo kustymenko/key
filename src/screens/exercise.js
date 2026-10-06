@@ -13,7 +13,7 @@ export function exerciseScreen({ hint = 'next', layout = 'ua' } = {}) {
   const letters = WORD.map((ch, i) => `<span class="task-ch ${i < idx ? 'is-done' : i === idx ? 'is-current' : ''}">${ch}</span>`).join('');
   const text = hint === 'error' ? 'Ось ця клавіша' : 'Знайди О';
   const dots = WORD.map((_, i) => `<i class="dot ${i < idx ? 'is-on' : ''}"></i>`).join('');
-  return `<div class="screen screen-exercise">
+  return `<div class="screen screen-exercise theme-neutral">
     <div class="topbar">${homeButton()}<div class="progress-dots" aria-hidden="true">${dots}</div>
       ${btn({ label: 'Пауза', icon: 'pause', kind: 'light', attrs: 'aria-label="Пауза"' })}</div>
     <div class="task-card">

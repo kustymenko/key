@@ -22,6 +22,27 @@
   --finger-rp: #56b4e9;
   --finger-th: #b8c0c8;
 
+  /* Пальці: бліді відтінки для клавіш (підібрані окремо, щоб усі 8 розрізнялися, у т. ч. при дальтонізмі) */
+  --finger-lp-pale: #ddb7c2;
+  --finger-lr-pale: #e6eeab;
+  --finger-lm-pale: #c0f3e5;
+  --finger-li-pale: #c2baf9;
+  --finger-ri-pale: #f9dec3;
+  --finger-rm-pale: #dbe9ff;
+  --finger-rr-pale: #f1b492;
+  --finger-rp-pale: #a9c4df;
+  --finger-th-pale: #e3e7eb;
+
+  /* Тепла гама: лише для екранів БЕЗ клавіатури (вибір дитини, карта, досягнення, кінець уроку).
+     Не повторює кольори пальців (перевіряє тест). */
+  --warm-bg: #fff1dc;
+  --warm-line: #f1cf9f;
+  --warm-text-soft: #6b5240;
+  --warm-accent: #d6335f;
+  --warm-accent-dark: #a6234a;
+  --warm-gold: #ffc21a;
+  --warm-done: #5a5bd1;
+
   /* Шрифт */
   --font: 'Nunito', system-ui, sans-serif;
 
@@ -33,4 +54,16 @@
   --tap: 64px;
   --gap: 16px;
   --radius: 18px;
+}
+
+/* Тема «тепла»: перевизначає нейтральні змінні на екранах без клавіатури */
+.theme-warm {
+  --ui-bg: var(--warm-bg);
+  --ui-line: var(--warm-line);
+  --ui-text-soft: var(--warm-text-soft);
+  --accent: var(--warm-accent);
+  --accent-dark: var(--warm-accent-dark);
+  --star: var(--warm-gold);
+  --node-done: var(--warm-done);
+  background: var(--warm-bg);
 }

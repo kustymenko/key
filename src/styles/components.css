@@ -10,8 +10,8 @@
   transition: transform .08s, box-shadow .08s;
 }
 .btn:active, .btn[aria-pressed='true'] { transform: translateY(calc(var(--depth) - 2px)); box-shadow: 0 2px 0 var(--ui-main); }
-.btn.primary { background: var(--ui-main); color: #fff; box-shadow: 0 var(--depth) 0 #121b25; border-color: #121b25; }
-.btn.primary:active { box-shadow: 0 2px 0 #121b25; }
+.btn.primary { background: var(--accent, var(--ui-main)); color: #fff; box-shadow: 0 var(--depth) 0 var(--accent-dark, #121b25); border-color: var(--accent-dark, #121b25); }
+.btn.primary:active { box-shadow: 0 2px 0 var(--accent-dark, #121b25); }
 .btn.big { min-height: 88px; padding: 0 48px; font-size: 38px; --depth: 8px; }
 .btn.round { padding: 0; border-radius: 50%; width: var(--tap); height: var(--tap); }
 .btn.seg { box-shadow: none; border-radius: 0; margin: 0; }
@@ -22,7 +22,7 @@
 
 /* ---------- Зірочки: форма, а не колір ---------- */
 .stars { display: inline-flex; gap: 4px; }
-.star polygon { fill: var(--ui-main); stroke: var(--ui-main); }
+.star polygon { fill: var(--star, var(--ui-main)); stroke: var(--ui-main); }
 .star.is-off polygon { fill: none; stroke: var(--ui-text-soft); stroke-dasharray: 0; }
 .pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 22px 6px 14px; min-height: var(--tap); background: var(--ui-card); border: 3px solid var(--ui-line); border-radius: 999px; font-size: 32px; font-weight: 800; }
 
@@ -37,9 +37,9 @@
 }
 
 /* ---------- Клавіші ---------- */
-.f-lp { --c: var(--finger-lp); } .f-lr { --c: var(--finger-lr); } .f-lm { --c: var(--finger-lm); } .f-li { --c: var(--finger-li); }
-.f-ri { --c: var(--finger-ri); } .f-rm { --c: var(--finger-rm); } .f-rr { --c: var(--finger-rr); } .f-rp { --c: var(--finger-rp); }
-.f-th { --c: var(--finger-th); }
+.f-lp { --c: var(--finger-lp); --cp: var(--finger-lp-pale); } .f-lr { --c: var(--finger-lr); --cp: var(--finger-lr-pale); } .f-lm { --c: var(--finger-lm); --cp: var(--finger-lm-pale); } .f-li { --c: var(--finger-li); --cp: var(--finger-li-pale); }
+.f-ri { --c: var(--finger-ri); --cp: var(--finger-ri-pale); } .f-rm { --c: var(--finger-rm); --cp: var(--finger-rm-pale); } .f-rr { --c: var(--finger-rr); --cp: var(--finger-rr-pale); } .f-rp { --c: var(--finger-rp); --cp: var(--finger-rp-pale); }
+.f-th { --c: var(--finger-th); --cp: var(--finger-th-pale); }
 
 .kb { display: flex; flex-direction: column; gap: 8px; width: 100%; }
 .kb-row { display: flex; gap: 8px; justify-content: center; }
@@ -47,13 +47,13 @@
   --h: 66px;
   position: relative; flex: 1 1 0; height: var(--h); min-width: 0;
   display: flex; align-items: center; justify-content: center;
-  background: color-mix(in srgb, var(--c) 40%, white);
-  border: 2px solid color-mix(in srgb, var(--c) 60%, white);
+  background: var(--cp);
+  border: 2px solid color-mix(in srgb, var(--cp) 70%, var(--c));
   border-radius: 12px;
-  box-shadow: 0 5px 0 color-mix(in srgb, var(--c) 55%, #8d98a5);
+  box-shadow: 0 5px 0 color-mix(in srgb, var(--cp) 60%, var(--c) 40%);
   color: var(--ui-key-text); font-weight: 800; font-size: 28px;
 }
-.key.is-service { font-size: 22px; background: color-mix(in srgb, var(--c) 28%, white); }
+.key.is-service { font-size: 22px; }
 .key.is-space { flex: 0 0 60%; }
 .key-label { pointer-events: none; }
 
@@ -89,7 +89,7 @@
 .hand-right { transform: scaleX(-1); }
 .palm { fill: #fff; stroke: var(--ui-main); stroke-width: 4; stroke-linejoin: round; }
 .finger {
-  fill: color-mix(in srgb, var(--c) 40%, white); stroke: var(--ui-main); stroke-width: 4;
+  fill: var(--cp); stroke: var(--ui-main); stroke-width: 4;
   transform-box: fill-box; transform-origin: center bottom;
 }
 .finger.is-active { fill: var(--c); stroke-width: 7; animation: breathe 1.8s ease-in-out infinite; }

@@ -1,12 +1,12 @@
 import { klavik } from '../character/klavik.js';
-import { AVATARS } from '../character/avatars.js';
+import { AVATARS, AVATAR_NAMES } from '../character/avatars.js';
 import { icons } from '../design/icons.js';
 import { bubble } from './common.js';
 
 const kids = [
   { name: 'Соня', avatar: 'fox' },
-  { name: 'Максим', avatar: 'hedgehog' },
-  { name: 'Ліза', avatar: 'cat' },
+  { name: 'Максим', avatar: 'frog' },
+  { name: 'Ліза', avatar: 'rabbit' },
 ];
 
 // Екран «Хто ти?»
@@ -14,7 +14,7 @@ export function profilesScreen() {
   const cards = kids
     .map((k) => `<button class="profile-card">${AVATARS[k.avatar](150)}<span class="profile-name">${k.name}</span></button>`)
     .join('');
-  return `<div class="screen screen-profiles">
+  return `<div class="screen screen-profiles theme-warm">
     <div class="profiles-head">
       <div class="profiles-klavik">${klavik('cheer', 210)}</div>
       ${bubble('Хто ти?')}
