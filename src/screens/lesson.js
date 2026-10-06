@@ -11,7 +11,9 @@ import { buildLesson } from '../lessons/generator.js';
 import { createExercise, currentChar, pressChar } from '../lessons/exercise.js';
 import { starsFor } from '../lessons/stars.js';
 import { accuracy, charsPerMinute, hardLetters, mergeMissed } from '../lessons/stats.js';
-import { donePhrase, HINT_PHRASES, fill, plural } from '../content/phrases.js';
+import { donePhrase, BADGE_PHRASES, pickPhrase, HINT_PHRASES, fill, plural } from '../content/phrases.js';
+import { badge } from '../design/badges.js';
+import { BADGES } from '../content/badges.js';
 
 const IGNORED = new Set(['Backspace', 'Tab', 'Enter', 'CapsLock', 'Escape']); // службові: не помилка
 const FACE = 150;
@@ -39,14 +41,20 @@ function tokens(text) {
   return out;
 }
 
-function taskHtml(text, pos, level) {
+function taskHtml(text, pos, level, tight = false) {
   const long = level === '3-4';
   const size = long ? 'long' : text.length <= 7 ? 'xl' : 'l';
   const chars = (t) => t.map(({ ch, i }) => {
     const cls = ['task-ch', i < pos ? 'is-done' : i === pos ? 'is-current' : '', ch === ' ' ? 'is-space' : ''].filter(Boolean).join(' ');
     return `<span class="${cls}">${ch === ' ' ? '␣' : ch}</span>`;
   }).join('');
-  return `<div class="task-line is-${size}">${tokens(text).map((t) => `<span class="tk">${chars(t)}</span>`).join('')}</div>`;
+  return `<div class="task-line is-${size} ${tight ? 'is-tight' : ''}">${tokens(text).map((t) => `<span class="tk">${chars(t)}</span>`).join('')}</div>`;
+}
+
+// «Новий значок!» на екрані завершення
+function badgesHtml(ids) {
+  const items = ids.map((id) => `<span class="new-badge">${badge(id, { size: 64 })}<b>${BADGES.find((b) => b.id === id).name}</b></span>`).join('');
+  return `<div class="done-badges" role="status"><span class="done-badges-title">${pickPhrase(BADGE_PHRASES)}</span>${items}</div>`;
 }
 
 // Екран уроку: знайомство з клавішами, вправи, завершення з зірочками (і статистикою для 3–4 класу)
@@ -98,7 +106,12 @@ export function mountLesson(root, state) {
         .join('<span class="keys-plus" aria-hidden="true">+</span>');
       $('[data-task]').innerHTML = `<span class="task-ch is-current">${step.ch}</span><span class="intro-eq" aria-hidden="true">=</span>${caps}`;
     } else {
-      $('[data-task]').innerHTML = taskHtml(step.text, run.ex.pos, level());
+      const box = $('[data-task]');
+      box.innerHTML = taskHtml(step.text, run.ex.pos, level(), run.tight);
+      if (run.tight === undefined && level() === '3-4') { // довгий текст у три рядки не вміщається: на цю вправу трохи дрібніше (але не менше 36 px)
+        run.tight = box.firstElementChild.offsetHeight > 150; // 2 рядки ≈ 132 px, 3 рядки ≈ 196 px
+        if (run.tight) box.innerHTML = taskHtml(step.text, run.ex.pos, level(), true);
+      }
     }
     $('[data-dots]').innerHTML = built.steps.map((_, i) => `<i class="dot ${i < run.i ? 'is-on' : ''}"></i>`).join('');
   }
@@ -113,6 +126,8 @@ export function mountLesson(root, state) {
     run.locked = false;
     run.stepStart = null;
     run.stepPaused = 0;
+    run.stepErr0 = run.errors;
+    run.tight = undefined;
     setFace('think');
     setMsg(bubble(step.kind === 'intro' ? introMsg(step.ch) : DRILL_HINT[level()], { speak: false }));
     paintTask();
@@ -123,8 +138,12 @@ export function mountLesson(root, state) {
     stopLive?.();
     stopLive = null;
     const n = starsFor({ level: level(), errors: run.errors, total: run.typed });
-    const prev = state.progress?.[state.layout]?.[meta.id] ?? 0;
-    if (state.progress) state.progress[state.layout][meta.id] = Math.max(prev, n);
+    let fresh = [];
+    if (state.profileId) fresh = state.store.finishLesson(state.profileId, { layout: state.layout, lessonId: meta.id, stars: n, errors: run.errors });
+    else if (state.progress) { // демо без профілю: зірочки лише в пам'яті вкладки
+      const prev = state.progress[state.layout][meta.id] ?? 0;
+      state.progress[state.layout][meta.id] = Math.max(prev, n);
+    }
     const count = learnedCount(state.layout, meta.id);
     const phrase = donePhrase({ level: level(), stars: n, what: meta.what, count, last: lastPhrase });
     lastPhrase = phrase;
@@ -150,6 +169,7 @@ export function mountLesson(root, state) {
           <div class="done-stars" role="img" aria-label="Зірочок: ${n} з 3">${stars(n, 3, 110)}</div>
           <div class="bubble done-bubble"><span class="bubble-text">${phrase}</span></div>
           ${statsHtml}
+          ${fresh.length ? badgesHtml(fresh) : ''}
           <div class="done-buttons">
             ${next ? btn({ label: 'Далі', icon: 'next', kind: 'primary', size: 'big', attrs: 'data-act="next"' }) : ''}
             ${btn({ label: 'Ще раз', icon: 'replay', kind: next ? 'light' : 'primary', size: 'big', attrs: 'data-act="again"' })}
@@ -197,6 +217,7 @@ export function mountLesson(root, state) {
       run.drillMs += performance.now() - run.stepStart - run.stepPaused;
       run.drillChars += step.text.length;
     }
+    saveProgress(step, next);
     setFace('joy');
     screen.querySelectorAll('.key').forEach((k) => k.classList.remove('is-next', 'is-error'));
     if (step.kind === 'intro') setMsg(bubble(foundMsg(step.ch), { speak: false }));
@@ -205,6 +226,24 @@ export function mountLesson(root, state) {
       if (run.i >= built.steps.length) finish();
       else showStep();
     }, step.kind === 'intro' ? 700 : 500);
+  }
+
+  // Прогрес зберігається після кожної вправи: статистика і місце, де зупинилась дитина
+  function saveProgress(step, ex) {
+    if (!state.profileId) return;
+    const drill = step.kind === 'drill';
+    const isLast = run.i + 1 >= built.steps.length;
+    state.store.saveStep(state.profileId, {
+      typed: step.kind === 'intro' ? 1 : step.text.length,
+      errors: run.errors - run.stepErr0,
+      ms: drill ? performance.now() - run.stepStart - run.stepPaused : 0,
+      chars: drill ? step.text.length : 0,
+      missed: ex.missed,
+      resume: isLast ? null : {
+        layout: state.layout, id: meta.id, level: level(), i: run.i + 1, steps: built.steps,
+        errors: run.errors, typed: run.typed, missed: run.missed, drillMs: run.drillMs, drillChars: run.drillChars,
+      },
+    });
   }
 
   function togglePause() {
@@ -224,7 +263,7 @@ export function mountLesson(root, state) {
     </div>`);
   }
 
-  function start() {
+  function start({ fresh = false } = {}) {
     timers.forEach(clearTimeout);
     timers.clear();
     stopLive?.();
@@ -234,11 +273,14 @@ export function mountLesson(root, state) {
     if (!lesson || (lesson.minLevel === '3-4' && level() === '1-2')) lesson = getLesson(state.layout, 1);
     state.lessonId = lesson.id;
     meta = lesson;
-    built = buildLesson({ layout: state.layout, id: lesson.id, level: level() });
+    const saved = !fresh && state.profileId ? state.store.get(state.profileId)?.resume : null;
+    const resumed = saved && saved.layout === state.layout && saved.id === lesson.id && saved.level === level() && saved.i < saved.steps.length;
+    built = resumed ? { id: lesson.id, letters: lesson.letters, steps: saved.steps } : buildLesson({ layout: state.layout, id: lesson.id, level: level() });
     stage.innerHTML = lessonScreen();
     screen = stage.querySelector('[data-lesson]');
-    run = { i: 0, ex: null, errors: 0, typed: 0, locked: false, paused: false, face: null, missed: {}, drillMs: 0, drillChars: 0, stepStart: null, stepPaused: 0, pauseAt: 0 };
-    const s0 = built.steps[0];
+    run = { i: 0, ex: null, errors: 0, typed: 0, locked: false, paused: false, face: null, missed: {}, drillMs: 0, drillChars: 0, stepStart: null, stepPaused: 0, pauseAt: 0, stepErr0: 0 };
+    if (resumed) Object.assign(run, { i: saved.i, errors: saved.errors, typed: saved.typed, missed: { ...saved.missed }, drillMs: saved.drillMs, drillChars: saved.drillChars, stepErr0: saved.errors });
+    const s0 = built.steps[run.i];
     const first = codeOfChar(s0.kind === 'intro' ? s0.ch : s0.text[0], state.layout);
     screen.innerHTML = `<div class="topbar">${homeButton()}<div class="progress-dots" data-dots aria-hidden="true"></div>
         ${btn({ label: 'Пауза', icon: 'pause', kind: 'light', attrs: 'aria-label="Пауза" data-act="pause"' })}</div>
@@ -249,6 +291,7 @@ export function mountLesson(root, state) {
       <div class="play-row">${keyboard({ layout: state.layout, next: first })}${hands({ active: fingerOf(first) })}</div>`;
     stopLive = attachLiveKeyboard(screen, { getLayout: () => state.layout, trackFinger: false, onKey });
     showStep();
+    if (resumed) setMsg(bubble('Продовжимо!', { speak: false }));
   }
 
   const onClick = (e) => {
@@ -256,11 +299,11 @@ export function mountLesson(root, state) {
     if (!b) return;
     b.blur(); // щоб пробіл і Enter не «натискали» кнопку
     if (b.dataset.act === 'pause' || b.dataset.act === 'resume') togglePause();
-    if (b.dataset.act === 'again') start();
+    if (b.dataset.act === 'again') start({ fresh: true });
     if (b.dataset.act === 'next') {
       const next = nextLesson(state.layout, level(), meta.id);
       if (next) state.lessonId = next.id;
-      start();
+      start({ fresh: true });
     }
   };
   stage.addEventListener('click', onClick);

@@ -12,10 +12,15 @@ export const icons = {
   replay: (s) => wrap('<path d="M5 12a7 7 0 1 0 2.2-5.1"/><path d="M4.5 4.5v4.5H9"/>', s),
   next: (s) => wrap('<path d="M5 12h13"/><path d="m13 6 6 6-6 6"/>', s),
   map: (s) => wrap('<path d="M4 6.5 9 5l6 1.5 5-1.5v12.5L15 19.5 9 18l-5 1.5z"/><path d="M9 5v13M15 6.5v13"/>', s),
+  back: (s) => wrap('<path d="M19 12H6"/><path d="m11 6-6 6 6 6"/>', s),
+  trophy: (s) => wrap('<path d="M7 4.5h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4.5a2.5 2.5 0 0 0 2.5 4.5M17 6h2.5a2.5 2.5 0 0 1-2.5 4.5"/><path d="M12 14.5V18M8.5 19.5h7"/>', s),
+  gear: (s) => wrap('<circle cx="12" cy="12" r="3"/><path d="M12 3.5v2.4M12 18.1v2.4M3.5 12h2.4M18.1 12h2.4M6 6l1.7 1.7M16.3 16.3 18 18M6 18l1.7-1.7M16.3 7.7 18 6"/>', s),
+  close: (s) => wrap('<path d="M6 6l12 12M18 6 6 18" stroke-width="3.4"/>', s),
+  trash: (s) => wrap('<path d="M5 7h14M9.5 7V4.5h5V7"/><path d="M6.5 7l1 13h9l1-13"/>', s),
   plus: (s) => wrap('<path d="M12 5v14M5 12h14" stroke-width="3.4"/>', s),
 };
 
-const STAR_POINTS = Array.from({ length: 10 }, (_, i) => {
+export const STAR_POINTS = Array.from({ length: 10 }, (_, i) => {
   const r = i % 2 === 0 ? 11 : 4.6;
   const a = (Math.PI / 5) * i - Math.PI / 2;
   return `${(12 + r * Math.cos(a)).toFixed(2)},${(12.6 + r * Math.sin(a)).toFixed(2)}`;

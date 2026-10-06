@@ -90,7 +90,7 @@ const fitsCard = (page) => page.evaluate(() => {
 });
 
 async function setup(page, { layout, level }) {
-  await page.goto(base);
+  await page.goto(`${base}#demo`);
   await page.click(`[data-layout="${layout}"]`);
   await page.click(`[data-level="${level}"]`);
   await page.click('[data-openall="1"]');
@@ -150,7 +150,7 @@ async function stage3(page, w) {
   await page.waitForTimeout(1200);
   await page.screenshot({ path: tag('done-ua-34') });
   const doneBox = await page.evaluate(() => { const r = document.querySelector('.done-main').getBoundingClientRect(); const s = document.querySelector('.stage').getBoundingClientRect(); return [r.left - s.left, r.right - s.left, r.top - s.top, r.bottom - s.top, s.width, s.height]; });
-  if (doneBox[0] < 0 || doneBox[2] < 90 || doneBox[1] > doneBox[4] || doneBox[3] > doneBox[5]) problems.push(`екран завершення 3–4 виходить за сцену: ${doneBox}`);
+  if (doneBox[0] < 0 || doneBox[2] < 8 || doneBox[1] > doneBox[4] || doneBox[3] > doneBox[5]) problems.push(`екран завершення 3–4 виходить за сцену: ${doneBox}`);
   // Смужок з боків немає: тло тепле на все вікно
   const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
   if (bg !== 'rgb(255, 241, 220)') problems.push(`тло навколо екрана завершення не тепле: ${bg}`);
@@ -180,7 +180,7 @@ for (const [w, h] of SIZES) {
   page.on('pageerror', (e) => problems.push(`помилка: ${e.message}`));
   page.on('request', (r) => !r.url().startsWith('file:') && !r.url().startsWith('data:') && problems.push(`мережа: ${r.url()}`));
 
-  await page.goto(pathToFileURL(file).href);
+  await page.goto(`${pathToFileURL(file).href}#demo`);
   await page.screenshot({ path: `screenshots/demo-top-${w}.png` });
   await page.screenshot({ path: `screenshots/demo-full-${w}.png`, fullPage: true });
   for (const s of SCREENS) {

@@ -6,8 +6,11 @@ export const btn = ({ label, icon, kind = '', size = '', attrs = '' }) =>
 // Кнопка «Додому»: завжди зліва вгорі
 export const homeButton = () => btn({ label: 'Додому', icon: 'home', kind: 'light', attrs: 'aria-label="Додому" data-home' });
 
-export const speakButton = () =>
-  `<button class="btn round light" aria-label="Послухати">${icons.speaker(32)}</button>`;
+// Імена вводять діти: у HTML вставляємо лише екрановані
+export const esc = (t) => String(t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+
+export const speakButton = (attrs = '') =>
+  `<button class="btn round light" aria-label="Послухати" ${attrs}>${icons.speaker(32)}</button>`;
 
 export const bubble = (text, { speak = true } = {}) =>
   `<div class="bubble"><span class="bubble-text">${text}</span>${speak ? speakButton() : ''}</div>`;
