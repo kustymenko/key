@@ -24,7 +24,7 @@ const frame = (hash, title, html) =>
   `<a class="frame" href="#${hash}" aria-label="${title}"><div class="frame-clip"><div class="frame-scale">${html}</div></div><span class="frame-title">${title}</span></a>`;
 
 export function demoPage(state) {
-  const { layout, level } = state;
+  const { layout, level, openAll } = state;
   const next = 'KeyJ';
   return `<main class="demo theme-warm"><div class="demo-wrap">
   <section class="hero">
@@ -33,10 +33,20 @@ export function demoPage(state) {
       <h1 class="title" aria-label="Клавіатурка">${TITLE.map((c) => `<span class="title-key">${c}</span>`).join('')}</h1>
       <p class="lead">Друкуємо разом з Клавиком!</p>
       <div class="row">
-        <a class="btn primary big" href="#lesson" style="text-decoration:none">${icons.play(32)}<span>Урок 1</span></a>
+        <a class="btn primary big" href="#map" style="text-decoration:none">${icons.play(32)}<span>Грай</span></a>
         <div class="segmented" role="group" aria-label="Курс">
           <button class="btn seg" data-layout="ua" aria-pressed="${layout === 'ua'}">Українська</button>
           <button class="btn seg" data-layout="en" aria-pressed="${layout === 'en'}">English</button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="segmented" role="group" aria-label="Рівень">
+          <button class="btn seg" data-level="1-2" aria-pressed="${level === '1-2'}">1–2 клас</button>
+          <button class="btn seg" data-level="3-4" aria-pressed="${level === '3-4'}">3–4 клас</button>
+        </div>
+        <div class="segmented" role="group" aria-label="Уроки">
+          <button class="btn seg" data-openall="0" aria-pressed="${!openAll}">Уроки по черзі</button>
+          <button class="btn seg" data-openall="1" aria-pressed="${openAll}">Усі уроки відкриті</button>
         </div>
       </div>
     </div>
@@ -98,7 +108,7 @@ export function demoPage(state) {
     <h2>Ескізи екранів <small>(натисни, щоб відкрити на весь екран)</small></h2>
     <div class="frames">
       ${frame('profiles', 'Хто ти?', profilesScreen())}
-      ${frame('map', 'Карта пригод', mapScreen())}
+      ${frame('map', 'Карта пригод', mapScreen(state))}
       ${frame('keyboard', 'Спробуй клавіатуру', keyboardScreen({ layout }))}
       ${frame('exercise', 'Вправа', exerciseScreen({ layout }))}
       ${frame('exercise-error', 'Вправа: підказка після помилки', exerciseScreen({ hint: 'error', layout }))}

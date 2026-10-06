@@ -18,6 +18,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 
 /* Режим «один екран»: сцена 1366×768 масштабується під вікно */
 body.is-screen { overflow: hidden; }
+body.is-screen.is-warm { background: var(--warm-bg); } /* тепла сцена займає все вікно, без сірих смужок */
 .stage { position: fixed; left: 50%; top: 50%; width: 1366px; height: 768px; transform-origin: center center; }
 .back-link {
   position: fixed; left: 12px; bottom: 8px; z-index: 5; font-size: 20px; font-weight: 800;

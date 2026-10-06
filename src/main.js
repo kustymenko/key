@@ -9,24 +9,26 @@ import './styles/screens.css';
 
 import { demoPage } from './screens/demo.js';
 import { profilesScreen } from './screens/profiles.js';
-import { mapScreen } from './screens/map.js';
+import { mapScreen, mountMap } from './screens/map.js';
+import { setBackdrop } from './screens/common.js';
 import { exerciseScreen } from './screens/exercise.js';
 import { keyboardScreen, mountKeyboardScreen } from './screens/keyboard.js';
 import { lessonScreen, mountLesson } from './screens/lesson.js';
 
 const app = document.getElementById('app');
-const state = { layout: 'ua', level: '1-2' };
+// progress — зірочки за уроки в цій сесії (збереження в localStorage — Етап 4); openAll — усі уроки відкриті (для перевірки)
+const state = { layout: 'ua', level: '1-2', lessonId: 1, progress: { ua: {}, en: {} }, openAll: false };
 
 const SCREENS = {
   profiles: profilesScreen,
-  map: mapScreen,
+  map: () => mapScreen(state),
   exercise: () => exerciseScreen({ layout: state.layout }),
   'exercise-error': () => exerciseScreen({ hint: 'error', layout: state.layout }),
   keyboard: () => keyboardScreen({ layout: state.layout }),
   lesson: lessonScreen,
 };
 // Екрани, які слухають справжню клавіатуру: повертають функцію «вимкнути»
-const MOUNT = { keyboard: mountKeyboardScreen, lesson: mountLesson };
+const MOUNT = { keyboard: mountKeyboardScreen, lesson: mountLesson, map: mountMap };
 let unmount = null;
 
 // Сцена 1366×768, яка масштабується під вікно
@@ -52,9 +54,11 @@ function render() {
     document.body.classList.add('is-screen');
     app.innerHTML = `<div class="stage">${SCREENS[name]()}</div><a class="back-link" href="#">← до всіх ескізів</a>`;
     fitStage();
+    setBackdrop(!!app.querySelector('.stage > .screen.theme-warm')); // тепле тло на все вікно
     unmount = MOUNT[name]?.(app, state) ?? null;
   } else {
     document.body.classList.remove('is-screen');
+    setBackdrop(false);
     app.innerHTML = demoPage(state);
     fitFrames();
   }
@@ -65,12 +69,19 @@ document.addEventListener('click', (e) => {
   if (e.target.closest('[data-home]')) location.hash = '';
 });
 
-// Перемикачі в демо (мова клавіатури і рівень)
+// Кнопки з переходом на інший екран (наприклад «Карта» після уроку)
 document.addEventListener('click', (e) => {
-  const b = e.target.closest('[data-layout],[data-level]');
+  const b = e.target.closest('[data-go]');
+  if (b) location.hash = b.dataset.go;
+});
+
+// Перемикачі в демо (мова клавіатури, рівень, відкриті уроки)
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-layout],[data-level],[data-openall]');
   if (!b) return;
   if (b.dataset.layout) state.layout = b.dataset.layout;
   if (b.dataset.level) state.level = b.dataset.level;
+  if (b.dataset.openall) state.openAll = b.dataset.openall === '1';
   const y = window.scrollY;
   render();
   window.scrollTo(0, y);

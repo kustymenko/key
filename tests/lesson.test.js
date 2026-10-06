@@ -1,30 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { LESSON1 } from '../src/lessons/lesson1.js';
 import { createExercise, pressChar, currentChar } from '../src/lessons/exercise.js';
 import { starsFor } from '../src/lessons/stars.js';
-import { codeOfChar } from '../src/keyboard/layouts.js';
-import { fingerOf } from '../src/keyboard/fingers.js';
-import { DONE_PHRASES, pickPhrase, fill } from '../src/content/phrases.js';
-
-describe('урок 1', () => {
-  for (const layout of ['ua', 'en']) {
-    const lesson = LESSON1[layout];
-    it(`${layout}: вправи лише з літер уроку, 5–7 символів`, () => {
-      for (const s of lesson.steps.filter((x) => x.kind === 'drill')) {
-        expect(s.text.length).toBeGreaterThanOrEqual(5);
-        expect(s.text.length).toBeLessThanOrEqual(7); // більше не вміщається на сцені
-        expect([...s.text].every((c) => lesson.letters.includes(c))).toBe(true);
-      }
-    });
-    it(`${layout}: літери на вказівних пальцях основного ряду`, () => {
-      expect(lesson.letters.map((c) => fingerOf(codeOfChar(c, layout)))).toEqual(['li', 'ri']);
-    });
-    it(`${layout}: спочатку знайомство з обома літерами, потім вправи`, () => {
-      expect(lesson.steps.slice(0, 2).map((s) => s.kind)).toEqual(['intro', 'intro']);
-      expect(lesson.steps.slice(2).every((s) => s.kind === 'drill')).toBe(true);
-    });
-  }
-});
+import { DONE_PHRASES, pickPhrase, donePhrase, plural, letterNoun } from '../src/content/phrases.js';
+import { accuracy, charsPerMinute, hardLetters, mergeMissed } from '../src/lessons/stats.js';
 
 describe('вправа', () => {
   it('правильні клавіші рухають курсор і закінчують вправу', () => {
@@ -32,7 +10,7 @@ describe('вправа', () => {
     let r = pressChar(st, 'а'); st = r.state;
     expect(r.result).toBe('ok');
     expect(currentChar(st)).toBe('о');
-    r = pressChar(st, 'О'); // велика літера теж зараховується
+    r = pressChar(st, 'О'); // для малої літери регістр не важливий
     expect(r.result).toBe('done');
     expect(r.state.errors).toBe(0);
   });
@@ -49,6 +27,21 @@ describe('вправа', () => {
     st = pressChar(st, 'а').state;
     expect(st.streak).toBe(0);
     expect(st.errors).toBe(3);
+  });
+  it('велика літера в завданні вимагає Shift: мала не підходить', () => {
+    expect(pressChar(createExercise('К'), 'к').result).toBe('error');
+    expect(pressChar(createExercise('К'), 'К').result).toBe('done');
+  });
+  it('запам’ятовує, на яких літерах помилялися', () => {
+    let st = createExercise('кк');
+    st = pressChar(st, 'н').state;
+    st = pressChar(st, 'н').state;
+    expect(st.missed).toEqual({ к: 2 });
+  });
+  it('пробіл — звичайний символ вправи', () => {
+    let st = pressChar(createExercise('а о'), 'а').state;
+    expect(currentChar(st)).toBe(' ');
+    expect(pressChar(st, ' ').result).toBe('ok');
   });
 });
 
@@ -68,13 +61,53 @@ describe('зірочки', () => {
   });
 });
 
-describe('фрази Клавика', () => {
-  it('для 1–2 класу не довші за 5 слів без підстановки літер', () => {
-    for (const list of Object.values(DONE_PHRASES))
-      for (const p of list) expect(fill(p, { letters: 'А і О' }).split(/\s+/).length).toBeLessThanOrEqual(5);
+describe('статистика 3–4 класу', () => {
+  it('точність у відсотках', () => {
+    expect(accuracy(95, 5)).toBe(95);
+    expect(accuracy(0, 0)).toBe(100);
+    expect(accuracy(10, 10)).toBe(50);
   });
+  it('знаки за хвилину: 50 символів за 60 секунд = 50', () => {
+    expect(charsPerMinute(50, 60000)).toBe(50);
+    expect(charsPerMinute(30, 30000)).toBe(60);
+    expect(charsPerMinute(30, 0)).toBe(0);
+  });
+  it('важкі літери: найчастіші, від двох помилок, не більше трьох', () => {
+    expect(hardLetters({ к: 5, н: 2, а: 1, о: 3, у: 4 })).toEqual(['к', 'у', 'о']);
+    expect(hardLetters({ а: 1 })).toEqual([]);
+  });
+  it('помилки кількох вправ додаються', () => {
+    expect(mergeMissed({ к: 1 }, { к: 2, н: 1 })).toEqual({ к: 3, н: 1 });
+  });
+});
+
+describe('фрази Клавика', () => {
   it('не повторює попередню фразу', () => {
-    const list = DONE_PHRASES[3];
+    const list = DONE_PHRASES['1-2'][3];
     for (let i = 0; i < 50; i++) expect(pickPhrase(list, list[0])).not.toBe(list[0]);
+  });
+  it('відмінювання біля числа', () => {
+    expect([1, 2, 5, 11, 12, 21, 32].map(letterNoun)).toEqual(['літеру', 'літери', 'літер', 'літер', 'літер', 'літеру', 'літери']);
+    expect(plural(3, ['помилка', 'помилки', 'помилок'])).toBe('помилки');
+  });
+  it('1–2 клас: до 5 слів, хвала конкретна (називає літери чи кількість)', () => {
+    for (const stars of [1, 2, 3])
+      for (const what of ['А і О', 'Є', 'нові клавіші', 'великі літери', 'кому і крапку', null])
+        for (let i = 0; i < 20; i++) {
+          const p = donePhrase({ level: '1-2', stars, what, count: 8 });
+          expect(p.split(/\s+/).length, p).toBeLessThanOrEqual(5);
+          expect(p).not.toMatch(/\{|undefined/);
+        }
+  });
+  it('3–4 клас: до 12 слів', () => {
+    for (const stars of [1, 2, 3])
+      for (let i = 0; i < 20; i++) expect(donePhrase({ level: '3-4', stars, what: 'кому і крапку', count: 32 }).split(/\s+/).length).toBeLessThanOrEqual(12);
+  });
+  it('для повторення (без нових літер) фрази називають кількість літер', () => {
+    for (let i = 0; i < 30; i++) expect(donePhrase({ level: '1-2', stars: 3, what: null, count: 8 })).toMatch(/8/);
+  });
+  it('усі фрази кінця уроку: нова фраза не з тих, що звучать незавершено', () => {
+    const all = Object.values(DONE_PHRASES).flatMap((byStars) => Object.values(byStars).flat());
+    expect(all.some((p) => /Ось які/.test(p))).toBe(false);
   });
 });

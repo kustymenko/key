@@ -52,6 +52,12 @@ export function lettersOf(layout) {
 
 // Фізична клавіша для символу розкладки (регістр не важливий), або null
 export function codeOfChar(ch, layout) {
+  if (ch === ' ') return 'Space';
+  if (layout === 'ua' && ch === ',') return 'Slash'; // в українській кома — Shift + клавіша крапки
   const up = String(ch).toUpperCase();
   return ROWS.flat().find((k) => k[layout] && k[layout].toUpperCase() === up)?.code ?? null;
 }
+
+// Чи треба тримати Shift для символу (велика літера; кома в українській розкладці)
+export const needsShift = (ch, layout) =>
+  (ch !== ch.toLowerCase() && ch === ch.toUpperCase()) || (layout === 'ua' && ch === ',');

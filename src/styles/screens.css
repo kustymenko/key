@@ -47,16 +47,15 @@
 /* Карта пригод */
 .map-path { position: absolute; inset: 0; width: 100%; height: 100%; }
 .map-path path { fill: none; stroke: var(--ui-line); stroke-width: 22; stroke-linecap: round; stroke-dasharray: 2 38; }
-.node { position: absolute; width: 0; height: 0; }
-.node-disc { position: absolute; left: -64px; top: -64px; width: 128px; height: 128px; border-radius: 50%; display: grid; place-items: center; background: var(--ui-card); border: 5px solid var(--ui-main); font-weight: 800; font-size: 38px; }
+.node { position: absolute; width: 128px; height: 128px; margin: -64px 0 0 -64px; padding: 0; border: 0; background: none; font: inherit; color: inherit; cursor: pointer; }
+.node:disabled { cursor: default; }
+.node-label.is-small { font-size: 28px; }
+.node-disc { position: absolute; left: 0; top: 0; width: 128px; height: 128px; border-radius: 50%; display: grid; place-items: center; background: var(--ui-card); border: 5px solid var(--ui-main); font-weight: 800; font-size: 38px; }
 .node.is-done .node-disc { background: var(--node-done, var(--ui-main)); border-color: var(--ui-main); color: #fff; }
-.node.is-current .node-disc { border-color: var(--accent, var(--ui-main)); width: 160px; height: 160px; left: -80px; top: -80px; font-size: 48px; outline: 6px solid var(--accent, var(--ui-main)); outline-offset: 8px; box-shadow: 0 0 0 22px rgb(255 194 26 / .28); }
+.node.is-current .node-disc { border-color: var(--accent, var(--ui-main)); width: 160px; height: 160px; left: -16px; top: -16px; font-size: 48px; outline: 6px solid var(--accent, var(--ui-main)); outline-offset: 8px; box-shadow: 0 0 0 22px rgb(255 194 26 / .28); }
 .node.is-locked .node-disc { border: 4px dashed var(--ui-text-soft); background: var(--ui-bg); color: var(--ui-text-soft); }
-.node-stars { position: absolute; left: -60px; width: 120px; top: 74px; display: flex; justify-content: center; }
-.node.is-current .node-stars { top: 96px; }
-.map-klavik { position: absolute; }
-.map-play { position: absolute; right: 56px; bottom: 36px; }
-.map-play .btn { min-width: 260px; }
+.node-stars { position: absolute; left: 4px; width: 120px; top: 138px; display: flex; justify-content: center; }
+.node.is-current .node-stars { top: 160px; }
 
 /* Вправа */
 .screen-exercise { display: flex; flex-direction: column; }
@@ -109,13 +108,41 @@
 .pause-layer { position: absolute; inset: 0; z-index: 20; background: rgb(242 244 246 / .96); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 36px; }
 .pause-layer .row { gap: 32px; }
 
+/* Вправа: текст завдання за рівнем (xl — до 7 символів, l — 8–10, long — 20–60 для 3–4 класу) */
+.task-line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 22px; }
+.tk { display: inline-flex; gap: 22px; white-space: nowrap; }
+.task-ch.is-space { min-width: 70px; font-size: 64px; padding-bottom: 6px; }
+.task-line.is-l { gap: 4px 12px; }
+.task-line.is-l .tk { gap: 12px; }
+.task-line.is-l .task-ch { min-width: 74px; height: 94px; font-size: 80px; border-bottom-width: 8px; }
+.task-line.is-l .task-ch.is-space { min-width: 46px; font-size: 52px; }
+.task-line.is-long { gap: 8px 0; }
+.task-line.is-long .tk { gap: 0; }
+.task-line.is-long .task-ch { min-width: 0; height: 62px; font-size: 46px; padding: 0 3px 3px; border-bottom: 5px solid transparent; border-radius: 10px; }
+.task-line.is-long .task-ch.is-current { border: 4px solid var(--ui-main); border-bottom-width: 6px; padding: 0 3px; }
+.task-line.is-long .task-ch.is-space { min-width: 16px; font-size: 34px; color: transparent; }
+.task-line.is-long .task-ch.is-space.is-current { color: var(--ui-text-soft); min-width: 28px; }
+
 /* Кінець уроку (тепла гама, без клавіатури) */
 .screen-done { display: flex; align-items: center; justify-content: center; }
-.done-main { display: flex; flex-direction: column; align-items: center; gap: 22px; }
-.done-bubble { font-size: 52px; padding: 14px 36px; }
+.done-main { display: flex; align-items: center; gap: 56px; }
+.done-col { display: flex; flex-direction: column; align-items: flex-start; gap: 20px; max-width: 780px; }
+.done-bubble { font-size: 46px; padding: 14px 32px; }
 .done-bubble::before { display: none; }
+.done-buttons { display: flex; gap: 20px; flex-wrap: wrap; }
+.done-buttons .btn.big { padding: 0 36px; }
+.done-stats { display: flex; gap: 18px; }
+.stat { display: flex; flex-direction: column; align-items: center; min-width: 150px; padding: 8px 22px 10px; background: var(--ui-card); border: 3px solid var(--ui-line); border-radius: 22px; }
+.stat b { font-size: 46px; line-height: 1.1; }
+.stat span { font-size: 22px; color: var(--ui-text-soft); }
+.done-hard { display: flex; align-items: center; gap: 12px; font-size: 26px; font-weight: 800; color: var(--ui-text-soft); }
+.done-hard .keycap { min-width: 56px; height: 48px; font-size: 26px; color: var(--ui-main); }
 .done-stars .star { animation: pop .5s cubic-bezier(.3, 1.6, .5, 1) both; }
 .done-stars .star:nth-child(2) { animation-delay: .25s; }
 .done-stars .star:nth-child(3) { animation-delay: .5s; }
 @keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
 @media (prefers-reduced-motion: reduce) { .done-stars .star { animation: none; } }
+
+/* Карта: заголовок з Клавиком */
+.map-head { position: absolute; left: 340px; top: 6px; display: flex; align-items: center; gap: 22px; }
+.map-title { font-size: 36px; padding: 8px 24px; }
