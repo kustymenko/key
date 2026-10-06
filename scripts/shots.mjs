@@ -9,7 +9,7 @@ if (!existsSync(file)) throw new Error('Спочатку: npm run build');
 mkdirSync('screenshots', { recursive: true });
 
 const SIZES = [[1366, 768], [1920, 1080]];
-const SCREENS = ['profiles', 'map', 'exercise', 'exercise-error'];
+const SCREENS = ['profiles', 'map', 'exercise', 'exercise-error', 'keyboard'];
 // У хмарі Chromium уже встановлено (не качаємо через playwright install)
 const cloudChrome = '/opt/pw-browsers/chromium';
 const browser = await chromium.launch({ executablePath: existsSync(cloudChrome) ? cloudChrome : undefined });

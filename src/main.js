@@ -11,6 +11,7 @@ import { demoPage } from './screens/demo.js';
 import { profilesScreen } from './screens/profiles.js';
 import { mapScreen } from './screens/map.js';
 import { exerciseScreen } from './screens/exercise.js';
+import { keyboardScreen, mountKeyboardScreen } from './screens/keyboard.js';
 
 const app = document.getElementById('app');
 const state = { layout: 'ua', level: '1-2' };
@@ -20,7 +21,11 @@ const SCREENS = {
   map: mapScreen,
   exercise: () => exerciseScreen({ layout: state.layout }),
   'exercise-error': () => exerciseScreen({ hint: 'error', layout: state.layout }),
+  keyboard: () => keyboardScreen({ layout: state.layout }),
 };
+// Екрани, які слухають справжню клавіатуру: повертають функцію «вимкнути»
+const MOUNT = { keyboard: mountKeyboardScreen };
+let unmount = null;
 
 // Сцена 1366×768, яка масштабується під вікно
 function fitStage() {
@@ -38,11 +43,14 @@ function fitFrames() {
 }
 
 function render() {
+  unmount?.();
+  unmount = null;
   const name = location.hash.replace('#', '');
   if (SCREENS[name]) {
     document.body.classList.add('is-screen');
     app.innerHTML = `<div class="stage">${SCREENS[name]()}</div><a class="back-link" href="#">← до всіх ескізів</a>`;
     fitStage();
+    unmount = MOUNT[name]?.(app, state) ?? null;
   } else {
     document.body.classList.remove('is-screen');
     app.innerHTML = demoPage(state);

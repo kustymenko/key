@@ -23,14 +23,14 @@
   --finger-th: #b8c0c8;
 
   /* Пальці: бліді відтінки для клавіш (підібрані окремо, щоб усі 8 розрізнялися, у т. ч. при дальтонізмі) */
-  --finger-lp-pale: #ddb7c2;
-  --finger-lr-pale: #e6eeab;
-  --finger-lm-pale: #c0f3e5;
-  --finger-li-pale: #c2baf9;
-  --finger-ri-pale: #f9dec3;
-  --finger-rm-pale: #dbe9ff;
-  --finger-rr-pale: #f1b492;
-  --finger-rp-pale: #a9c4df;
+  --finger-lp-pale: #e8a7b5;
+  --finger-lr-pale: #c1ba86;
+  --finger-lm-pale: #d5f9e5;
+  --finger-li-pale: #b5b6d4;
+  --finger-ri-pale: #fff1bd;
+  --finger-rm-pale: #b2c8fc;
+  --finger-rr-pale: #f4ccb8;
+  --finger-rp-pale: #b1eaff;
   --finger-th-pale: #e3e7eb;
 
   /* Тепла гама: лише для екранів БЕЗ клавіатури (вибір дитини, карта, досягнення, кінець уроку).

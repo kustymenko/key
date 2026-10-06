@@ -102,3 +102,21 @@
   display: inline-grid; place-items: center; width: 60px; height: 72px; font-size: 40px; font-weight: 800; color: var(--ui-main);
   background: var(--ui-card); border: 3px solid var(--ui-main); border-radius: 16px; box-shadow: 0 7px 0 var(--ui-main);
 }
+
+/* Натиснута на справжній клавіатурі: насичений колір пальця, клавіша «втиснута», товста обвідка */
+.key.is-pressed {
+  background: var(--c); border-color: var(--ui-main); color: var(--ink, var(--ui-text));
+  transform: translateY(4px); box-shadow: 0 1px 0 var(--ui-main); outline: 4px solid var(--ui-main); outline-offset: 1px; z-index: 3;
+}
+.hands-caption:empty { visibility: hidden; }
+.hands-caption:empty::before { content: '\00a0'; }
+
+/* Підказка про розкладку: «Перемкни мову: Alt + Shift» */
+.keycap {
+  display: inline-grid; place-items: center; min-width: 76px; height: 56px; padding: 0 16px;
+  background: var(--ui-card); color: var(--ui-main); border: 3px solid var(--ui-main); border-radius: 14px;
+  box-shadow: 0 5px 0 var(--ui-main); font-size: 30px; font-weight: 800;
+}
+.keys-plus { font-size: 34px; font-weight: 800; }
+.layout-hint { display: inline-flex; align-items: center; gap: 14px; }
+.lang-chip { display: inline-grid; place-items: center; min-width: 76px; height: 56px; padding: 0 14px; border-radius: 14px; background: var(--ui-main); color: #fff; font-size: 28px; font-weight: 800; }

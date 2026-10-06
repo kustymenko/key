@@ -27,7 +27,7 @@ export function keyboard({ layout = 'ua', next = null, hint = 'next', rows = ROW
             const cls = ['key', `f-${f}`, SERVICE.has(k.code) ? 'is-service' : '', k.code === 'Space' ? 'is-space' : '', isNext ? `is-next is-${hint}` : '']
               .filter(Boolean)
               .join(' ');
-            const style = `flex-grow:${k.code === 'Space' ? 0 : k.w}${isNext ? `;--ink:${inkOn(f)}` : ''}`;
+            const style = `flex-grow:${k.code === 'Space' ? 0 : k.w};--ink:${inkOn(f)}`;
             return `<div class="${cls}" style="${style}" data-code="${k.code}"><span class="key-label">${k[layout]}</span></div>`;
           })
           .join('')}</div>`,
@@ -60,6 +60,6 @@ export function hands({ active = null, hint = 'next', caption = true } = {}) {
   const name = FINGERS.find((f) => f.id === active)?.name ?? '';
   return `<div class="hands is-${hint}" role="img" aria-label="Схема долонь${name ? ': ' + name : ''}">
     <div class="hands-pair">${hand('left', active)}${hand('right', active)}</div>
-    ${caption && name ? `<div class="hands-caption">${name}</div>` : ''}
+    ${caption ? `<div class="hands-caption">${name}</div>` : ''}
   </div>`;
 }
