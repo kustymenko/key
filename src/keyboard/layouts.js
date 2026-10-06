@@ -49,3 +49,9 @@ export function lettersOf(layout) {
   const re = layout === 'ua' ? /^[А-ЩЬЮЯЄІЇ]$/ : /^[A-Z]$/;
   return ROWS.flat().filter((k) => re.test(k[layout]));
 }
+
+// Фізична клавіша для символу розкладки (регістр не важливий), або null
+export function codeOfChar(ch, layout) {
+  const up = String(ch).toUpperCase();
+  return ROWS.flat().find((k) => k[layout] && k[layout].toUpperCase() === up)?.code ?? null;
+}

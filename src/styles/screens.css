@@ -81,3 +81,19 @@
 .profile-card { border-color: var(--ui-main); }
 .swatches.warm .chip { border-color: var(--ui-main); }
 .btn-note { display: inline-block; background: transparent; }
+
+/* Спробуй клавіатуру (повна клавіатура з рядом цифр) */
+.screen-keys .task-card { top: 100px; height: 236px; }
+.screen-keys .task-main { flex-direction: row; align-items: center; gap: 36px; }
+.press-key {
+  flex: none; width: 150px; height: 150px; display: grid; place-items: center; font-size: 84px; font-weight: 800; line-height: 1;
+  background: var(--ui-bg); border: 6px solid var(--ui-main); border-radius: 30px; box-shadow: 0 8px 0 var(--ui-main);
+}
+.press-key.is-service { font-size: 56px; }
+.press-key.is-empty { border-style: dashed; box-shadow: none; color: var(--ui-text-soft); }
+.keys-msg { display: flex; align-items: center; min-height: 80px; }
+.keys-msg .bubble { font-size: 38px; }
+.screen-keys .play-row { top: 380px; }
+.screen-keys .key { --h: 58px; font-size: 26px; }
+.screen-keys .key.is-service { font-size: 20px; }
+.screen-keys .topbar .segmented { margin-right: 8px; }

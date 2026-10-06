@@ -7,6 +7,7 @@ import { btn } from './common.js';
 import { profilesScreen } from './profiles.js';
 import { mapScreen } from './map.js';
 import { exerciseScreen } from './exercise.js';
+import { keyboardScreen } from './keyboard.js';
 
 const TITLE = 'Клавіатурка'.toUpperCase().split('');
 const CAPTIONS = { joy: 'Радіє', cheer: 'Підбадьорює', think: 'Думає', rest: 'Відпочиває' };
@@ -81,6 +82,8 @@ export function demoPage(state) {
     </div>
     <h3>Наступна клавіша — обвідка і світіння</h3>
     <div class="kb-demo theme-neutral">${keyboard({ layout, next, hint: 'next' })}${hands({ active: fingerOf(next), hint: 'next' })}</div>
+    <div class="row"><a class="btn primary" href="#keyboard" style="text-decoration:none">${icons.play(32)}<span>Спробуй клавіатуру</span></a></div>
+    <p class="note">Натискай клавіші на справжній клавіатурі: на екранній загориться така сама клавіша, а на долонях — потрібний палець.</p>
     <h3>Підказка після помилки — подвійна обвідка і підстрибування</h3>
     <div class="kb-demo theme-neutral">${keyboard({ layout, next, hint: 'error' })}${hands({ active: fingerOf(next), hint: 'error' })}</div>
   </section>
@@ -90,6 +93,7 @@ export function demoPage(state) {
     <div class="frames">
       ${frame('profiles', 'Хто ти?', profilesScreen())}
       ${frame('map', 'Карта пригод', mapScreen())}
+      ${frame('keyboard', 'Спробуй клавіатуру', keyboardScreen({ layout }))}
       ${frame('exercise', 'Вправа', exerciseScreen({ layout }))}
       ${frame('exercise-error', 'Вправа: підказка після помилки', exerciseScreen({ hint: 'error', layout }))}
     </div>
