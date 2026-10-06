@@ -13,12 +13,13 @@ import { newProfileScreen, mountNewProfile } from './screens/newprofile.js';
 import { achievementsScreen } from './screens/achievements.js';
 import { adultScreen, mountAdult } from './screens/adult.js';
 import { mapScreen, mountMap } from './screens/map.js';
-import { setBackdrop } from './screens/common.js';
+import { setBackdrop, soundButton } from './screens/common.js';
 import { exerciseScreen } from './screens/exercise.js';
 import { keyboardScreen, mountKeyboardScreen } from './screens/keyboard.js';
 import { lessonScreen, mountLesson } from './screens/lesson.js';
 import { createStore } from './storage/store.js';
 import { stopSpeech } from './audio/speech.js';
+import { sfx } from './audio/sfx.js';
 
 const app = document.getElementById('app');
 const freshProgress = () => ({ ua: {}, en: {} });
@@ -117,6 +118,28 @@ function render() {
   setBackdrop(!!app.querySelector('.stage > .screen.theme-warm')); // тепле тло на все вікно
   unmount = MOUNT[name]?.(app, state) ?? null;
 }
+
+// Звук: браузер дозволяє його лише після дії дитини — готуємо при першому натисканні
+const wake = () => sfx.ensure();
+document.addEventListener('pointerdown', wake, { once: true, capture: true });
+document.addEventListener('keydown', wake, { once: true, capture: true });
+
+// Перемикач звукових ефектів (однаковий на всіх екранах); малюємо наново лише кнопки, екран не чіпаємо
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('[data-sound]');
+  if (!t) return;
+  t.blur(); // щоб пробіл під час друку не «натискав» кнопку
+  sfx.setEnabled(!sfx.isEnabled());
+});
+sfx.onChange(() => {
+  document.querySelectorAll('[data-sound]').forEach((b) => { b.outerHTML = soundButton(); });
+});
+
+// Легке «тік» на кнопках і картках (не на перемикачі звуку — він озвучується сам)
+document.addEventListener('click', (e) => {
+  if (e.target.closest('[data-sound]')) return;
+  if (e.target.closest('.btn, .node, .profile-card')) sfx.play('click');
+}, true);
 
 // Кнопка «Додому» на будь-якому екрані повертає на головну сторінку
 document.addEventListener('click', (e) => {

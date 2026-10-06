@@ -4,21 +4,22 @@ import { attachLiveKeyboard, setActiveFinger } from '../keyboard/live.js';
 import { fingerOf, shiftCodeFor } from '../keyboard/fingers.js';
 import { codeOfChar, needsShift, ROWS } from '../keyboard/layouts.js';
 import { stars } from '../design/icons.js';
-import { btn, homeButton, bubble, setBackdrop } from './common.js';
+import { btn, homeButton, bubble, setBackdrop, soundButton } from './common.js';
 import { layoutHint } from './keyboard.js';
 import { getLesson, keyNameAcc, keyNameNom, isPunct, learnedCount, nextLesson } from '../lessons/course.js';
 import { buildLesson } from '../lessons/generator.js';
 import { createExercise, currentChar, pressChar } from '../lessons/exercise.js';
 import { starsFor } from '../lessons/stars.js';
 import { accuracy, charsPerMinute, hardLetters, mergeMissed } from '../lessons/stats.js';
-import { donePhrase, BADGE_PHRASES, pickPhrase, HINT_PHRASES, fill, plural } from '../content/phrases.js';
+import { donePhrase, BADGE_PHRASES, pickPhrase, HINT_PHRASES, fill, plural, AGAIN_PHRASES, DRILL_PHRASES, STREAK_PHRASES, STEP_DONE_PHRASES, BACK_PHRASES, RESUME_PHRASES } from '../content/phrases.js';
+import { playSfx } from '../audio/sfx.js';
 import { badge } from '../design/badges.js';
 import { BADGES } from '../content/badges.js';
 
 const IGNORED = new Set(['Backspace', 'Tab', 'Enter', 'CapsLock', 'Escape']); // службові: не помилка
 const FACE = 150;
 const KEY_LABELS = new Map(ROWS.flat().map((k) => [k.code, k]));
-const DRILL_HINT = { '1-2': HINT_PHRASES.drill, '3-4': 'Друкуй спокійно й точно' };
+const STREAK_EVERY = 6; // скільки правильних натискань поспіль викликають похвалу Клавика
 
 // Порожня оболонка: далі екран «оживляє» mountLesson
 export const lessonScreen = () => '<div class="screen screen-exercise theme-neutral" data-lesson></div>';
@@ -74,6 +75,9 @@ export function mountLesson(root, state) {
   };
   const $ = (sel) => screen.querySelector(sel);
   const level = () => state.level;
+  // Фраза Клавика зі списку: випадкова, не така сама, як попередня з цього списку
+  const lastBy = new Map();
+  const pick = (list) => { const p = pickPhrase(list, lastBy.get(list)); lastBy.set(list, p); return p; };
 
   function setFace(emotion) {
     if (run.face === emotion) return;
@@ -129,7 +133,9 @@ export function mountLesson(root, state) {
     run.stepErr0 = run.errors;
     run.tight = undefined;
     setFace('think');
-    setMsg(bubble(step.kind === 'intro' ? introMsg(step.ch) : DRILL_HINT[level()], { speak: false }));
+    run.hold = 0;
+    run.drillMsg = pick(DRILL_PHRASES[level()]);
+    setMsg(bubble(step.kind === 'intro' ? introMsg(step.ch) : run.drillMsg, { speak: false }));
     paintTask();
     setNext(currentChar(run.ex));
   }
@@ -138,6 +144,7 @@ export function mountLesson(root, state) {
     stopLive?.();
     stopLive = null;
     const n = starsFor({ level: level(), errors: run.errors, total: run.typed });
+    playSfx('stars', n);
     let fresh = [];
     if (state.profileId) fresh = state.store.finishLesson(state.profileId, { layout: state.layout, lessonId: meta.id, stars: n, errors: run.errors });
     else if (state.progress) { // демо без профілю: зірочки лише в пам'яті вкладки
@@ -149,6 +156,7 @@ export function mountLesson(root, state) {
     lastPhrase = phrase;
     const next = nextLesson(state.layout, level(), meta.id);
     setBackdrop(true);
+    if (fresh.length) later(() => playSfx('badge'), 1100); // значок — після зірочок
 
     let statsHtml = '';
     if (level() === '3-4') { // статистика лише для 3–4 класу: точність на першому місці
@@ -162,7 +170,7 @@ export function mountLesson(root, state) {
       </div>${hard.length ? `<div class="done-hard"><span>Потренуй:</span>${hard.map((c) => `<span class="keycap">${c.toUpperCase()}</span>`).join('')}</div>` : ''}`;
     }
     stage.innerHTML = `<div class="screen screen-done theme-warm ${level() === '3-4' ? 'has-stats' : ''}" data-done>
-      <div class="topbar">${btn({ label: 'Додому', icon: 'home', kind: 'light', attrs: 'aria-label="Додому" data-home' })}</div>
+      <div class="topbar">${btn({ label: 'Додому', icon: 'home', kind: 'light', attrs: 'aria-label="Додому" data-home' })}<div class="topbar-spacer"></div>${soundButton()}</div>
       <div class="done-main">
         <div class="done-klavik">${klavik(n === 3 ? 'joy' : 'cheer', 230)}</div>
         <div class="done-col">
@@ -195,21 +203,33 @@ export function mountLesson(root, state) {
     run.ex = next;
     if (result === 'error') {
       run.errors += 1;
+      run.okRun = 0;
+      run.hold = 0;
+      playSfx('hint');
       const want = currentChar(next);
       setFace('cheer');
       setNext(want, 'error');
-      const again = want === ' ' ? 'Ось пробіл' : HINT_PHRASES.again;
+      const again = want === ' ' ? 'Ось пробіл' : pick(AGAIN_PHRASES);
       setMsg(bubble(next.streak >= 3 && want !== ' ' ? `Це ${isPunct(want) ? keyNameNom(want) : `клавіша ${want.toUpperCase()}`}` : again, { speak: false }));
       return;
     }
     run.typed += 1;
+    run.okRun += 1;
     paintTask();
     if (result === 'ok') {
-      setFace('think');
-      setMsg(bubble(DRILL_HINT[level()], { speak: false }));
+      playSfx('tap');
+      if (step.kind === 'drill' && run.okRun % STREAK_EVERY === 0) { // серія без помилок: Клавик радіє, фраза лишається ще кілька натискань
+        setFace('joy');
+        setMsg(bubble(pick(STREAK_PHRASES), { speak: false }));
+        run.hold = run.okRun + 3;
+      } else if (run.okRun > run.hold) {
+        setFace('think');
+        setMsg(bubble(run.drillMsg, { speak: false }));
+      }
       setNext(currentChar(next));
       return;
     }
+    playSfx('step');
     // крок завершено
     run.locked = true;
     run.missed = mergeMissed(run.missed, next.missed);
@@ -220,7 +240,7 @@ export function mountLesson(root, state) {
     saveProgress(step, next);
     setFace('joy');
     screen.querySelectorAll('.key').forEach((k) => k.classList.remove('is-next', 'is-error'));
-    if (step.kind === 'intro') setMsg(bubble(foundMsg(step.ch), { speak: false }));
+    setMsg(bubble(step.kind === 'intro' ? foundMsg(step.ch) : pick(STEP_DONE_PHRASES), { speak: false }));
     later(() => {
       run.i += 1;
       if (run.i >= built.steps.length) finish();
@@ -253,6 +273,8 @@ export function mountLesson(root, state) {
       layer.remove();
       run.paused = false;
       run.stepPaused += performance.now() - run.pauseAt;
+      setFace('cheer');
+      setMsg(bubble(pick(BACK_PHRASES), { speak: false }));
       return;
     }
     run.paused = true;
@@ -278,12 +300,12 @@ export function mountLesson(root, state) {
     built = resumed ? { id: lesson.id, letters: lesson.letters, steps: saved.steps } : buildLesson({ layout: state.layout, id: lesson.id, level: level() });
     stage.innerHTML = lessonScreen();
     screen = stage.querySelector('[data-lesson]');
-    run = { i: 0, ex: null, errors: 0, typed: 0, locked: false, paused: false, face: null, missed: {}, drillMs: 0, drillChars: 0, stepStart: null, stepPaused: 0, pauseAt: 0, stepErr0: 0 };
+    run = { okRun: 0, i: 0, ex: null, errors: 0, typed: 0, locked: false, paused: false, face: null, missed: {}, drillMs: 0, drillChars: 0, stepStart: null, stepPaused: 0, pauseAt: 0, stepErr0: 0 };
     if (resumed) Object.assign(run, { i: saved.i, errors: saved.errors, typed: saved.typed, missed: { ...saved.missed }, drillMs: saved.drillMs, drillChars: saved.drillChars, stepErr0: saved.errors });
     const s0 = built.steps[run.i];
     const first = codeOfChar(s0.kind === 'intro' ? s0.ch : s0.text[0], state.layout);
     screen.innerHTML = `<div class="topbar">${homeButton()}<div class="progress-dots" data-dots aria-hidden="true"></div>
-        ${btn({ label: 'Пауза', icon: 'pause', kind: 'light', attrs: 'aria-label="Пауза" data-act="pause"' })}</div>
+        ${soundButton()}${btn({ label: 'Пауза', icon: 'pause', kind: 'light', attrs: 'aria-label="Пауза" data-act="pause"' })}</div>
       <div class="task-card">
         <div class="task-klavik" data-face></div>
         <div class="task-main"><div class="task-text" data-task aria-label="Завдання"></div><div data-msg></div></div>
@@ -291,7 +313,7 @@ export function mountLesson(root, state) {
       <div class="play-row">${keyboard({ layout: state.layout, next: first })}${hands({ active: fingerOf(first) })}</div>`;
     stopLive = attachLiveKeyboard(screen, { getLayout: () => state.layout, trackFinger: false, onKey });
     showStep();
-    if (resumed) setMsg(bubble('Продовжимо!', { speak: false }));
+    if (resumed) setMsg(bubble(pick(RESUME_PHRASES), { speak: false }));
   }
 
   const onClick = (e) => {

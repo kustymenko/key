@@ -7,6 +7,8 @@ export const icons = {
   pause: (s) => wrap('<rect x="6" y="5" width="4" height="14" rx="1.2" fill="currentColor"/><rect x="14" y="5" width="4" height="14" rx="1.2" fill="currentColor"/>', s),
   play: (s) => wrap('<path d="M8 5.5v13l11-6.5z" fill="currentColor"/>', s),
   speaker: (s) => wrap('<path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.5a8 8 0 0 1 0 11"/>', s),
+  sound: (s) => wrap('<path d="M9 18V6l10-2v12" /><circle cx="6.5" cy="18" r="2.6" fill="currentColor"/><circle cx="16.5" cy="16" r="2.6" fill="currentColor"/>', s),
+  soundOff: (s) => wrap('<path d="M9 18V6l10-2v12" /><circle cx="6.5" cy="18" r="2.6" fill="currentColor"/><circle cx="16.5" cy="16" r="2.6" fill="currentColor"/><path d="M3 3l18 18" stroke-width="3.2"/>', s),
   check: (s) => wrap('<path d="m5 12.5 4.5 4.5L19 7.5" stroke-width="3.4"/>', s),
   lock: (s) => wrap('<rect x="5.5" y="10.5" width="13" height="9.5" rx="2.4" fill="currentColor"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/>', s),
   replay: (s) => wrap('<path d="M5 12a7 7 0 1 0 2.2-5.1"/><path d="M4.5 4.5v4.5H9"/>', s),

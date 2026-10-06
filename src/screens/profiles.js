@@ -1,7 +1,7 @@
 import { klavik } from '../character/klavik.js';
 import { AVATARS } from '../character/avatars.js';
 import { icons } from '../design/icons.js';
-import { bubble, esc } from './common.js';
+import { bubble, esc, soundButton } from './common.js';
 
 // Скільки карток — такий розмір: одна дитина-двоє великі, клас — менші (до 18 карток, без прокручування)
 export const cardSize = (count) => (count <= 4 ? 'l' : count <= 10 ? 'm' : 's');
@@ -19,6 +19,7 @@ export function profilesScreen({ profiles = [], persistent = true, canCreate = t
     : '';
   const warn = persistent ? '' : `<div class="save-warn" role="status">${icons.lock(26)}<span>Тут прогрес не збережеться</span></div>`;
   return `<div class="screen screen-profiles theme-warm is-${size}">
+    <div class="topbar"><div class="topbar-spacer"></div>${soundButton()}</div>
     <div class="profiles-head">
       <div class="profiles-klavik">${klavik('cheer', size === 'l' ? 210 : 130)}</div>
       ${bubble('Хто ти?', { speak: false })}
