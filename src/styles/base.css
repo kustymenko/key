@@ -12,6 +12,7 @@ body {
 h1, h2, h3, p { margin: 0; }
 h2 { font-size: var(--fs-h2); font-weight: 800; }
 h3 { font-size: 24px; font-weight: 800; color: var(--ui-text-soft); }
+button::-moz-focus-inner { border: 0; padding: 0; }
 button { font: inherit; color: inherit; cursor: pointer; }
 :focus-visible { outline: 5px solid var(--ui-main); outline-offset: 4px; }
 .icon { flex: none; }

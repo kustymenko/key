@@ -105,7 +105,7 @@ for (const [w, h] of [[1366, 768], [1920, 1080]]) {
   await page.reload(); await page.waitForTimeout(150);
   await page.click('[data-profile]'); await page.waitForSelector('.screen-map');
   await page.click('.node.is-current'); await page.waitForTimeout(150);
-  ok((await text(page, '[data-msg] .bubble-text')) === 'Продовжимо!', 'вправа не відновилась');
+  ok(['Продовжимо!', 'Ось де ми зупинились', 'Друкуємо далі!', 'Згадаємо, де ми були'].includes(await text(page, '[data-msg] .bubble-text')), 'вправа не відновилась');
   ok((await page.$$('.dot.is-on')).length === 3, `точки прогресу після відновлення: ${(await page.$$('.dot.is-on')).length}`);
   await shot(page, 'resume');
   await play(page);

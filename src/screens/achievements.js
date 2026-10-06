@@ -3,7 +3,7 @@ import { AVATARS } from '../character/avatars.js';
 import { icons, stars } from '../design/icons.js';
 import { badge } from '../design/badges.js';
 import { BADGES } from '../content/badges.js';
-import { btn, homeButton, esc } from './common.js';
+import { btn, homeButton, esc, soundButton } from './common.js';
 import { totalStars, lessonsDone } from '../storage/badges.js';
 import { learnedCount } from '../lessons/course.js';
 import { accuracy, charsPerMinute, hardLetters } from '../lessons/stats.js';
@@ -41,7 +41,7 @@ export function achievementsScreen(profile) {
   }).join('');
   const earned = Object.keys(profile.badges).length;
   return `<div class="screen screen-ach theme-warm">
-    <div class="topbar">${homeButton()}<div class="topbar-spacer"></div>
+    <div class="topbar">${homeButton()}<div class="topbar-spacer"></div>${soundButton()}
       <button class="btn round light" data-go="adult" aria-label="Для дорослого">${icons.gear(32)}</button>
       ${btn({ label: 'Карта', icon: 'map', kind: 'primary', attrs: 'data-go="map"' })}</div>
     <div class="ach-me">

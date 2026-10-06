@@ -1,6 +1,6 @@
 import { klavik } from '../character/klavik.js';
 import { icons, stars } from '../design/icons.js';
-import { btn, homeButton, totalStars, speakButton } from './common.js';
+import { btn, homeButton, totalStars, speakButton, soundButton } from './common.js';
 import { lessonsFor, lessonTitle } from '../lessons/course.js';
 import { spokenTitle } from '../audio/lessonSpeech.js';
 import { speak } from '../audio/speech.js';
@@ -48,10 +48,13 @@ export function mapScreen(state = { layout: 'ua', level: '1-2', progress: { ua: 
     const inner = n.state === 'locked'
       ? `<span class="node-lock">${icons.lock(44)}</span>`
       : `<span class="node-label ${n.label.length > 3 ? 'is-small' : ''}">${n.label}</span>`;
+    // Кільце поточного уроку — малюнок SVG, а не рамка з тінню: так однаково чисто у Chrome, Firefox і Safari
+    const ring = n.state === 'current'
+      ? '<svg class="node-ring" viewBox="-96 -96 192 192" aria-hidden="true"><circle class="ring-glow" r="96"/><circle class="ring-body" r="76"/></svg>' : '';
     const under = n.state === 'locked' ? '' : stars(n.stars, 3, 30);
     const label = n.state === 'locked' ? `Урок ${n.id}: закритий` : lessonTitle(state.layout, n);
     return `<button class="node is-${n.state}" style="left:${n.x}px;top:${n.y}px" data-lesson-id="${n.id}" aria-label="${label}" ${n.state === 'locked' ? 'disabled' : ''}>
-      <span class="node-disc">${inner}</span><span class="node-stars">${under}</span></button>`;
+      ${ring}<span class="node-disc">${inner}</span><span class="node-stars">${under}</span></button>`;
   }).join('');
   const cur = nodes.find((n) => n.state === 'current') ?? nodes[nodes.length - 1];
   const total = starsOf({ progress: state.progress ?? {} });
@@ -65,7 +68,8 @@ export function mapScreen(state = { layout: 'ua', level: '1-2', progress: { ua: 
     <div class="topbar">${homeButton()}<div class="topbar-spacer"></div>
       <div class="segmented map-course" role="group" aria-label="Курс">${course}</div>
       ${btn({ label: 'Грай', icon: 'play', kind: 'primary', attrs: `data-lesson-id="${cur.id}"` })}${starsBtn}</div>
-    <div class="map-head"><div class="map-klavik" aria-hidden="true">${klavik('cheer', 104)}</div><div class="bubble map-title ${title.length > 22 ? 'is-long' : ''}" data-say="${spokenTitle(state.layout, cur)}"><span class="bubble-text">${title}</span>${speakButton('data-say-btn')}</div></div>
+    <div class="map-head"><div class="map-klavik" aria-hidden="true">${klavik('cheer', 96)}</div><div class="bubble map-title ${title.length > 20 ? 'is-long' : ''}" data-say="${spokenTitle(state.layout, cur)}"><span class="bubble-text">${title}</span>${speakButton('data-say-btn')}</div></div>
+    <div class="map-sound">${soundButton()}</div>
     <svg class="map-path" viewBox="0 0 1366 768" aria-hidden="true"><path d="${pathFor(nodes)}"/></svg>
     ${html}
   </div>`;

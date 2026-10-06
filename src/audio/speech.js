@@ -1,5 +1,8 @@
-// Озвучка через Web Speech API (проста версія; повна — Етап 5). Нічого не ламається, якщо голосу немає.
-let enabled = true;
+// Озвучка через Web Speech API. Прапорець PHRASE_SPEECH (settings.js) вимикає її повністю.
+// Нічого не ламається, якщо голосу немає.
+import { PHRASE_SPEECH } from './settings.js';
+
+let enabled = PHRASE_SPEECH;
 let voices = [];
 
 function refresh() {
@@ -10,7 +13,7 @@ try {
   window.speechSynthesis?.addEventListener?.('voiceschanged', refresh); // голоси завантажуються не одразу
 } catch { /* озвучки немає */ }
 
-export const setSpeechEnabled = (on) => { enabled = on; if (!on) stopSpeech(); };
+export const setSpeechEnabled = (on) => { enabled = PHRASE_SPEECH && on; if (!enabled) stopSpeech(); };
 
 export function hasVoice(lang = 'uk-UA') {
   return voices.some((v) => v.lang?.toLowerCase().startsWith(lang.slice(0, 2).toLowerCase()));

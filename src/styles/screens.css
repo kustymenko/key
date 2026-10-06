@@ -49,12 +49,16 @@
 /* Карта пригод */
 .map-path { pointer-events: none; position: absolute; inset: 0; width: 100%; height: 100%; }
 .map-path path { fill: none; stroke: var(--ui-line); stroke-width: 22; stroke-linecap: round; stroke-dasharray: 2 38; }
-.node { position: absolute; width: 128px; height: 128px; margin: -64px 0 0 -64px; padding: 0; border: 0; background: none; font: inherit; color: inherit; cursor: pointer; }
+.node { position: absolute; width: 128px; height: 128px; margin: -64px 0 0 -64px; padding: 0; border: 0; background: none; font: inherit; color: inherit; cursor: pointer; appearance: none; -webkit-appearance: none; overflow: visible; }
+.node::-moz-focus-inner { border: 0; padding: 0; }
 .node:disabled { cursor: default; }
 .node-label.is-small { font-size: 28px; }
 .node-disc { position: absolute; left: 0; top: 0; width: 128px; height: 128px; border-radius: 50%; display: grid; place-items: center; background: var(--ui-card); border: 5px solid var(--ui-main); font-weight: 800; font-size: 38px; }
 .node.is-done .node-disc { background: var(--node-done, var(--ui-main)); border-color: var(--ui-main); color: #fff; }
-.node.is-current .node-disc { border-color: var(--accent, var(--ui-main)); width: 160px; height: 160px; left: -16px; top: -16px; font-size: 48px; border-width: 8px; box-shadow: 0 0 0 16px rgb(255 194 26 / .32); }
+.node.is-current .node-disc { width: 160px; height: 160px; left: -16px; top: -16px; font-size: 48px; border: 0; background: none; }
+.node-ring { position: absolute; left: -32px; top: -32px; width: 192px; height: 192px; overflow: visible; pointer-events: none; }
+.node-ring .ring-glow { fill: rgb(255 194 26 / .32); }
+.node-ring .ring-body { fill: var(--ui-card); stroke: var(--accent, var(--ui-main)); stroke-width: 8; }
 .node.is-locked .node-disc { border: 4px dashed var(--ui-text-soft); background: var(--ui-bg); color: var(--ui-text-soft); }
 .node-stars { position: absolute; left: 4px; width: 120px; top: 138px; display: flex; justify-content: center; }
 .node.is-current .node-stars { top: 160px; }
@@ -147,8 +151,10 @@
 @media (prefers-reduced-motion: reduce) { .done-stars .star { animation: none; } }
 
 /* Карта: заголовок з Клавиком */
-.map-head { z-index: 4; position: absolute; left: 258px; max-width: 520px; top: 6px; display: flex; align-items: center; gap: 22px; }
-.map-title { font-size: 32px; padding: 6px 14px 6px 22px; line-height: 1.1; }
+.map-head { z-index: 4; position: absolute; left: 258px; max-width: 560px; top: 6px; display: flex; align-items: center; gap: 22px; }
+.map-title { font-size: 32px; padding: 8px 24px 8px 22px; line-height: 1.1; }
+.map-title .bubble-text { white-space: nowrap; } /* коротка назва — в один рядок: «О» не лишається сама */
+.map-sound { position: absolute; z-index: 4; right: 36px; bottom: 28px; }
 
 /* Хто ти?: розмір карток залежить від кількості дітей */
 .screen-profiles { position: relative; }
@@ -212,7 +218,8 @@
 
 /* Карта: заголовок уроку; кінець уроку: значки */
 .map-klavik { flex: none; }
-.map-title.is-long { font-size: 26px; max-width: 330px; }
+.map-title.is-long { font-size: 26px; max-width: 400px; }
+.map-title.is-long .bubble-text { white-space: normal; text-wrap: balance; } /* довга назва — два рівних рядки, без «сирітки» */
 .map-title .btn.round { flex: none; width: 52px; min-width: 52px; height: 52px; min-height: 52px; }
 .map-course .btn.seg { padding: 0 16px; min-width: 0; font-size: 24px; }
 .stars-btn { padding: 0 22px 0 14px; font-size: 32px; gap: 8px; }
@@ -220,3 +227,8 @@
 .done-badges-title { font-size: 26px; font-weight: 800; }
 .new-badge { display: flex; align-items: center; gap: 10px; font-size: 24px; font-weight: 800; }
 .badge-pop svg { animation: pop .5s cubic-bezier(.3, 1.6, .5, 1) both; }
+
+/* Перемикач звуку: вимкнений — з перекресленим динаміком і пунктиром (форма, а не лише колір) */
+.sound-toggle[data-off] { border-style: dashed; color: var(--ui-text-soft); }
+.screen-profiles > .topbar { pointer-events: none; }
+.screen-profiles > .topbar .btn { pointer-events: auto; }
