@@ -6,10 +6,11 @@ import { ROWS } from './layouts.js';
 const SHOW_MS = 160; // найкоротший час, поки натиснута клавіша видна
 const KEYS = new Map(ROWS.flat().map((k) => [k.code, k]));
 
-// Показати палець на схемі долонь (і підпис під нею)
+// Показати палець (або кілька, як для Shift + літера) на схемі долонь і підпис під нею
 export function setActiveFinger(root, id) {
-  root.querySelectorAll('.finger').forEach((el) => el.classList.toggle('is-active', !!id && el.classList.contains(`f-${id}`)));
-  const name = FINGERS.find((f) => f.id === id)?.name ?? '';
+  const ids = [id].flat().filter(Boolean);
+  root.querySelectorAll('.finger').forEach((el) => el.classList.toggle('is-active', ids.some((f) => el.classList.contains(`f-${f}`))));
+  const name = ids.map((f) => FINGERS.find((x) => x.id === f)?.name).filter(Boolean).join(' + ');
   const caption = root.querySelector('.hands-caption');
   if (caption) caption.textContent = name;
   root.querySelector('.hands')?.setAttribute('aria-label', `Схема долонь${name ? ': ' + name : ''}`);

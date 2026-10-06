@@ -10,6 +10,8 @@ export const icons = {
   check: (s) => wrap('<path d="m5 12.5 4.5 4.5L19 7.5" stroke-width="3.4"/>', s),
   lock: (s) => wrap('<rect x="5.5" y="10.5" width="13" height="9.5" rx="2.4" fill="currentColor"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/>', s),
   replay: (s) => wrap('<path d="M5 12a7 7 0 1 0 2.2-5.1"/><path d="M4.5 4.5v4.5H9"/>', s),
+  next: (s) => wrap('<path d="M5 12h13"/><path d="m13 6 6 6-6 6"/>', s),
+  map: (s) => wrap('<path d="M4 6.5 9 5l6 1.5 5-1.5v12.5L15 19.5 9 18l-5 1.5z"/><path d="M9 5v13M15 6.5v13"/>', s),
   plus: (s) => wrap('<path d="M12 5v14M5 12h14" stroke-width="3.4"/>', s),
 };
 

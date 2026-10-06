@@ -13,3 +13,6 @@ export const bubble = (text, { speak = true } = {}) =>
   `<div class="bubble"><span class="bubble-text">${text}</span>${speak ? speakButton() : ''}</div>`;
 
 export const totalStars = (n) => `<div class="pill" aria-label="Зірочок: ${n}">${stars(1, 1, 36)}<b>${n}</b></div>`;
+
+// Тло навколо сцени: теплі екрани займають усе вікно (без сірих смужок з боків)
+export const setBackdrop = (warm) => document.body.classList.toggle('is-warm', warm);

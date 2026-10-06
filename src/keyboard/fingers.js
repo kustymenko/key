@@ -38,3 +38,6 @@ export function fingerOf(code) {
 export const HOME_CODES = {
   lp: 'KeyA', lr: 'KeyS', lm: 'KeyD', li: 'KeyF', ri: 'KeyJ', rm: 'KeyK', rr: 'KeyL', rp: 'Semicolon',
 };
+
+// Який Shift тримати для клавіші: ту, що лівою рукою, — правим Shift, і навпаки
+export const shiftCodeFor = (code) => (fingerOf(code)?.startsWith('l') ? 'ShiftRight' : 'ShiftLeft');
