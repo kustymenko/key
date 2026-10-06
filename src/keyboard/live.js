@@ -25,10 +25,10 @@ export function setKeyboardLayout(root, layout) {
 
 /**
  * Слухає справжню клавіатуру і підсвічує клавішу та палець у `root`.
- * getLayout() — яка розкладка очікується; onKey({ code, key, label, finger, kind }) — для екрана.
+ * getLayout() — яка розкладка очікується; trackFinger: false — не міняти палець на долонях (у вправі); onKey({ code, key, label, finger, kind }) — для екрана.
  * Повертає функцію, яка вимикає слухачів.
  */
-export function attachLiveKeyboard(root, { getLayout, onKey = () => {} }) {
+export function attachLiveKeyboard(root, { getLayout, onKey = () => {}, trackFinger = true }) {
   const since = new Map(); // code -> коли натиснули
   const timers = new Map();
   const keyEl = (code) => root.querySelector(`.key[data-code="${code}"]`);
@@ -49,7 +49,7 @@ export function attachLiveKeyboard(root, { getLayout, onKey = () => {} }) {
       clearTimeout(timers.get(e.code));
       since.set(e.code, performance.now());
       el.classList.add('is-pressed');
-      setActiveFinger(root, fingerOf(e.code));
+      if (trackFinger) setActiveFinger(root, fingerOf(e.code)); // у вправі палець лишається «правильним»
     }
     if (e.repeat) return;
     const k = KEYS.get(e.code);

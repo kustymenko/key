@@ -4,7 +4,7 @@ export const btn = ({ label, icon, kind = '', size = '', attrs = '' }) =>
   `<button class="btn ${kind} ${size}" ${attrs}>${icon ? icons[icon](32) : ''}${label ? `<span>${label}</span>` : ''}</button>`;
 
 // Кнопка «Додому»: завжди зліва вгорі
-export const homeButton = () => btn({ label: 'Додому', icon: 'home', kind: 'light', attrs: 'aria-label="Додому"' });
+export const homeButton = () => btn({ label: 'Додому', icon: 'home', kind: 'light', attrs: 'aria-label="Додому" data-home' });
 
 export const speakButton = () =>
   `<button class="btn round light" aria-label="Послухати">${icons.speaker(32)}</button>`;

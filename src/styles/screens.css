@@ -97,3 +97,25 @@
 .screen-keys .key { --h: 58px; font-size: 26px; }
 .screen-keys .key.is-service { font-size: 20px; }
 .screen-keys .topbar .segmented { margin-right: 8px; }
+
+/* Урок: знайомство з літерою («а» = клавіша «А») */
+.task-ch.is-current { transition: none; }
+.intro-eq { font-size: 72px; font-weight: 800; align-self: center; color: var(--ui-text-soft); padding: 0 6px; }
+.press-key.intro-key { width: 118px; height: 118px; font-size: 76px; border-radius: 26px; align-self: center; }
+.screen-exercise .task-main > [data-msg] { min-height: 62px; }
+.task-text[data-task] { align-items: center; }
+
+/* Пауза */
+.pause-layer { position: absolute; inset: 0; z-index: 20; background: rgb(242 244 246 / .96); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 36px; }
+.pause-layer .row { gap: 32px; }
+
+/* Кінець уроку (тепла гама, без клавіатури) */
+.screen-done { display: flex; align-items: center; justify-content: center; }
+.done-main { display: flex; flex-direction: column; align-items: center; gap: 22px; }
+.done-bubble { font-size: 52px; padding: 14px 36px; }
+.done-bubble::before { display: none; }
+.done-stars .star { animation: pop .5s cubic-bezier(.3, 1.6, .5, 1) both; }
+.done-stars .star:nth-child(2) { animation-delay: .25s; }
+.done-stars .star:nth-child(3) { animation-delay: .5s; }
+@keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .done-stars .star { animation: none; } }

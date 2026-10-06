@@ -12,6 +12,7 @@ import { profilesScreen } from './screens/profiles.js';
 import { mapScreen } from './screens/map.js';
 import { exerciseScreen } from './screens/exercise.js';
 import { keyboardScreen, mountKeyboardScreen } from './screens/keyboard.js';
+import { lessonScreen, mountLesson } from './screens/lesson.js';
 
 const app = document.getElementById('app');
 const state = { layout: 'ua', level: '1-2' };
@@ -22,9 +23,10 @@ const SCREENS = {
   exercise: () => exerciseScreen({ layout: state.layout }),
   'exercise-error': () => exerciseScreen({ hint: 'error', layout: state.layout }),
   keyboard: () => keyboardScreen({ layout: state.layout }),
+  lesson: lessonScreen,
 };
 // Екрани, які слухають справжню клавіатуру: повертають функцію «вимкнути»
-const MOUNT = { keyboard: mountKeyboardScreen };
+const MOUNT = { keyboard: mountKeyboardScreen, lesson: mountLesson };
 let unmount = null;
 
 // Сцена 1366×768, яка масштабується під вікно
@@ -57,6 +59,11 @@ function render() {
     fitFrames();
   }
 }
+
+// Кнопка «Додому» на будь-якому екрані повертає на головну сторінку
+document.addEventListener('click', (e) => {
+  if (e.target.closest('[data-home]')) location.hash = '';
+});
 
 // Перемикачі в демо (мова клавіатури і рівень)
 document.addEventListener('click', (e) => {

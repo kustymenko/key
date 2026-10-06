@@ -8,7 +8,7 @@ const SERVICE = new Set(['Backspace', 'Tab', 'CapsLock', 'Enter', 'ShiftLeft', '
 const NAMES = { ua: 'УКР', en: 'ENG' };
 
 // Підказка «Перемкни мову: Alt + Shift» з картинкою клавіш
-const layoutHint = (layout) =>
+export const layoutHint = (layout) =>
   `<div class="bubble layout-hint" role="status" aria-label="Перемкни мову: Alt+Shift">
     <span class="bubble-text">Перемкни мову:</span>
     <span class="keycap">Alt</span><span class="keys-plus">+</span><span class="keycap">Shift</span>
