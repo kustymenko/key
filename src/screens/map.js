@@ -69,6 +69,7 @@ export function mapScreen(state = { layout: 'ua', level: '1-2', progress: { ua: 
       <div class="segmented map-course" role="group" aria-label="Курс">${course}</div>
       ${btn({ label: 'Грай', icon: 'play', kind: 'primary', attrs: `data-lesson-id="${cur.id}"` })}${starsBtn}</div>
     <div class="map-head"><div class="map-klavik" aria-hidden="true">${klavik('cheer', 96)}</div><div class="bubble map-title ${title.length > 20 ? 'is-long' : ''}" data-say="${spokenTitle(state.layout, cur)}"><span class="bubble-text">${title}</span>${speakButton('data-say-btn')}</div></div>
+    <div class="map-games">${btn({ label: 'Ігри', icon: 'balloon', kind: 'light', attrs: 'data-go="games" aria-label="Ігри"' })}</div>
     <div class="map-sound">${soundButton()}</div>
     <svg class="map-path" viewBox="0 0 1366 768" aria-hidden="true"><path d="${pathFor(nodes)}"/></svg>
     ${html}

@@ -16,6 +16,8 @@ import { mapScreen, mountMap } from './screens/map.js';
 import { setBackdrop, soundButton } from './screens/common.js';
 import { exerciseScreen } from './screens/exercise.js';
 import { keyboardScreen, mountKeyboardScreen } from './screens/keyboard.js';
+import { gamesScreen, mountGames } from './screens/games.js';
+import { gameScreen, mountGame } from './screens/game.js';
 import { lessonScreen, mountLesson } from './screens/lesson.js';
 import { createStore } from './storage/store.js';
 import { stopSpeech } from './audio/speech.js';
@@ -26,7 +28,7 @@ const freshProgress = () => ({ ua: {}, en: {} });
 // Стан сесії. profileId — яка дитина зараз за комп'ютером (не зберігається: за ноутбук сідають по черзі).
 // Без профілю (лише в демо) прогрес живе в пам'яті вкладки. demo — сторінка для вчителя (#demo).
 const state = {
-  layout: 'ua', level: '1-2', lessonId: 1, progress: freshProgress(), openAll: false,
+  layout: 'ua', level: '1-2', lessonId: 1, gameKind: 'balloons', progress: freshProgress(), openAll: false,
   profileId: null, demo: false, store: createStore(),
   openProfile(id) {
     const p = this.store.get(id);
@@ -55,6 +57,8 @@ const SCREENS = {
   achievements: () => achievementsScreen(state.store.get(state.profileId)),
   adult: adultScreen,
   lesson: lessonScreen,
+  games: () => gamesScreen(state),
+  game: gameScreen,
   // Ескізи — лише для вчителя (#demo)
   exercise: () => exerciseScreen({ layout: state.layout }),
   'exercise-error': () => exerciseScreen({ hint: 'error', layout: state.layout }),
@@ -65,7 +69,7 @@ const NEEDS_PROFILE = new Set(['achievements', 'adult']); // карта й ур�
 // Екрани, які слухають справжню клавіатуру або кліки: повертають функцію «вимкнути»
 const MOUNT = {
   '': mountProfiles, new: mountNewProfile, adult: mountAdult,
-  keyboard: mountKeyboardScreen, lesson: mountLesson, map: mountMap,
+  keyboard: mountKeyboardScreen, lesson: mountLesson, map: mountMap, games: mountGames, game: mountGame,
 };
 let unmount = null;
 
@@ -90,7 +94,7 @@ function routeName() {
   if (name === 'demo') return name;
   if (!(name in SCREENS)) return '';
   if (DEMO_ONLY.has(name) && !state.demo) return '';
-  if (!state.profileId && (NEEDS_PROFILE.has(name) || (!state.demo && (name === 'map' || name === 'lesson')))) return '';
+  if (!state.profileId && (NEEDS_PROFILE.has(name) || (!state.demo && (name === 'map' || name === 'lesson' || name === 'games' || name === 'game')))) return '';
   return name;
 }
 
