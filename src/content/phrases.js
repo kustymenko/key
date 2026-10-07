@@ -61,3 +61,22 @@ export function donePhrase({ level, stars, what, count, last }) {
   const list = DONE_PHRASES[level][stars].filter((p) => what || !p.includes('{what}')).map((p) => fill(p, vars));
   return pickPhrase(list, last);
 }
+
+// Міні-ігри (до 5 слів). Без «програшу»: навіть якщо нічого не вдалось — підбадьорення.
+export const GAME_START = {
+  balloons: ['Лопай кульки!', 'Натисни літеру на кульці', 'Лопни кульки літерами!', 'Кульки летять, лопай!', 'Знайди літеру кульки'],
+  falling: ['Лови літери!', 'Натискай, поки падають', 'Лови літери пальцями', 'Літери падають, лови!', 'Спіймай кожну літеру'],
+};
+export const GAME_PRAISE = ['Так!', 'Влучно!', 'Класно!', 'Чудово!', 'Молодець!', 'Ось так!'];
+// Серія влучань поспіль
+export const GAME_STREAK = ['Ти в ударі!', 'Без жодного промаху!', 'Так тримати!', 'Супер швидко!', 'Чудова серія!'];
+export const GAME_DONE_ZERO = ['Нічого, спробуй ще раз!', 'Давай ще разок!', 'Наступного разу вийде!'];
+export const GAME_RECORD = ['Новий рекорд!', 'Ти побив свій рекорд!', 'Це твій рекорд!'];
+
+// Підсумок гри: «Ти лопнув 12 кульок!» / «Ти спіймав 8 літер!»
+export function gameDonePhrase(kind, n, last = null) {
+  if (n <= 0) return pickPhrase(GAME_DONE_ZERO, last);
+  return kind === 'balloons'
+    ? `Ти лопнув ${n} ${plural(n, ['кульку', 'кульки', 'кульок'])}!`
+    : `Ти спіймав ${n} ${plural(n, ['літеру', 'літери', 'літер'])}!`;
+}

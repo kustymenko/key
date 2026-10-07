@@ -23,6 +23,10 @@ export function cleanProfile(p) {
   for (const [ch, n] of Object.entries(s.missed ?? {})) if (num(n)) missed[ch] = n;
   const badges = {};
   for (const [id, t] of Object.entries(p.badges ?? {})) if (Number.isFinite(t)) badges[id] = t;
+  const games = {}; // найкращий результат у кожній грі: { 'balloons-ua': { plays, best } }
+  for (const [k, g] of Object.entries(p.games ?? {})) {
+    if (/^(balloons|falling)-(ua|en)$/.test(k) && g && typeof g === 'object') games[k] = { plays: num(g.plays), best: num(g.best) };
+  }
   return {
     id: p.id,
     name: String(p.name ?? '').slice(0, MAX_NAME) || '?',
@@ -32,6 +36,7 @@ export function cleanProfile(p) {
     progress,
     stats: { typed: num(s.typed), errors: num(s.errors), ms: num(s.ms), chars: num(s.chars), missed },
     badges,
+    games,
     flags: { clean: !!p.flags?.clean },
     resume: p.resume && typeof p.resume === 'object' && Array.isArray(p.resume.steps) ? p.resume : null,
   };
@@ -119,6 +124,18 @@ export function createStore(storage = safeStorage()) {
       const fresh = awardBadges(p);
       save();
       return fresh;
+    },
+
+    // Гру зіграно: запам'ятовуємо найкращий результат (порівняння лише з самим собою); record — чи побито
+    saveGame(id, kind, layout, score) {
+      const p = find(id);
+      if (!p) return { record: false, best: score };
+      const key = `${kind}-${layout}`;
+      const g = p.games[key] ?? { plays: 0, best: 0 };
+      const record = g.plays > 0 && score > g.best;
+      p.games[key] = { plays: g.plays + 1, best: Math.max(g.best, score) };
+      save();
+      return { record, best: p.games[key].best };
     },
 
     // Скинути прогрес: зірочки, значки, статистика; ім'я, тваринка й рівень лишаються

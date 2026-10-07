@@ -232,3 +232,63 @@
 .sound-toggle[data-off] { border-style: dashed; color: var(--ui-text-soft); }
 .screen-profiles > .topbar { pointer-events: none; }
 .screen-profiles > .topbar .btn { pointer-events: auto; }
+
+/* ---------- Міні-ігри ---------- */
+/* Меню «Ігри» (тепла гама, без клавіатури) */
+.games-head { position: absolute; left: 0; right: 0; top: 96px; display: flex; align-items: center; justify-content: center; gap: 28px; }
+.games-head .bubble { font-size: 52px; padding: 14px 28px 14px 40px; }
+.game-cards { position: absolute; left: 0; right: 0; top: 290px; display: flex; justify-content: center; gap: 56px; }
+.game-card { width: 420px; height: 380px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 0; font: inherit; color: var(--ui-text); background: var(--ui-card); border: 4px solid var(--ui-main); border-radius: 36px; box-shadow: 0 10px 0 var(--ui-main); cursor: pointer; }
+.game-card:active:not(:disabled) { transform: translateY(8px); box-shadow: 0 2px 0 var(--ui-main); }
+.game-card.is-locked { border-style: dashed; box-shadow: none; background: var(--ui-bg); color: var(--ui-text-soft); cursor: default; }
+.game-art { display: grid; place-items: center; height: 168px; }
+.game-art-lock { display: grid; place-items: center; width: 140px; height: 140px; border-radius: 50%; border: 4px dashed var(--ui-text-soft); }
+.game-name { font-size: 44px; line-height: 1.1; }
+.game-note { display: inline-flex; align-items: center; gap: 10px; font-size: 28px; font-weight: 800; color: var(--ui-text-soft); }
+
+/* Екран гри (нейтральна гама: на екрані клавіатура) */
+.screen-game .game-title { gap: 10px; }
+.screen-game .topbar-spacer { display: flex; align-items: center; justify-content: center; }
+.game-field { position: absolute; left: 36px; right: 36px; top: 104px; height: 380px; overflow: hidden; background: var(--ui-card); border: 4px solid var(--ui-main); border-radius: 36px; box-shadow: 0 8px 0 var(--ui-main); }
+.game-bottom { position: absolute; left: 36px; right: 36px; top: 506px; display: flex; align-items: flex-start; gap: 28px; }
+.game-kb { flex: none; width: 880px; }
+.game-kb .key { --h: 54px; font-size: 26px; }
+.game-kb .key.is-next { font-size: 30px; }
+.game-helper { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.game-helper .bubble { font-size: 26px; padding: 8px 18px; text-align: center; min-height: 52px; }
+.game-helper .bubble::before { display: none; }
+.time-bar { width: 260px; height: 18px; border: 3px solid var(--ui-main); border-radius: 999px; overflow: hidden; background: var(--ui-bg); }
+.time-bar i { display: block; height: 100%; background: var(--ui-main); transform-origin: left; }
+
+/* Кулька / плитка: колір береться з пальця, яким натискають цю літеру */
+.game-item { position: absolute; left: 0; top: 0; width: 92px; height: 112px; will-change: transform; transition: opacity .4s; }
+.game-item-ch { position: absolute; left: 0; top: 0; width: 92px; height: 92px; display: grid; place-items: center; font-size: 54px; font-weight: 800; line-height: 1; color: var(--ui-key-text); background: var(--cp); border: 4px solid var(--ui-main); border-radius: 50% 50% 48% 48%; transition: transform .15s; }
+.game-item.is-balloons::after { content: ''; position: absolute; left: 41px; top: 92px; width: 10px; height: 14px; background: var(--ui-main); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.game-item.is-falling .game-item-ch { border-radius: 22px; box-shadow: 0 6px 0 var(--ui-main); }
+.game-item.is-target .game-item-ch { outline: 6px solid var(--ui-main); outline-offset: 3px; background: var(--c); color: var(--ink, var(--ui-text)); }
+.game-item.is-away, .game-item.is-fade { opacity: 0; }
+.game-item.is-pop { pointer-events: none; }
+.game-item.is-pop .game-item-ch { animation: popout .32s ease-out forwards; }
+@keyframes popout { 0% { transform: scale(1); opacity: 1; } 40% { transform: scale(1.3); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
+.spark { position: absolute; left: 44px; top: 44px; width: 14px; height: 14px; border-radius: 50%; background: var(--warm-gold); border: 3px solid var(--ui-main); animation: spark .45s ease-out forwards; }
+@keyframes spark { from { transform: rotate(var(--a)) translateY(0); opacity: 1; } to { transform: rotate(var(--a)) translateY(-78px); opacity: 0; } }
+
+/* Початок гри і підказка про мову */
+.game-intro { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: rgb(255 255 255 / .96); }
+.game-intro .bubble { font-size: 36px; }
+.game-intro .bubble::before { display: none; }
+.game-letters { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 900px; }
+.game-letters .keycap { min-width: 50px; height: 44px; padding: 0 10px; font-size: 26px; box-shadow: 0 4px 0 var(--ui-main); }
+.game-banner { position: absolute; left: 0; right: 0; top: 14px; z-index: 6; display: flex; justify-content: center; pointer-events: none; }
+.game-banner[hidden] { display: none; }
+
+/* Кінець гри */
+.game-score { display: flex; align-items: center; gap: 22px; }
+.game-score b { font-size: 120px; line-height: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .game-item.is-pop .game-item-ch { animation: none; opacity: 0; }
+  .spark { display: none; }
+}
+.map-games { position: absolute; z-index: 4; right: 36px; top: 98px; }
+.game-intro { gap: 10px; }
+.game-intro .bubble { font-size: 32px; padding: 6px 24px; }
