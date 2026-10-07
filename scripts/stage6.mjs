@@ -53,6 +53,7 @@ for (const [w, h] of [[1366, 768], [1920, 1080]]) {
   // 2. Після 3 — відкриті «Кульки», після 6 — обидві
   await open(page, seed('ua', '1-2', 3));
   await page.click('[data-go="games"]');
+  await page.waitForSelector('.screen-games');
   ok((await page.$$('.game-card:disabled')).length === 1, `${w}: після 3 уроків має бути закрита лише «Падаючі літери»`);
   await page.screenshot({ path: `screenshots/s6-games-3-${w}.png` });
 

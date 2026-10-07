@@ -20,7 +20,7 @@ export const icons = {
   close: (s) => wrap('<path d="M6 6l12 12M18 6 6 18" stroke-width="3.4"/>', s),
   trash: (s) => wrap('<path d="M5 7h14M9.5 7V4.5h5V7"/><path d="M6.5 7l1 13h9l1-13"/>', s),
   balloon: (s) => wrap('<ellipse cx="12" cy="9.5" rx="6" ry="7" fill="currentColor"/><path d="M12 16.5l-1.6 2.4h3.2z" fill="currentColor"/><path d="M12 19c-1.5 1.2 1.5 2 0 3.2"/>', s),
-  drop: (s) => wrap('<path d="M12 3v7"/><path d="m8.5 7.5 3.5 4 3.5-4"/><rect x="7" y="14" width="10" height="7" rx="2.4" fill="currentColor"/>', s),
+  drop: (s) => wrap('<rect x="6" y="2.5" width="12" height="11" rx="3" fill="currentColor"/><path d="M12 16.5v4.5"/><path d="m8.5 18 3.5 3.5 3.5-3.5"/>', s),
   plus: (s) => wrap('<path d="M12 5v14M5 12h14" stroke-width="3.4"/>', s),
 };
 

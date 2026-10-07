@@ -198,7 +198,7 @@ export function mountGame(root, state) {
           ${record ? `<div class="done-badges" role="status"><span class="done-badges-title">${icons.trophy(34)} ${pickPhrase(GAME_RECORD)}</span></div>` : ''}
           <div class="done-buttons">
             ${btn({ label: 'Ще раз', icon: 'replay', kind: 'primary', size: 'big', attrs: 'data-act="again"' })}
-            ${btn({ label: 'Ігри', icon: kind === 'balloons' ? 'balloon' : 'drop', kind: 'light', size: 'big', attrs: 'data-go="games"' })}
+            ${btn({ label: 'Ігри', icon: 'balloon', kind: 'light', size: 'big', attrs: 'data-go="games"' })}
             ${btn({ label: 'Карта', icon: 'map', kind: 'light', size: 'big', attrs: 'data-go="map"' })}
           </div>
         </div>
