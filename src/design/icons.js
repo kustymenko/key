@@ -10,6 +10,8 @@ export const icons = {
   sound: (s) => wrap('<path d="M9 18V6l10-2v12" /><circle cx="6.5" cy="18" r="2.6" fill="currentColor"/><circle cx="16.5" cy="16" r="2.6" fill="currentColor"/>', s),
   soundOff: (s) => wrap('<path d="M9 18V6l10-2v12" /><circle cx="6.5" cy="18" r="2.6" fill="currentColor"/><circle cx="16.5" cy="16" r="2.6" fill="currentColor"/><path d="M3 3l18 18" stroke-width="3.2"/>', s),
   check: (s) => wrap('<path d="m5 12.5 4.5 4.5L19 7.5" stroke-width="3.4"/>', s),
+  pencil: (s) => wrap('<path d="M5 19l1-4.2L16.5 4.3a2 2 0 0 1 2.8 0l.4.4a2 2 0 0 1 0 2.8L9.2 18z"/><path d="M14.5 6.5l3 3"/>', s),
+  eye: (s) => wrap('<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3" fill="currentColor"/>', s),
   lock: (s) => wrap('<rect x="5.5" y="10.5" width="13" height="9.5" rx="2.4" fill="currentColor"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/>', s),
   replay: (s) => wrap('<path d="M5 12a7 7 0 1 0 2.2-5.1"/><path d="M4.5 4.5v4.5H9"/>', s),
   next: (s) => wrap('<path d="M5 12h13"/><path d="m13 6 6 6-6 6"/>', s),

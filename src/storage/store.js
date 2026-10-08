@@ -104,13 +104,13 @@ export function createStore(storage = safeStorage()) {
     },
 
     // Прогрес після кожної вправи: додаємо статистику й запам'ятовуємо, де зупинилась дитина
-    saveStep(id, { typed, errors, ms, chars, missed, resume }) {
+    saveStep(id, { typed, errors, ms, chars, missed, resume, keepResume = false }) {
       const p = find(id);
       if (!p) return;
       const s = p.stats;
       s.typed += typed; s.errors += errors; s.ms += ms; s.chars += chars;
       for (const [ch, n] of Object.entries(missed ?? {})) s.missed[ch] = (s.missed[ch] ?? 0) + n;
-      p.resume = resume ?? null;
+      if (!keepResume) p.resume = resume ?? null; // вільне друкування не чіпає збережене місце в уроці
       save();
     },
 

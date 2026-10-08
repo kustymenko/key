@@ -5,6 +5,7 @@ import { lessonsFor, lessonTitle } from '../lessons/course.js';
 import { spokenTitle } from '../audio/lessonSpeech.js';
 import { speak } from '../audio/speech.js';
 import { totalStars as starsOf } from '../storage/badges.js';
+import { freeReady, FREE_UNLOCK } from '../lessons/generator.js';
 
 const COLS = 7; // вузлів у ряду; ряди йдуть зміїкою
 const X0 = 130;
@@ -42,6 +43,14 @@ function pathFor(nodes) {
   return d;
 }
 
+// «Вільно»: друкування слів і речень з усіх вивчених літер. Поки слів мало — закрито, з підказкою
+function freeButton(state) {
+  const open = freeReady(state.layout, state.progress, state.openAll);
+  return open
+    ? btn({ label: 'Вільно', icon: 'pencil', kind: 'light', attrs: 'data-free aria-label="Вільне друкування"' })
+    : btn({ label: 'Вільно', icon: 'lock', kind: 'light', attrs: `disabled aria-label="Вільне друкування: після ${FREE_UNLOCK[state.layout]} уроку"` });
+}
+
 export function mapScreen(state = { layout: 'ua', level: '1-2', progress: { ua: {}, en: {} } }) {
   const nodes = mapNodes(state);
   const html = nodes.map((n) => {
@@ -69,7 +78,7 @@ export function mapScreen(state = { layout: 'ua', level: '1-2', progress: { ua: 
       <div class="segmented map-course" role="group" aria-label="Курс">${course}</div>
       ${btn({ label: 'Грай', icon: 'play', kind: 'primary', attrs: `data-lesson-id="${cur.id}"` })}${starsBtn}</div>
     <div class="map-head"><div class="map-klavik" aria-hidden="true">${klavik('cheer', 96)}</div><div class="bubble map-title ${title.length > 20 ? 'is-long' : ''}" data-say="${spokenTitle(state.layout, cur)}"><span class="bubble-text">${title}</span>${speakButton('data-say-btn')}</div></div>
-    <div class="map-games">${btn({ label: 'Ігри', icon: 'balloon', kind: 'light', attrs: 'data-go="games" aria-label="Ігри"' })}</div>
+    <div class="map-games">${freeButton(state)}${btn({ label: 'Ігри', icon: 'balloon', kind: 'light', attrs: 'data-go="games" aria-label="Ігри"' })}</div>
     <div class="map-sound">${soundButton()}</div>
     <svg class="map-path" viewBox="0 0 1366 768" aria-hidden="true"><path d="${pathFor(nodes)}"/></svg>
     ${html}
@@ -82,10 +91,12 @@ export function mountMap(root, state) {
   const timer = setTimeout(() => say && speak(say.dataset.say), 500); // Клавик називає урок
   const onClick = (e) => {
     if (e.target.closest('[data-say-btn]')) return speak(say.dataset.say);
+    if (e.target.closest('[data-free]')) { state.free = true; return state.go('lesson'); }
     const c = e.target.closest('[data-course]');
     if (c) return state.setLayout(c.dataset.course);
     const b = e.target.closest('[data-lesson-id]');
     if (!b || b.disabled) return;
+    state.free = false;
     state.lessonId = Number(b.dataset.lessonId);
     state.go('lesson');
   };

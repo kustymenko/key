@@ -194,3 +194,60 @@ export function buildLesson({ layout, id, level = '1-2', rng = Math.random }) {
     steps: [...intro, ...texts.map((text) => ({ kind: 'drill', text }))],
   };
 }
+
+// ---------- вільне друкування ----------
+// Слова й речення з банків лише з тих клавіш, які дитина вже вивчила (до найдальшого пройденого уроку).
+// Вільне друкування відкривається, коли слів для вправ уже досить (УКР — після 3 уроку, ENG — після 7).
+export const FREE_UNLOCK = { ua: 3, en: 7 };
+const SHIFT_LESSON = { ua: 20, en: 17 };
+
+// Найдальший пройдений урок курсу (0 — ще нічого)
+export function topLesson(layout, progress) {
+  const ids = Object.keys(progress?.[layout] ?? {}).map(Number);
+  return ids.length ? Math.max(...ids) : 0;
+}
+export const freeReady = (layout, progress, openAll = false) => openAll || topLesson(layout, progress) >= FREE_UNLOCK[layout];
+
+// Речення банку, які можна надрукувати лише вивченими клавішами (велика літера — якщо вивчено Shift)
+export function freeSentences(layout, id) {
+  const known = learnedKeys(layout, id);
+  const shiftOk = id >= SHIFT_LESSON[layout];
+  return SENTENCES[layout].filter((x) => x.s.length >= 15 && x.s.length <= MAX_34
+    && [...x.s].every((c) => known.has(c) || (shiftOk && c !== c.toLowerCase() && known.has(c.toLowerCase()))));
+}
+
+/**
+ * Вільне друкування: { id, letters: [], steps } тільки з вправ (без знайомства з клавішами).
+ * 1–2 клас: 5 коротких вправ зі слів (5–10 знаків). 3–4 клас: 3 вправи — слова, речення, два речення.
+ * id — найдальший пройдений урок: вивчені клавіші беремо до нього включно.
+ */
+export function buildFree({ layout, id, level = '1-2', rng = Math.random }) {
+  const lesson = { id, letters: [], kind: 'review' };
+  const words = uniqItems(wordPool(layout, id).map((x) => x.w).filter((w) => w.length >= 2));
+  const syl = syllablePool(layout, id);
+  let texts;
+  if (level === '3-4') {
+    const sents = freeSentences(layout, id);
+    const long = uniqItems(words.filter((w) => w.length >= 3 && w.length <= 8));
+    const base = long.length >= 6 ? long : uniqItems([...long, ...syl]);
+    const sentence = (avoid = '') => { const ok = sents.filter((x) => !avoid.includes(x.s) && x.s.length <= 48); return ok.length ? pick(rng, ok).s : null; };
+    const first = sentence();
+    const second = first ? sentence(first) : null;
+    texts = [
+      compose34(rng, base, ' ', TARGETS_34[0]),
+      first ?? compose34(rng, base, ' ', TARGETS_34[1]),
+      first && second && first.length + second.length + 1 <= MAX_34 ? `${first} ${second}` : compose34(rng, base, ' ', TARGETS_34[2]),
+    ];
+  } else {
+    const items = words.filter((w) => w.length <= 6);
+    const pool = items.length >= 10 ? items : uniqItems([...items, ...syl]);
+    const used = new Set();
+    texts = [];
+    for (let i = 0; i < 5; i++) {
+      const t = compose12(rng, pool, true, used) ?? pool[0];
+      used.add(t);
+      texts.push(t);
+    }
+  }
+  return { id, letters: lesson.letters, steps: texts.map((text) => ({ kind: 'drill', text })) };
+}
