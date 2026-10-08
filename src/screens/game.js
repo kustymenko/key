@@ -3,7 +3,7 @@ import { keyboard } from '../keyboard/onscreen.js';
 import { attachLiveKeyboard } from '../keyboard/live.js';
 import { codeOfChar } from '../keyboard/layouts.js';
 import { icons } from '../design/icons.js';
-import { btn, homeButton, soundButton, setBackdrop } from './common.js';
+import { btn, homeButton, soundButton, setBackdrop, offerBreak } from './common.js';
 import { layoutHint } from './keyboard.js';
 import { gameArt } from './games.js';
 import { playSfx } from '../audio/sfx.js';
@@ -204,6 +204,7 @@ export function mountGame(root, state) {
         </div>
       </div>
     </div>`;
+    offerBreak(stage.firstElementChild, state);
   }
 
   function start() {

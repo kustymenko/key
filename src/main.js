@@ -22,6 +22,7 @@ import { lessonScreen, mountLesson } from './screens/lesson.js';
 import { createStore } from './storage/store.js';
 import { stopSpeech } from './audio/speech.js';
 import { sfx } from './audio/sfx.js';
+import { createActivity } from './session.js';
 
 const app = document.getElementById('app');
 const freshProgress = () => ({ ua: {}, en: {} });
@@ -29,14 +30,16 @@ const freshProgress = () => ({ ua: {}, en: {} });
 // Без профілю (лише в демо) прогрес живе в пам'яті вкладки. demo — сторінка для вчителя (#demo).
 const state = {
   layout: 'ua', level: '1-2', lessonId: 1, gameKind: 'balloons', progress: freshProgress(), openAll: false,
-  profileId: null, demo: false, store: createStore(),
+  profileId: null, demo: false, free: false, store: createStore(), activity: createActivity(),
   openProfile(id) {
     const p = this.store.get(id);
     if (!p) return;
-    Object.assign(this, { profileId: id, layout: p.layout, level: p.level, progress: p.progress, lessonId: 1 });
+    Object.assign(this, { profileId: id, layout: p.layout, level: p.level, progress: p.progress, lessonId: 1, free: false });
+    this.activity.reset();
   },
   closeProfile() {
-    Object.assign(this, { profileId: null, progress: freshProgress(), lessonId: 1 });
+    Object.assign(this, { profileId: null, progress: freshProgress(), lessonId: 1, free: false });
+    this.activity.reset();
   },
   // Перейти на екран (і перемалювати, якщо адреса вже така)
   go(name) {
@@ -122,6 +125,10 @@ function render() {
   setBackdrop(!!app.querySelector('.stage > .screen.theme-warm')); // тепле тло на все вікно
   unmount = MOUNT[name]?.(app, state) ?? null;
 }
+
+// Облік безперервної роботи (для пропозиції перерви): будь-яке натискання дитини
+document.addEventListener('keydown', () => state.activity.tick(), true);
+document.addEventListener('pointerdown', () => state.activity.tick(), true);
 
 // Звук: браузер дозволяє його лише після дії дитини — готуємо при першому натисканні
 const wake = () => sfx.ensure();

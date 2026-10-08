@@ -4,14 +4,14 @@ import { attachLiveKeyboard, setActiveFinger } from '../keyboard/live.js';
 import { fingerOf, shiftCodeFor } from '../keyboard/fingers.js';
 import { codeOfChar, needsShift, ROWS } from '../keyboard/layouts.js';
 import { stars } from '../design/icons.js';
-import { btn, homeButton, bubble, setBackdrop, soundButton } from './common.js';
+import { btn, homeButton, bubble, setBackdrop, soundButton, offerBreak } from './common.js';
 import { layoutHint } from './keyboard.js';
 import { getLesson, keyNameAcc, keyNameNom, isPunct, learnedCount, nextLesson } from '../lessons/course.js';
-import { buildLesson } from '../lessons/generator.js';
+import { buildLesson, buildFree, topLesson } from '../lessons/generator.js';
 import { createExercise, currentChar, pressChar } from '../lessons/exercise.js';
 import { starsFor } from '../lessons/stars.js';
 import { accuracy, charsPerMinute, hardLetters, mergeMissed } from '../lessons/stats.js';
-import { donePhrase, BADGE_PHRASES, pickPhrase, HINT_PHRASES, fill, plural, AGAIN_PHRASES, DRILL_PHRASES, STREAK_PHRASES, STEP_DONE_PHRASES, BACK_PHRASES, RESUME_PHRASES } from '../content/phrases.js';
+import { donePhrase, freeDonePhrase, BADGE_PHRASES, pickPhrase, HINT_PHRASES, fill, plural, AGAIN_PHRASES, DRILL_PHRASES, STREAK_PHRASES, STEP_DONE_PHRASES, BACK_PHRASES, RESUME_PHRASES, FREE_START } from '../content/phrases.js';
 import { playSfx } from '../audio/sfx.js';
 import { badge } from '../design/badges.js';
 import { BADGES } from '../content/badges.js';
@@ -143,18 +143,20 @@ export function mountLesson(root, state) {
   function finish() {
     stopLive?.();
     stopLive = null;
+    const free = !!meta.free;
     const n = starsFor({ level: level(), errors: run.errors, total: run.typed });
-    playSfx('stars', n);
+    playSfx(free ? 'step' : 'stars', n);
     let fresh = [];
-    if (state.profileId) fresh = state.store.finishLesson(state.profileId, { layout: state.layout, lessonId: meta.id, stars: n, errors: run.errors });
+    if (free) fresh = []; // вільне друкування: зірочок і значків немає, прогрес уроків не змінюється
+    else if (state.profileId) fresh = state.store.finishLesson(state.profileId, { layout: state.layout, lessonId: meta.id, stars: n, errors: run.errors });
     else if (state.progress) { // демо без профілю: зірочки лише в пам'яті вкладки
       const prev = state.progress[state.layout][meta.id] ?? 0;
       state.progress[state.layout][meta.id] = Math.max(prev, n);
     }
     const count = learnedCount(state.layout, meta.id);
-    const phrase = donePhrase({ level: level(), stars: n, what: meta.what, count, last: lastPhrase });
+    const phrase = free ? freeDonePhrase(level(), run.drillChars, lastPhrase) : donePhrase({ level: level(), stars: n, what: meta.what, count, last: lastPhrase });
     lastPhrase = phrase;
-    const next = nextLesson(state.layout, level(), meta.id);
+    const next = free ? null : nextLesson(state.layout, level(), meta.id);
     setBackdrop(true);
     if (fresh.length) later(() => playSfx('badge'), 1100); // значок — після зірочок
 
@@ -174,7 +176,7 @@ export function mountLesson(root, state) {
       <div class="done-main">
         <div class="done-klavik">${klavik(n === 3 ? 'joy' : 'cheer', 230)}</div>
         <div class="done-col">
-          <div class="done-stars" role="img" aria-label="Зірочок: ${n} з 3">${stars(n, 3, 110)}</div>
+          ${free ? '' : `<div class="done-stars" role="img" aria-label="Зірочок: ${n} з 3">${stars(n, 3, 110)}</div>`}
           <div class="bubble done-bubble"><span class="bubble-text">${phrase}</span></div>
           ${statsHtml}
           ${fresh.length ? badgesHtml(fresh) : ''}
@@ -186,6 +188,7 @@ export function mountLesson(root, state) {
         </div>
       </div>
     </div>`;
+    offerBreak(stage.firstElementChild, state);
   }
 
   function onKey({ code, key, kind }) {
@@ -255,6 +258,7 @@ export function mountLesson(root, state) {
     const isLast = run.i + 1 >= built.steps.length;
     state.store.saveStep(state.profileId, {
       typed: step.kind === 'intro' ? 1 : step.text.length,
+      keepResume: !!meta.free,
       errors: run.errors - run.stepErr0,
       ms: drill ? performance.now() - run.stepStart - run.stepPaused : 0,
       chars: drill ? step.text.length : 0,
@@ -295,9 +299,14 @@ export function mountLesson(root, state) {
     if (!lesson || (lesson.minLevel === '3-4' && level() === '1-2')) lesson = getLesson(state.layout, 1);
     state.lessonId = lesson.id;
     meta = lesson;
-    const saved = !fresh && state.profileId ? state.store.get(state.profileId)?.resume : null;
+    if (state.free) { // вільне друкування: вправи з усіх вивчених клавіш, без збереженого місця
+      const top = Math.max(topLesson(state.layout, state.progress), state.openAll ? 7 : 0, 1);
+      meta = { id: top, letters: [], kind: 'review', what: null, free: true };
+    }
+    const saved = !fresh && !meta.free && state.profileId ? state.store.get(state.profileId)?.resume : null;
     const resumed = saved && saved.layout === state.layout && saved.id === lesson.id && saved.level === level() && saved.i < saved.steps.length;
-    built = resumed ? { id: lesson.id, letters: lesson.letters, steps: saved.steps } : buildLesson({ layout: state.layout, id: lesson.id, level: level() });
+    built = meta.free ? buildFree({ layout: state.layout, id: meta.id, level: level() })
+      : resumed ? { id: lesson.id, letters: lesson.letters, steps: saved.steps } : buildLesson({ layout: state.layout, id: lesson.id, level: level() });
     stage.innerHTML = lessonScreen();
     screen = stage.querySelector('[data-lesson]');
     run = { okRun: 0, i: 0, ex: null, errors: 0, typed: 0, locked: false, paused: false, face: null, missed: {}, drillMs: 0, drillChars: 0, stepStart: null, stepPaused: 0, pauseAt: 0, stepErr0: 0 };
@@ -314,6 +323,7 @@ export function mountLesson(root, state) {
     stopLive = attachLiveKeyboard(screen, { getLayout: () => state.layout, trackFinger: false, onKey });
     showStep();
     if (resumed) setMsg(bubble(pick(RESUME_PHRASES), { speak: false }));
+    else if (meta.free) setMsg(bubble(pick(FREE_START), { speak: false }));
   }
 
   const onClick = (e) => {

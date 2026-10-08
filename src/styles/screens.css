@@ -121,13 +121,13 @@
 .task-line.is-l { gap: 4px 12px; }
 .task-line.is-l .tk { gap: 12px; }
 .task-line.is-l .task-ch { min-width: 74px; height: 94px; font-size: 80px; border-bottom-width: 8px; }
-.task-line.is-l .task-ch.is-space { min-width: 46px; font-size: 52px; }
+.task-line.is-l .task-ch.is-space { min-width: 46px; font-size: 56px; }
 .task-line.is-long { gap: 8px 0; }
 .task-line.is-long .tk { gap: 0; }
 .task-line.is-long .task-ch { min-width: 0; height: 62px; font-size: 46px; padding: 0 3px 3px; border-bottom: 5px solid transparent; border-radius: 10px; }
 .task-line.is-long .task-ch.is-current { border: 4px solid var(--ui-main); border-bottom-width: 6px; padding: 0 3px; }
 .task-line.is-long.is-tight .task-ch { height: 52px; font-size: 38px; }
-.task-line.is-long .task-ch.is-space { min-width: 16px; font-size: 34px; color: transparent; }
+.task-line.is-long .task-ch.is-space { min-width: 16px; font-size: 36px; color: transparent; }
 .task-line.is-long .task-ch.is-space.is-current { color: var(--ui-text-soft); min-width: 28px; }
 
 /* Кінець уроку (тепла гама, без клавіатури) */
@@ -152,9 +152,9 @@
 
 /* Карта: заголовок з Клавиком */
 .map-head { z-index: 4; position: absolute; left: 258px; max-width: 560px; top: 6px; display: flex; align-items: center; gap: 22px; }
-.map-title { font-size: 32px; padding: 8px 24px 8px 22px; line-height: 1.1; }
+.map-title { font-size: 32px; padding: 6px 8px 6px 22px; gap: 10px; line-height: 1.1; }
 .map-title .bubble-text { white-space: nowrap; } /* коротка назва — в один рядок: «О» не лишається сама */
-.map-sound { position: absolute; z-index: 4; right: 36px; bottom: 28px; }
+.map-sound { position: absolute; z-index: 4; left: 36px; top: 106px; } /* внизу праворуч її перекривав останній урок */
 
 /* Хто ти?: розмір карток залежить від кількості дітей */
 .screen-profiles { position: relative; }
@@ -220,10 +220,10 @@
 .map-klavik { flex: none; }
 .map-title.is-long { font-size: 26px; max-width: 400px; }
 .map-title.is-long .bubble-text { white-space: normal; text-wrap: balance; } /* довга назва — два рівних рядки, без «сирітки» */
-.map-title .btn.round { flex: none; width: 52px; min-width: 52px; height: 52px; min-height: 52px; }
+.map-title .btn.round { flex: none; width: 64px; min-width: 64px; height: 64px; min-height: 64px; }
 .map-course .btn.seg { padding: 0 16px; min-width: 0; font-size: 24px; }
 .stars-btn { padding: 0 22px 0 14px; font-size: 32px; gap: 8px; }
-.done-badges { display: flex; align-items: center; gap: 14px; padding: 4px 20px 4px 14px; background: var(--ui-card); border: 3px solid var(--ui-line); border-radius: 28px; }
+.done-badges { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; max-width: 100%; box-sizing: border-box; padding: 4px 20px 4px 14px; background: var(--ui-card); border: 3px solid var(--ui-line); border-radius: 28px; }
 .done-badges-title { font-size: 26px; font-weight: 800; }
 .new-badge { display: flex; align-items: center; gap: 10px; font-size: 24px; font-weight: 800; }
 .badge-pop svg { animation: pop .5s cubic-bezier(.3, 1.6, .5, 1) both; }
@@ -289,6 +289,14 @@
   .game-item.is-pop .game-item-ch { animation: none; opacity: 0; }
   .spark { display: none; }
 }
-.map-games { position: absolute; z-index: 4; right: 36px; top: 98px; }
+.map-games { position: absolute; z-index: 4; right: 36px; top: 106px; }
 .game-intro { gap: 10px; }
 .game-intro .bubble { font-size: 32px; padding: 6px 24px; }
+
+/* Вільне друкування: дві кнопки справа вгорі на карті */
+.map-games { display: flex; align-items: flex-start; gap: 16px; }
+.map-games .btn[disabled] { opacity: .55; transform: none; }
+
+/* Пропозиція перерви (поверх екрана завершення, тепла гама) */
+.break-layer { background: var(--warm-bg); gap: 24px; }
+.break-tip { display: flex; align-items: center; gap: 16px; font-size: 36px; font-weight: 800; color: var(--ui-text); }

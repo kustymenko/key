@@ -1,6 +1,8 @@
 import { icons, stars } from '../design/icons.js';
 import { PHRASE_SPEECH } from '../audio/settings.js';
 import { sfx } from '../audio/sfx.js';
+import { klavik } from '../character/klavik.js';
+import { pickPhrase, BREAK_PHRASES, BREAK_TIPS } from '../content/phrases.js';
 
 export const btn = ({ label, icon, kind = '', size = '', attrs = '' }) =>
   `<button class="btn ${kind} ${size}" ${attrs}>${icon ? icons[icon](32) : ''}${label ? `<span>${label}</span>` : ''}</button>`;
@@ -28,3 +30,21 @@ export const soundButton = () => {
   const on = sfx.isEnabled();
   return `<button class="btn round light sound-toggle" data-sound ${on ? '' : 'data-off'} aria-label="${on ? 'Звуки: увімкнено' : 'Звуки: вимкнено'}">${on ? icons.sound(32) : icons.soundOff(32)}</button>`;
 };
+
+// Пропозиція перерви: поверх екрана завершення. Дитина обирає сама — «Відпочити» (додому) або «Ще трохи».
+// Нічого не примушує і не лічить час уголос.
+export function offerBreak(host, state) {
+  if (!state.activity?.due()) return;
+  const layer = document.createElement('div');
+  layer.className = 'pause-layer break-layer';
+  layer.setAttribute('role', 'dialog');
+  layer.setAttribute('aria-label', 'Перерва');
+  layer.innerHTML = `<div>${klavik('rest', 200)}</div>
+    <div class="bubble"><span class="bubble-text">${pickPhrase(BREAK_PHRASES)}</span></div>
+    <div class="break-tip">${icons.eye(48)}<span>${pickPhrase(BREAK_TIPS)}</span></div>
+    <div class="row">${btn({ label: 'Відпочити', icon: 'home', kind: 'primary', size: 'big', attrs: 'data-home' })}${btn({ label: 'Ще трохи', icon: 'play', kind: 'light', size: 'big', attrs: 'data-act="keep-going"' })}</div>`;
+  layer.addEventListener('click', (e) => {
+    if (e.target.closest('[data-act="keep-going"]')) { state.activity.reset(); layer.remove(); }
+  });
+  host.appendChild(layer);
+}
