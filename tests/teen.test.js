@@ -40,7 +40,8 @@ describe('логіка профілю 5–6 (спільна для всіх св
   it('куди йти після вибору картки', () => {
     expect(homeRoute({ level: '1-2' })).toBe('map');
     expect(homeRoute({ level: '3-4', world: 'sky' })).toBe('map');
-    expect(homeRoute({ level: '5', world: 'sky' })).toBe('teen');
+    expect(homeRoute({ level: '5', world: 'sky' })).toBe('teen/start'); // ще без вступного тесту
+    expect(homeRoute({ level: '5', world: 'sky', placement: { kind: 'zero' } })).toBe('teen');
     expect(homeRoute({ level: '6', world: null })).toBe('teen/pick'); // клас змінили на 6, світ ще не обрано
     expect(isTeen('5') && isTeen('6') && !isTeen('3-4')).toBe(true);
   });

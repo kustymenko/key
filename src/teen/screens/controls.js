@@ -28,7 +28,7 @@ export const settingsRows = (cls, ctx) => ctx.demo ? '' : `
   <div class="${cls}-group"><h3>Помічник</h3><div class="${cls}-row">
     <button class="${cls}-opt opt-hat" data-set-helper="1" aria-pressed="${ctx.helper}"><span>Показувати</span></button>
     <button class="${cls}-opt opt-hat" data-set-helper="0" aria-pressed="${!ctx.helper}"><span>Сховати</span></button></div></div>
-  <div class="${cls}-adult-row"><a class="${cls}-adult" href="#adult">${icons.gear(24)}<span>Для дорослого</span></a></div>`;
+  <div class="${cls}-adult-row"><a class="${cls}-adult" href="#teen/start">${icons.pencil(24)}<span>Вступний тест</span></a> <a class="${cls}-adult" href="#adult">${icons.gear(24)}<span>Для дорослого</span></a></div>`;
 
 // Кнопка «сховати» біля помічника
 export const hideHelperButton = (cls) => `<button class="${cls}-hide" data-act="hide-helper" aria-label="Сховати помічника"><span aria-hidden="true">×</span></button>`;

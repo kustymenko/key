@@ -59,8 +59,12 @@ for (const [w, h] of [[1366, 768], [1920, 1080]]) {
     await page.waitForSelector('[data-pick-world]');
     if (i === 0) { await shot('pick-new'); await check('pick-new'); }
     await page.click(`[data-pick-world="${WORLDS[i]}"]`);
-    await page.waitForSelector(`.cn-${WORLDS[i]}`);
-    ok(page.url().endsWith('#teen'), `${WORLDS[i]}: після створення має відкритись #teen, а відкрилось ${page.url()}`);
+    await page.waitForSelector('[data-pl]');
+    ok(page.url().endsWith('#teen/start'), `${WORLDS[i]}: після створення має відкритись вступний тест (#teen/start), а відкрилось ${page.url()}`);
+    if (w === 1366) await shot(`${WORLDS[i]}-start`);
+    await check(`${WORLDS[i]}-start`);
+    await page.click('[data-act="skip"]'); // тест перевіряє scripts/placement.mjs; тут — «Почну з початку»
+    await page.waitForSelector(`.stage > .cn-${WORLDS[i]}`);
   }
   let profiles = await store(page);
   ok(profiles.length === 4 && profiles.slice(1).every((p, i) => p.world === WORLDS[i] && ['5', '6'].includes(p.level)), 'профілі 5–6 збережені без світу чи класу');
@@ -139,10 +143,13 @@ for (const [w, h] of [[1366, 768], [1920, 1080]]) {
   ok(kid.level === '5' && kid.progress.ua[1] === 3 && kid.progress.ua[2] === 2 && kid.progress.ua[3] === 3 && kid.stats.typed === 120, 'зміна класу на 5 не зберегла прогрес');
   await page.click('[data-go="teen/pick"]'); await page.waitForSelector('[data-pick-world]');
   await shot('pick-existing'); await check('pick-existing');
-  await page.click('[data-pick-world="pixel"]'); await page.waitForSelector('.cn-pixel');
+  await page.click('[data-pick-world="pixel"]'); await page.waitForSelector('[data-pl]');
+  ok((await page.locator('[data-act="carry"]').count()) === 1, 'учневі з 3–4 класу не запропоновано пропустити вивчене');
+  await page.click('[data-act="carry"]'); await page.waitForSelector('.stage > .cn-pixel');
   ok((await store(page))[0].world === 'pixel' && (await store(page))[0].progress.ua[3] === 3, 'вибір світу після зміни класу');
+  ok((await store(page))[0].placement?.kind === 'carry' && (await store(page))[0].placement.learned.ua.length === 6, 'вивчені літери не враховано');
   // дитячі екрани недоступні учневі 5–6
-  await page.goto(`${base}#map`); await page.waitForSelector('.cn-pixel');
+  await page.goto(`${base}#map`); await page.waitForSelector('.stage > .cn-pixel');
   // назад на 3–4: прогрес і світ на місці, відкривається дитяча карта
   await page.goto(`${base}#adult`); await page.waitForSelector('.sum-input');
   const s2 = (await page.innerText('.adult-sum')).match(/\d+/g).map(Number);

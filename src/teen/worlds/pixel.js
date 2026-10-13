@@ -161,6 +161,14 @@ const rewardArt = (r, i) => {
 const rewardsTab = () => shell('rewards', `<section class="px-panel px-shelf"><h2>Мої нагороди <small>${REWARDS.filter((r) => r.got).length} з ${REWARDS.length}</small></h2>
   <div class="px-grid">${REWARDS.map((r, i) => `<div class="px-reward ${r.got ? 'is-got' : ''}">${rewardArt(r, i)}<span>${r.name}</span></div>`).join('')}</div></section>`);
 
+
+// Рамка для екранів вступного тесту: тло, «Додому» і панель світу; вміст (inner) малює спільний код
+export const frame = (ctx, inner = '') => {
+  const saved = [C, PLAYER, WORLDS, QUESTS, REWARDS, av];
+  useCtx(ctx);
+  try { return `<div class="screen cn cn-pixel is-tab-test">${stars()}<header class="px-top">${homeButton('px')}</header><div class="px-panel pl-panel" data-pl>${inner}</div></div>`; } finally { [C, PLAYER, WORLDS, QUESTS, REWARDS, av] = saved; }
+};
+
 export const screen = (tab, ctx) => {
   const saved = [C, PLAYER, WORLDS, QUESTS, REWARDS, av]; // мініатюри світів викликають screen() усередині screen()
   useCtx(ctx);

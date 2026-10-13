@@ -35,7 +35,8 @@ export function levelInfo(totalXp) {
 export function homeRoute(profile) {
   if (!profile) return '';
   if (!isTeen(profile.level)) return 'map';
-  return profile.world ? 'teen' : 'teen/pick';
+  if (!profile.world) return 'teen/pick';
+  return profile.placement ? 'teen' : 'teen/start';
 }
 
 // Короткі підказки помічника (до 10 слів); однакові для всіх світів, обираються без повторів підряд

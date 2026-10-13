@@ -145,6 +145,14 @@ const crystal = (r, i) => {
 const rewardsTab = () => shell('rewards', `<section class="sk-glass sk-shelf"><h2>Мої кристали <small>${REWARDS.filter((r) => r.got).length} з ${REWARDS.length}</small></h2>
   <div class="sk-grid">${REWARDS.map((r, i) => `<div class="sk-reward ${r.got ? 'is-got' : ''}">${crystal(r, i)}<span>${r.name}</span></div>`).join('')}</div></section>`);
 
+
+// Рамка для екранів вступного тесту: тло, «Додому» і панель світу; вміст (inner) малює спільний код
+export const frame = (ctx, inner = '') => {
+  const saved = [C, PLAYER, WORLDS, QUESTS, REWARDS, av];
+  useCtx(ctx);
+  try { return `<div class="screen cn cn-sky is-tab-test">${stars()}${homeButton('sk')}<div class="sk-glass pl-panel" data-pl>${inner}</div></div>`; } finally { [C, PLAYER, WORLDS, QUESTS, REWARDS, av] = saved; }
+};
+
 export const screen = (tab, ctx) => {
   const saved = [C, PLAYER, WORLDS, QUESTS, REWARDS, av]; // мініатюри світів викликають screen() усередині screen()
   useCtx(ctx);

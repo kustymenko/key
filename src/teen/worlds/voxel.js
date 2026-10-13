@@ -186,6 +186,14 @@ const rewardsTab = () => shell('rewards', `<div class="vx-sky"></div>
   <section class="vx-panel vx-shelf"><h2>Мої нагороди <small>${REWARDS.filter((r) => r.got).length} з ${REWARDS.length}</small></h2>
   <div class="vx-grid">${REWARDS.map((r, i) => `<div class="vx-reward ${r.got ? 'is-got' : ''}">${rewardCube(r, i)}<span>${r.name}</span></div>`).join('')}</div></section>`);
 
+
+// Рамка для екранів вступного тесту: тло, «Додому» і панель світу; вміст (inner) малює спільний код
+export const frame = (ctx, inner = '') => {
+  const saved = [C, PLAYER, WORLDS, QUESTS, REWARDS, av];
+  useCtx(ctx);
+  try { return `<div class="screen cn cn-voxel is-tab-test has-home"><div class="vx-sky"></div>${homeButton('vx')}<div class="vx-panel pl-panel" data-pl>${inner}</div></div>`; } finally { [C, PLAYER, WORLDS, QUESTS, REWARDS, av] = saved; }
+};
+
 export const screen = (tab, ctx) => {
   const saved = [C, PLAYER, WORLDS, QUESTS, REWARDS, av]; // мініатюри світів викликають screen() усередині screen()
   useCtx(ctx);
