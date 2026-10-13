@@ -1,7 +1,8 @@
 // Концепція 2 «Піксель-аркада»: піксельна 8-бітна карта (поле вдень, інтерфейс на нічному тлі), герой 12×16 пікселів, нагороди-спрайти.
 // Усі спрайти намальовані вручну буквами в цьому файлі: власні, нічого не скопійовано.
-import { TABS, avatarControls, settingsRows, hideHelperButton, homeButton } from '../screens/controls.js';
+import { TABS, avatarControls, settingsRows, hideHelperButton, homeButton, playBar } from '../screens/controls.js';
 import { taskText, keysPanel } from '../screens/typing.js';
+import { hintToggle, lessonBody, lessonDone } from '../screens/lessonView.js';
 import { HERO_OPTIONS as AV_OPTIONS, DEFAULT_HERO } from '../logic/profile.js';
 import { shade, noise } from './draw.js';
 
@@ -129,7 +130,7 @@ function shell(tab, inner) {
 
 const ghost = `<svg viewBox="0 0 8 8" width="40" height="40" shape-rendering="crispEdges" aria-hidden="true">${rects(['..nnnn..', '.nnnnnn.', 'nnknnknn', 'nnnnnnnn', 'nnnnnnnn', 'nnnnnnnn', 'nn.nn.nn', 'n..nn..n'], { ...PAL, n: '#e9e6ff' })}</svg>`;
 
-const worldTab = () => shell('world', `${mapSvg()}
+const worldTab = () => shell('world', `${mapSvg()}${playBar('px', C)}
   <section class="px-quests ${C.helper ? '' : 'is-wide'}">${QUESTS.map((q) => `<div class="px-q ${q.done ? 'is-done' : ''}"><i>${q.done ? '✓' : ''}</i><div><b>${q.t}</b><small>${q.done ? 'Виконано' : q.now}</small></div><span>+${q.xp}</span></div>`).join('')}</section>
   ${C.helper ? `<div class="px-sprite">${C.demo ? '' : hideHelperButton('px')}<div>${ghost}</div><p>${C.tip}</p></div>` : ''}
   <div class="px-where"><small>Світ</small><b>${(WORLDS.find((w) => w.state === 'now') ?? WORLDS[0]).name}</b></div>`);
@@ -139,13 +140,16 @@ const avatarTab = () => shell('avatar', `<div class="px-platform"></div>
   <section class="px-panel px-wardrobe"><h2>Налаштуй героя</h2>${avatarControls('px', C)}${settingsRows('px', C)}</section>`);
 
 const doneStar = `<svg viewBox="0 0 8 8" width="80" height="80" shape-rendering="crispEdges" aria-hidden="true">${rects(STAR, { ...PAL, y: '#5b5880' })}</svg>`;
-const typeTab = () => shell('type', `<div class="px-ground" aria-hidden="true"></div>
-  <div class="px-task"><div class="px-task-tag">ЗАВДАННЯ</div><div class="px-task-top"><span>Вправа «Нові землі»</span>
-  <span>Точність <b data-acc>—</b></span><span>Знаків за хвилину <b data-speed>—</b></span></div>
-  <div class="px-bar"><div data-xp-fill style="width:${(PLAYER.xp / PLAYER.xpMax) * 100}%"></div></div>
-  ${taskText()}<div class="px-msg" data-msg></div>
-  <div class="px-done" data-done hidden>${doneStar}<div class="px-done-text"><b>ГОТОВО!</b><div class="px-chips"><span>Точність <b data-done-acc></b></span><span>Знаків за хвилину <b data-done-speed></b></span></div></div><button class="px-btn" data-again>Ще раз</button></div></div>
-  ${keysPanel()}`);
+const typeTab = () => {
+  const L = C.lesson;
+  return shell('type', `<div class="px-ground" aria-hidden="true"></div>
+  <div class="px-task"><div class="px-task-tag">${L ? 'УРОК ' + L.id : 'ЗАВДАННЯ'}</div><div class="px-task-top"><span>${L ? L.title : 'Вправа «Нові землі»'}</span>
+  <span>Точність <b data-acc>—</b></span><span>Знаків за хвилину <b data-speed>—</b></span>${L ? hintToggle() : ''}</div>
+  <div class="px-bar"><div ${L ? 'data-bar' : 'data-xp-fill'} style="width:${L ? 0 : (PLAYER.xp / PLAYER.xpMax) * 100}%"></div></div>
+  ${L ? lessonBody() : taskText()}<div class="px-msg" data-msg></div>
+  <div class="px-done" data-done hidden>${L ? lessonDone() : `${doneStar}<div class="px-done-text"><b>ГОТОВО!</b><div class="px-chips"><span>Точність <b data-done-acc></b></span><span>Знаків за хвилину <b data-done-speed></b></span></div></div><button class="px-btn" data-again>Ще раз</button>`}</div></div>
+  ${keysPanel({ layout: L ? L.layout : 'ua', demo: !L })}`);
+};
 
 const GEMS = [
   ['..aaaa..', '.ahaaaA.', 'ahaaaaaA', '.aaaaaA.', '..aaaA..', '...aA...'],
@@ -172,5 +176,5 @@ export const frame = (ctx, inner = '') => {
 export const screen = (tab, ctx) => {
   const saved = [C, PLAYER, WORLDS, QUESTS, REWARDS, av]; // мініатюри світів викликають screen() усередині screen()
   useCtx(ctx);
-  try { return ({ world: worldTab, avatar: avatarTab, type: typeTab, rewards: rewardsTab }[tab] ?? worldTab)(); } finally { [C, PLAYER, WORLDS, QUESTS, REWARDS, av] = saved; }
+  try { return ({ world: worldTab, avatar: avatarTab, type: typeTab, lesson: typeTab, rewards: rewardsTab }[tab] ?? worldTab)(); } finally { [C, PLAYER, WORLDS, QUESTS, REWARDS, av] = saved; }
 };

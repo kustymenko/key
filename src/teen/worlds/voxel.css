@@ -144,3 +144,12 @@
 /* Панель «Герой» не заходить на нижнє меню */
 .vx-wardrobe { top: 80px; padding: 12px 26px 14px; }
 .vx-wardrobe .vx-adult-row { margin-top: 8px; }
+
+/* Панель «Далі: урок» */
+.vx-play { left: 600px; top: 26px; width: 604px; background: var(--vx-panel); border: 4px solid var(--vx-ink); border-radius: 10px; box-shadow: inset 3px 3px 0 #fffaf0, inset -3px -3px 0 var(--vx-panel-edge), 0 6px 0 var(--vx-ink); color: var(--vx-ink); font-family: 'Rubik', sans-serif; --pb-accent: var(--vx-orange); --pb-ink: #1d1409; height: 80px; }
+.vx-play .pb-go, .vx-play .pb-lang, .vx-play .pb-list { font-family: 'Rubik', sans-serif; }
+.cn-voxel .ll-ch.is-current { background: #fff; }
+
+.cn-voxel.is-tab-type .vx-task { height: 218px; }
+.cn-voxel.is-tab-type .keys-panel { top: 410px; }
+.vx-msg { min-height: 28px; bottom: 8px; }

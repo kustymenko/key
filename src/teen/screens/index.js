@@ -6,25 +6,31 @@ import { teenContext } from './context.js';
 import { mountTyping } from './typing.js';
 import { worldPickHtml } from './pick.js';
 import { placementScreen, mountPlacement } from './placement.js';
+import { lessonScreen, lessonsListScreen, mountLesson, mountLessonsList } from './lesson.js';
 
 const TAB_IDS = ['world', 'avatar', 'type', 'rewards'];
 
 // 'teen' → { tab: 'world' }; 'teen/pick' → { tab: 'pick' }; інакше null
 export function teenRoute(name) {
-  const [root, tab = 'world'] = name.split('/');
+  const [root, tab = 'world', arg] = name.split('/');
   if (root !== 'teen') return null;
-  return ['pick', 'start', 'test'].includes(tab) || TAB_IDS.includes(tab) ? { tab } : null;
+  if (tab === 'lesson') return arg === undefined || /^\d+$/.test(arg) ? { tab, id: arg === undefined ? null : Number(arg) } : null;
+  return ['pick', 'start', 'test', 'lessons'].includes(tab) || TAB_IDS.includes(tab) ? { tab } : null;
 }
 
 export function teenScreen(route, profile) {
   if (route.tab === 'pick' || !profile.world) return worldPickHtml({ back: 'home' });
   if (route.tab === 'start' || route.tab === 'test') return placementScreen(profile);
+  if (route.tab === 'lesson') return lessonScreen(profile, route.id);
+  if (route.tab === 'lessons') return lessonsListScreen(profile);
   return themeOf(profile.world).screen(route.tab, teenContext(profile));
 }
 
 // Оживлення: вибір світу, герой, помічник, пробна вправа
 export function mountTeen(app, route, state) {
   if (route.tab === 'start' || route.tab === 'test') return mountPlacement(app, route, state);
+  if (route.tab === 'lesson') return mountLesson(app, route, state);
+  if (route.tab === 'lessons') return mountLessonsList(app, state);
   const store = state.store;
   const profile = () => store.get(state.profileId);
   const rerender = () => state.go(location.hash.replace('#', ''));
@@ -47,6 +53,8 @@ export function mountTeen(app, route, state) {
     }
     const world = e.target.closest('[data-set-world]');
     if (world) { store.update(p.id, { world: world.dataset.setWorld }); return rerender(); }
+    const lang = e.target.closest('[data-set-layout]');
+    if (lang) { store.update(p.id, { layout: lang.dataset.setLayout }); return rerender(); }
     const helper = e.target.closest('[data-set-helper]');
     if (helper) { store.update(p.id, { helperHidden: helper.dataset.setHelper === '0' }); return rerender(); }
     if (e.target.closest('[data-act="hide-helper"]')) { store.update(p.id, { helperHidden: true }); rerender(); }

@@ -1,7 +1,8 @@
 // Концепція 1 «Кубічний світ»: денний острів з кубиків (ізометрія), герой із кубиків, нагороди-кубики.
 // Усе намальовано кодом: жодних чужих текстур, назв чи персонажів.
-import { TABS, avatarControls, settingsRows, hideHelperButton, homeButton } from '../screens/controls.js';
+import { TABS, avatarControls, settingsRows, hideHelperButton, homeButton, playBar } from '../screens/controls.js';
 import { taskText, keysPanel } from '../screens/typing.js';
+import { hintToggle, lessonBody, lessonDone } from '../screens/lessonView.js';
 import { HERO_OPTIONS as AV_OPTIONS, DEFAULT_HERO } from '../logic/profile.js';
 import { shade, noise, hslHex } from './draw.js';
 
@@ -153,7 +154,7 @@ const questPanel = () => `<aside class="vx-panel vx-quests"><h2>Завдання
   ${C.helper ? `<div class="vx-bot">${C.demo ? '' : hideHelperButton('vx')}<svg viewBox="-24 -34 48 56" width="48" height="56" aria-hidden="true">${iso(0, 0, 14, 14).box(-0.7, -0.7, 0.2, 1.4, 1.4, 1.4, '#e9eef5')}<polygon points="-10,-3 -3,-3 -3,-9 -10,-9" fill="#2a2f3d"/></svg>
   <p>${C.tip}</p></div>` : ''}</aside>`;
 
-const worldTab = () => shell('world', `<div class="vx-sky"></div>${island(592, 186)}${questPanel()}`);
+const worldTab = () => shell('world', `<div class="vx-sky"></div>${island(592, 186)}${questPanel()}${playBar('vx', C)}`);
 
 const avatarTab = () => shell('avatar', `<div class="vx-sky"></div>
   <section class="vx-panel vx-wardrobe"><h2>Налаштуй героя</h2>${avatarControls('vx', C)}${settingsRows('vx', C)}</section>
@@ -166,16 +167,19 @@ const typeDeco = () => {
 };
 const doneCube = `<svg viewBox="-34 -34 68 68" width="84" height="84" aria-hidden="true">${iso(0, 0, 26, 24).box(-1, -1, -0.7, 2, 2, 1.4, '#aab4c0')}</svg>`;
 
-const typeTab = () => shell('type', `<div class="vx-sky vx-calm">${typeDeco()}</div>
-  <div class="vx-task"><div class="vx-task-top"><span class="vx-task-title">${cubeIcon('#9aa3ad')}Вправа: «Нові землі»</span>
-    <span class="vx-stat">Точність <b data-acc>—</b></span><span class="vx-stat">Знаків за хвилину <b data-speed>—</b></span></div>
-    <div class="vx-xpbar"><div data-xp-fill style="width:${(PLAYER.xp / PLAYER.xpMax) * 100}%"></div></div>
-    ${taskText()}
+const typeTab = () => {
+  const L = C.lesson; // екран уроку швидкого курсу (null — пробна вправа на демо-сторінці)
+  return shell('type', `<div class="vx-sky vx-calm">${typeDeco()}</div>
+  <div class="vx-task"><div class="vx-task-top"><span class="vx-task-title">${cubeIcon('#9aa3ad')}${L ? L.heading : 'Вправа: «Нові землі»'}</span>
+    <span class="vx-stat">Точність <b data-acc>—</b></span><span class="vx-stat">Знаків за хвилину <b data-speed>—</b></span>${L ? hintToggle() : ''}</div>
+    <div class="vx-xpbar"><div ${L ? 'data-bar' : 'data-xp-fill'} style="width:${L ? 0 : (PLAYER.xp / PLAYER.xpMax) * 100}%"></div></div>
+    ${L ? lessonBody() : taskText()}
     <div class="vx-msg" data-msg></div>
-    <div class="vx-done" data-done hidden>${doneCube}<div class="vx-done-text"><b>Вправу пройдено!</b>
+    <div class="vx-done" data-done hidden>${L ? lessonDone() : `${doneCube}<div class="vx-done-text"><b>Вправу пройдено!</b>
       <div class="vx-chips"><span>Точність <b data-done-acc></b></span><span>Знаків за хвилину <b data-done-speed></b></span></div></div>
-      <button class="vx-btn" data-again>Ще раз</button></div></div>
-  ${keysPanel()}`);
+      <button class="vx-btn" data-again>Ще раз</button>`}</div></div>
+  ${keysPanel({ layout: L ? L.layout : 'ua', demo: !L })}`);
+};
 
 const rewardCube = (r, i) => {
   const base = r.got ? `hsl(${(i * 47 + 20) % 360} 70% 56%)` : '#c6ccd4';
@@ -197,5 +201,5 @@ export const frame = (ctx, inner = '') => {
 export const screen = (tab, ctx) => {
   const saved = [C, PLAYER, WORLDS, QUESTS, REWARDS, av]; // мініатюри світів викликають screen() усередині screen()
   useCtx(ctx);
-  try { return ({ world: worldTab, avatar: avatarTab, type: typeTab, rewards: rewardsTab }[tab] ?? worldTab)(); } finally { [C, PLAYER, WORLDS, QUESTS, REWARDS, av] = saved; }
+  try { return ({ world: worldTab, avatar: avatarTab, type: typeTab, lesson: typeTab, rewards: rewardsTab }[tab] ?? worldTab)(); } finally { [C, PLAYER, WORLDS, QUESTS, REWARDS, av] = saved; }
 };

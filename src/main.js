@@ -133,6 +133,7 @@ function renderTeen(route) {
   document.body.classList.add('is-screen');
   setBackdrop(false);
   if (profile.world && !profile.placement && !['start', 'test', 'pick'].includes(route.tab)) { state.go('teen/start'); return; } // перший вхід: вступний тест (його можна пропустити)
+  if (route.tab === 'type') { state.go('teen/lesson'); return; } // «Друк» веде до поточного уроку швидкого курсу
   const picking = route.tab === 'pick' || !profile.world;
   document.body.style.background = picking ? '#14181f' : backdropOf(profile.world, route.tab);
   app.innerHTML = `<div class="stage">${teenScreen(route, profile)}</div>`;

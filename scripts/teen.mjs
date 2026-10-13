@@ -97,18 +97,10 @@ for (const [w, h] of [[1366, 768], [1920, 1080]]) {
       });
       if (hit) problems.push(`${w} ${world}/${tab || 'world'}: ${hit}`);
     }
-    // вправа: одна помилка, потім до кінця
-    await page.goto(`${base}#teen/type`); await page.waitForSelector('[data-task]');
-    const press = (code, key) => page.evaluate(([c, k]) => window.dispatchEvent(new KeyboardEvent('keydown', { code: c, key: k, bubbles: true })), [code, key]);
-    for (let n = 0; n < TEXT.length; n++) {
-      if (n === 5) { await press('KeyZ', 'я'); if (w === 1366) await shot(`${world}-type-error`); }
-      await press(codeOfChar(TEXT[n], 'ua'), TEXT[n]);
-    }
-    ok(await page.evaluate(() => !document.querySelector('[data-done]').hidden), `${world}: вправа не завершилась`);
-    if (w === 1366) await shot(`${world}-type-done`);
-    const xp = await page.evaluate(() => document.querySelector('[data-xp-text]').textContent);
-    ok(/^0\s*\/\s*500$/.test(xp), `${world}: досвід за пробну вправу змінився (${xp})`);
-    ok((await store(page))[i + 1].xp === 0, `${world}: пробна вправа змінила збережений досвід`);
+    // «Друк» веде до поточного уроку швидкого курсу (див. scripts/lessons.mjs); тут лише відкривається
+    await page.goto(`${base}#teen/type`); await page.waitForSelector('[data-lines]');
+    ok(page.url().endsWith('#teen/lesson'), `${world}: «Друк» має вести до уроку, а веде на ${page.url()}`);
+    ok((await store(page))[i + 1].xp === 0, `${world}: урок змінив збережений досвід`);
   }
 
   // Герой, світ, помічник: змінюємо й перевіряємо після перезавантаження
