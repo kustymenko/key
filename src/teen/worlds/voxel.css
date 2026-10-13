@@ -141,3 +141,6 @@
 .vx-chips, .px-chips, .sk-chips { display: flex; gap: 14px; margin-top: 10px; }
 .vx-chips span { background: #fff; border: 3px solid var(--vx-ink); border-radius: 8px; padding: 4px 12px; font-size: 20px; }
 .vx-chips b { font-size: 24px; margin-left: 4px; }
+/* Панель «Герой» не заходить на нижнє меню */
+.vx-wardrobe { top: 80px; padding: 12px 26px 14px; }
+.vx-wardrobe .vx-adult-row { margin-top: 8px; }

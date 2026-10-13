@@ -141,3 +141,8 @@
 .px-chips b { margin-left: 4px; }
 .px-chips { margin-top: 12px; }
 .px-task-tag { position: static; display: block; padding: 0; margin: -4px 0 8px; background: none; color: #5b5880; font-size: 12px; }
+/* Панель «Герой» вміщується з запасом до нижнього краю */
+.px-wardrobe { top: 100px; padding: 14px 26px 16px; }
+.px-wardrobe .px-group { margin-top: 4px; }
+.px-wardrobe .px-row { margin-top: 4px; }
+.px-wardrobe .px-adult-row { margin-top: 6px; }

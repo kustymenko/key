@@ -84,6 +84,18 @@ for (const [w, h] of [[1366, 768], [1920, 1080]]) {
     for (const tab of ['', 'avatar', 'type', 'rewards']) {
       await page.goto(`${base}#teen${tab ? '/' + tab : ''}`); await page.waitForSelector(`.cn-${world}`); await page.waitForTimeout(120);
       await shot(`${world}-${tab || 'world'}`); await check(`${world}/${tab || 'world'}`);
+      // панелі не заходять на меню, а позначка поточного рівня не ховається під плашкою героя
+      const hit = await page.evaluate(() => {
+        const k = document.querySelector('.stage').getBoundingClientRect().width / 1366;
+        const r = (s) => { const b = document.querySelector(`.stage > .screen > ${s}`)?.getBoundingClientRect(); return b && { top: b.top / k, bottom: b.bottom / k, left: b.left / k, right: b.right / k }; };
+        const w = r('.vx-wardrobe'), nav = r('.vx-nav'), tag = r('.vx-tag.is-now'), plate = r('.vx-plate'), pw = r('.px-wardrobe');
+        const bad = [];
+        if (w && nav && w.bottom > nav.top) bad.push('панель «Герой» заходить на меню');
+        if (tag && plate && tag.top < plate.bottom && tag.right > plate.left && tag.left < plate.right) bad.push('позначка рівня під плашкою героя');
+        if (pw && pw.bottom > 740) bad.push('панель «Герой» впритул до нижнього краю');
+        return bad.join('; ');
+      });
+      if (hit) problems.push(`${w} ${world}/${tab || 'world'}: ${hit}`);
     }
     // вправа: одна помилка, потім до кінця
     await page.goto(`${base}#teen/type`); await page.waitForSelector('[data-task]');

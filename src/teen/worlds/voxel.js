@@ -153,7 +153,7 @@ const questPanel = () => `<aside class="vx-panel vx-quests"><h2>Завдання
   ${C.helper ? `<div class="vx-bot">${C.demo ? '' : hideHelperButton('vx')}<svg viewBox="-24 -34 48 56" width="48" height="56" aria-hidden="true">${iso(0, 0, 14, 14).box(-0.7, -0.7, 0.2, 1.4, 1.4, 1.4, '#e9eef5')}<polygon points="-10,-3 -3,-3 -3,-9 -10,-9" fill="#2a2f3d"/></svg>
   <p>${C.tip}</p></div>` : ''}</aside>`;
 
-const worldTab = () => shell('world', `<div class="vx-sky"></div>${island(592, 150)}${questPanel()}`);
+const worldTab = () => shell('world', `<div class="vx-sky"></div>${island(592, 186)}${questPanel()}`);
 
 const avatarTab = () => shell('avatar', `<div class="vx-sky"></div>
   <section class="vx-panel vx-wardrobe"><h2>Налаштуй героя</h2>${avatarControls('vx', C)}${settingsRows('vx', C)}</section>
