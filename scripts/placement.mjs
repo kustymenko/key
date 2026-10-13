@@ -4,7 +4,6 @@ import { chromium } from 'playwright';
 import { mkdirSync, existsSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
-import { codeOfChar } from '../src/keyboard/layouts.js';
 
 const file = resolve('docs/index.html');
 if (!existsSync(file)) throw new Error('Спочатку: npm run build');
@@ -42,14 +41,22 @@ for (const [w, h] of [[1366, 768], [1920, 1080]]) {
     await page.click('[data-go="new"]'); await page.fill('.name-input', `Учень${i + 1}`); await page.click('[data-act="name-next"]');
     await page.click('[data-level-pick="5"]'); await page.click(`[data-pick-world="${WORLDS[i]}"]`); await page.waitForSelector('[data-pl]');
   }
-  const typeText = async (lineSel) => {
-    for (let guard = 0; guard < 1200; guard++) {
-      const ch = await page.evaluate((sel) => { const c = document.querySelector(`${sel} .pl-cur`); return c ? c.textContent.replace(/ /g, ' ') : null; }, lineSel);
-      if (ch == null) return;
-      const code = codeOfChar(ch, 'ua');
-      await page.evaluate(([k, c, sh]) => window.dispatchEvent(new KeyboardEvent('keydown', { key: k, code: c, shiftKey: sh, bubbles: true, cancelable: true })), [ch, code ?? '', ch !== ch.toLowerCase()]);
+  // Друк усередині сторінки одним викликом: читаємо поточний символ і «натискаємо» його, поки частина не завершиться
+  const typeText = () => page.evaluate(() => {
+    for (let guard = 0; guard < 1500; guard++) {
+      const c = document.querySelector('[data-lines] .pl-cur');
+      if (!c) return;
+      const k = c.textContent.replace(/\u00a0/g, ' ');
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: k, code: '', shiftKey: k !== k.toLowerCase(), bubbles: true, cancelable: true }));
     }
-  };
+  });
+  const typeLetters = () => page.evaluate(() => {
+    for (let n = 0; n < 60; n++) {
+      const l = document.querySelector('[data-letter]')?.textContent;
+      if (!l) return;
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: l.toLowerCase(), code: '', bubbles: true, cancelable: true }));
+    }
+  });
 
   for (let i = 0; i < 3; i++) {
     const world = WORLDS[i];
@@ -68,20 +75,16 @@ for (const [w, h] of [[1366, 768], [1920, 1080]]) {
     await page.waitForSelector('.layout-hint');
     ok((await page.locator('[data-msg] .layout-hint').count()) === 1, `${world}: немає підказки про розкладку`);
     await page.evaluate(() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ф', code: 'KeyA', bubbles: true, cancelable: true }))); // «ф» — найімовірніше не та літера
-    for (let n = 0; n < 40; n++) {
-      const l = await page.evaluate(() => document.querySelector('[data-letter]')?.textContent);
-      if (!l) break;
-      await page.evaluate(([k]) => window.dispatchEvent(new KeyboardEvent('keydown', { key: k, code: '', bubbles: true, cancelable: true })), [l.toLowerCase()]);
-    }
+    await typeLetters();
     if (w === 1366 && i === 0) { /* знімок частини 1 робимо нижче в кожному світі */ }
     await page.waitForSelector('.pl-step:has-text("2 з 3")');
     await page.click('[data-act="go"]'); await page.waitForSelector('[data-lines]');
     await shot(`${world}-words`); await check(`${world}-words`);
-    await typeText('[data-lines]');
+    await typeText();
     await page.waitForSelector('.pl-step:has-text("3 з 3")');
     await page.click('[data-act="go"]'); await page.waitForSelector('[data-lines]');
     await shot(`${world}-sentences`);
-    await typeText('[data-lines]');
+    await typeText();
     await page.waitForSelector('.pl-stats');
     await shot(`${world}-result`); await check(`${world}-result`);
     ok((await page.locator('[data-act="accept"][data-kind="pro"]:not([data-manual])').count()) === 1, `${world}: швидкий і точний шлях має дати «досвідчений»`);
@@ -93,13 +96,9 @@ for (const [w, h] of [[1366, 768], [1920, 1080]]) {
     // повторне проходження: тепер приймаємо рекомендацію
     await page.goto(`${base}#teen/avatar`); await page.click('[href="#teen/start"]'); await page.waitForSelector('[data-pl]');
     await page.click('[data-act="start-test"]'); await page.click('[data-act="go"]'); await page.waitForSelector('[data-letter]');
-    for (let n = 0; n < 40; n++) {
-      const l = await page.evaluate(() => document.querySelector('[data-letter]')?.textContent);
-      if (!l) break;
-      await page.evaluate(([k]) => window.dispatchEvent(new KeyboardEvent('keydown', { key: k, code: '', bubbles: true, cancelable: true })), [l.toLowerCase()]);
-    }
-    await page.waitForSelector('.pl-step:has-text("2 з 3")'); await page.click('[data-act="go"]'); await page.waitForSelector('[data-lines]'); await typeText('[data-lines]');
-    await page.waitForSelector('.pl-step:has-text("3 з 3")'); await page.click('[data-act="go"]'); await page.waitForSelector('[data-lines]'); await typeText('[data-lines]');
+    await typeLetters();
+    await page.waitForSelector('.pl-step:has-text("2 з 3")'); await page.click('[data-act="go"]'); await page.waitForSelector('[data-lines]'); await typeText();
+    await page.waitForSelector('.pl-step:has-text("3 з 3")'); await page.click('[data-act="go"]'); await page.waitForSelector('[data-lines]'); await typeText();
     await page.waitForSelector('.pl-stats');
     await page.click('[data-act="accept"]:not([data-manual])'); await page.waitForSelector(`.stage > .cn-${world}`);
     p = (await store(page))[i];
