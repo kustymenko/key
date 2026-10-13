@@ -95,3 +95,49 @@
 .px-wardrobe .px-group h3 { font-size: 18px; }
 .px-wardrobe .px-row { margin-top: 6px; gap: 12px; }
 .px-wardrobe .px-opt { min-width: 52px; height: 52px; font-size: 11px; white-space: nowrap; display: inline-grid; place-items: center; text-decoration: none; }
+
+/* ---------- Етап Т1+: «Додому», ім'я, налаштування світу, екран «Друк» у стилі світу ---------- */
+.px-home, .px-adult, .px-chips span { margin: 4px; background: var(--px-panel); box-shadow: 0 -4px 0 0 var(--px-edge), 0 4px 0 0 var(--px-edge), -4px 0 0 0 var(--px-edge), 4px 0 0 0 var(--px-edge), 0 8px 0 4px #07061a; }
+.px-home { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; color: var(--px-edge); font: 400 14px 'Press Start 2P', sans-serif; cursor: pointer; border: 0; flex: none; }
+.px-home:hover { background: var(--px-panel2); }
+.px-top { gap: 16px; }
+.px-tab { min-width: 0; padding: 0 12px; }
+.px-nav { gap: 12px; }
+.px-lvl { gap: 14px; padding: 0 16px; }
+.px-who { display: grid; gap: 2px; }
+.px-name { font: 800 18px/1.1 var(--font); max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.px-rank { font: 400 12px 'Press Start 2P'; color: #b7b0e6; }
+.px-rank b { color: var(--px-cyan); }
+.px-lvl { font-size: 14px; }
+.px-xp i { width: 14px; }
+.px-wardrobe .px-opt, .px-btn { font: 800 17px var(--font); }
+.px-adult-row { margin-top: 14px; text-align: right; }
+.px-adult { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; font: 800 17px var(--font); color: #b7b0e6; text-decoration: none; }
+.px-adult:hover { color: #fff; background: var(--px-panel2); }
+.cn-pixel .wt { --wt-accent: var(--px-gold); }
+.cn-pixel .wt-shot { border-radius: 0; }
+.px-wardrobe .wt-row { margin-top: 8px; gap: 12px; }
+
+/* «Друк» у піксельному світі: нічна «консоль» — ступінчасті рамки, піксельна земля, світла «корпусна» панель клавіатури */
+.px-ground { position: absolute; left: 0; right: 0; bottom: 0; height: 46px; background: repeating-linear-gradient(90deg, #1d1845 0 32px, #231d52 32px 64px); border-top: 6px solid #3a3170; }
+.px-task-tag { position: absolute; left: 20px; top: -14px; padding: 6px 12px; background: #1b1740; color: var(--px-edge); font: 400 14px 'Press Start 2P'; }
+.cn-pixel.is-tab-type .px-task { box-shadow: 0 -4px 0 0 #1b1740, 0 4px 0 0 #1b1740, -4px 0 0 0 #1b1740, 4px 0 0 0 #1b1740, 0 8px 0 4px #07061a, inset 0 0 0 4px #c9c7de; }
+.cn-pixel.is-tab-type .keys-panel {
+  background: #dcdfea; box-shadow: 0 -4px 0 0 #1b1740, 0 4px 0 0 #1b1740, -4px 0 0 0 #1b1740, 4px 0 0 0 #1b1740, 0 8px 0 4px #07061a, inset 0 0 0 4px #bfc3d6;
+}
+.cn-pixel .keys-panel::before, .cn-pixel .keys-panel::after { content: ''; position: absolute; top: 8px; width: 8px; height: 8px; background: #8b8fa8; }
+.cn-pixel .keys-panel::before { left: 8px; } .cn-pixel .keys-panel::after { right: 8px; }
+.cn-pixel .keys-panel { position: relative; }
+.cn-pixel .keys-panel .key { border-radius: 2px; }
+.cn-pixel .keys-panel svg { shape-rendering: crispEdges; }
+.cn-pixel .keys-panel .finger:not(.is-active) { rx: 0; stroke: #1b1740; stroke-width: 5; }
+.cn-pixel .keys-panel .finger.is-active { rx: 0; stroke: #1b1740; }
+.cn-pixel .keys-panel .palm { stroke: #1b1740; stroke-width: 5; stroke-linejoin: miter; fill: #f3f2fb; }
+.cn-pixel .keys-panel .hands-caption { border-radius: 0; border-color: #1b1740; background: #f3f2fb; font-family: var(--font); font-weight: 800; box-shadow: 4px 4px 0 #1b1740; }
+.px-done { gap: 22px; padding: 0 30px; justify-content: flex-start; font-family: var(--font); }
+.px-done-text { flex: 1; }
+.px-done-text > b { display: block; font: 400 26px 'Press Start 2P'; color: #1b1740; margin-bottom: 4px; }
+.px-chips span { margin: 4px 4px 4px 0; padding: 6px 14px; background: #fff; color: #1b2430; font: 800 20px var(--font); box-shadow: 0 -3px 0 #1b1740, 0 3px 0 #1b1740, -3px 0 0 #1b1740, 3px 0 0 #1b1740; }
+.px-chips b { margin-left: 4px; }
+.px-chips { margin-top: 12px; }
+.px-task-tag { position: static; display: block; padding: 0; margin: -4px 0 8px; background: none; color: #5b5880; font-size: 12px; }

@@ -5,6 +5,7 @@ import { WORLD_IDS, levelInfo } from '../logic/profile.js';
 import { teenContext } from './context.js';
 import { mountTyping } from './typing.js';
 import { worldPickHtml } from './pick.js';
+import { placementScreen, mountPlacement } from './placement.js';
 
 const TAB_IDS = ['world', 'avatar', 'type', 'rewards'];
 
@@ -12,16 +13,18 @@ const TAB_IDS = ['world', 'avatar', 'type', 'rewards'];
 export function teenRoute(name) {
   const [root, tab = 'world'] = name.split('/');
   if (root !== 'teen') return null;
-  return tab === 'pick' || TAB_IDS.includes(tab) ? { tab } : null;
+  return ['pick', 'start', 'test'].includes(tab) || TAB_IDS.includes(tab) ? { tab } : null;
 }
 
 export function teenScreen(route, profile) {
   if (route.tab === 'pick' || !profile.world) return worldPickHtml({ back: 'home' });
+  if (route.tab === 'start' || route.tab === 'test') return placementScreen(profile);
   return themeOf(profile.world).screen(route.tab, teenContext(profile));
 }
 
 // Оживлення: вибір світу, герой, помічник, пробна вправа
 export function mountTeen(app, route, state) {
+  if (route.tab === 'start' || route.tab === 'test') return mountPlacement(app, route, state);
   const store = state.store;
   const profile = () => store.get(state.profileId);
   const rerender = () => state.go(location.hash.replace('#', ''));

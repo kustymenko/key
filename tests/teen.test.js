@@ -40,7 +40,8 @@ describe('логіка профілю 5–6 (спільна для всіх св
   it('куди йти після вибору картки', () => {
     expect(homeRoute({ level: '1-2' })).toBe('map');
     expect(homeRoute({ level: '3-4', world: 'sky' })).toBe('map');
-    expect(homeRoute({ level: '5', world: 'sky' })).toBe('teen');
+    expect(homeRoute({ level: '5', world: 'sky' })).toBe('teen/start'); // ще без вступного тесту
+    expect(homeRoute({ level: '5', world: 'sky', placement: { kind: 'zero' } })).toBe('teen');
     expect(homeRoute({ level: '6', world: null })).toBe('teen/pick'); // клас змінили на 6, світ ще не обрано
     expect(isTeen('5') && isTeen('6') && !isTeen('3-4')).toBe(true);
   });
@@ -108,7 +109,8 @@ describe('три світи: кожен екран відкривається в
       expect(html.length, `${world}/${tab}`).toBeGreaterThan(800);
       expect(html, `${world}/${tab}`).not.toMatch(/undefined|NaN|\[object|https?:\/\/(?!www\.w3\.org)/);
       expect(html).toContain(`href="#teen${tab === 'world' ? '' : '/' + tab}"`); // навігація веде в справжній світ, а не в демо
-      if (world === 'voxel') expect(html).toContain(p.name);
+      expect(html, `${world}/${tab}: ім'я`).toContain(p.name); // ім'я учня видно в усіх трьох світах
+      expect(html, `${world}/${tab}: «Додому»`).toContain('data-home');
     }
     expect(Object.keys(THEMES)).toEqual(WORLD_IDS);
   });
@@ -134,6 +136,10 @@ describe('три світи: кожен екран відкривається в
       for (const id of WORLD_IDS) expect(html).toContain(`data-set-world="${id}"`);
       expect(html).toContain('data-set-helper="1"');
       expect(html).toContain('href="#adult"');
+      expect(html).toContain('Змінити світ');
+      expect(html.match(/class="wt wt-/g)).toHaveLength(3); // світи — мініатюрами
+      expect(html).not.toMatch(/<h3>Світ<\/h3>/); // не плутається з вкладкою «Світ»
+      expect(html).not.toMatch(/set-helper[^>]*>[^<]*<span>Для дорослого/); // «Для дорослого» не серед варіантів помічника
     }
   });
   it('помічник: є у кожному світі, ховається, показується знову', () => {
@@ -173,6 +179,21 @@ describe('три світи: кожен екран відкривається в
     expect(html).toContain('6 клас');
     expect(html.match(/data-profile=/g)).toHaveLength(store.list().length);
     expect([kid, noWorld, ...teens]).toHaveLength(5);
+  });
+});
+
+describe('екран «Друк» у стилі кожного світу', () => {
+  it('кожен світ має власне оформлення екрана друку й екрана результату (кольори пальців не змінені)', () => {
+    const marks = { voxel: ['vx-deco', 'vx-done-text', 'vx-chips'], pixel: ['px-ground', 'px-task-tag', 'px-done-text'], sky: ['sk-deco', 'sk-done-text', 'sk-chips'] };
+    for (const world of WORLD_IDS) {
+      const html = teenScreen(teenRoute('teen/type'), teenProfile(world));
+      for (const m of marks[world]) expect(html, `${world}: ${m}`).toContain(m);
+      expect(html).toContain('data-done-speed');
+      expect(html).toContain('class="key f-lp'); // ті самі класи кольорів пальців
+    }
+  });
+  it('помічник і «Для дорослого» не в демо; у демо немає кнопки «Додому»', () => {
+    for (const id of WORLD_IDS) for (const tab of TABS) expect(conceptScreen({ id, tab })).not.toContain('data-home');
   });
 });
 

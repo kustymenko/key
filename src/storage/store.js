@@ -1,5 +1,6 @@
 import { awardBadges } from './badges.js';
 import { WORLD_IDS, cleanHero } from '../teen/logic/profile.js';
+import { cleanPlacement } from '../teen/logic/placement.js';
 
 // Профілі й прогрес у localStorage. Кожне звернення — в try/catch:
 // якщо сховище недоступне (приватне вікно, заборона, переповнення), тренажер працює далі, але без збереження.
@@ -44,6 +45,7 @@ export function cleanProfile(p) {
     hero: cleanHero(p.hero),
     helperHidden: !!p.helperHidden,
     xp: num(p.xp),
+    placement: cleanPlacement(p.placement), // розміщення за вступним тестом (5–6 клас)
     resume: p.resume && typeof p.resume === 'object' && Array.isArray(p.resume.steps) ? p.resume : null,
   };
 }
@@ -108,6 +110,7 @@ export function createStore(storage = safeStorage()) {
       if (WORLD_IDS.includes(patch.world)) p.world = patch.world;
       if (patch.hero) p.hero = cleanHero(patch.hero);
       if (typeof patch.helperHidden === 'boolean') p.helperHidden = patch.helperHidden;
+      if (patch.placement) p.placement = cleanPlacement(patch.placement) ?? p.placement;
       save();
       return p;
     },

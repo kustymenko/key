@@ -1,6 +1,6 @@
 // Концепція 1 «Кубічний світ»: денний острів з кубиків (ізометрія), герой із кубиків, нагороди-кубики.
 // Усе намальовано кодом: жодних чужих текстур, назв чи персонажів.
-import { TABS, avatarControls, settingsRows, hideHelperButton } from '../screens/controls.js';
+import { TABS, avatarControls, settingsRows, hideHelperButton, homeButton } from '../screens/controls.js';
 import { taskText, keysPanel } from '../screens/typing.js';
 import { HERO_OPTIONS as AV_OPTIONS, DEFAULT_HERO } from '../logic/profile.js';
 import { shade, noise, hslHex } from './draw.js';
@@ -10,7 +10,7 @@ let C, PLAYER, WORLDS, QUESTS, REWARDS, av = DEFAULT_HERO;
 const useCtx = (ctx) => { C = ctx; PLAYER = ctx.player; WORLDS = ctx.progress.worlds; QUESTS = ctx.progress.quests; REWARDS = ctx.progress.rewards; av = ctx.hero; };
 
 export const heroSize = 360; // розмір великого героя на екрані «Герой»
-export const meta = { id: 'voxel', name: 'Кубічний світ', desc: 'Острів із кубиків. Збудуй свій світ і відкривай нові землі.' };
+export const meta = { id: 'voxel', name: 'Кубічний світ', short: 'Кубічний', desc: 'Острів із кубиків. Збудуй свій світ і відкривай нові землі.' };
 
 // ---------- Ізометричні кубики ----------
 function iso(ox, oy, S, V) {
@@ -122,7 +122,7 @@ function island(ox, oy) {
       <path d="M-8 22h16l-8 9z" fill="#2a2f3d"/></g>`;
   }
   // хмаринки з кубиків
-  const clouds = [[-3, 2, 5], [9, -2, 6], [12, 10, 5]].map(([x, y, z]) => box(x, y, z, 2.2, 1.2, 0.5, '#ffffff') + box(x + 0.4, y + 0.1, z + 0.5, 1.2, 0.9, 0.4, '#ffffff')).join('');
+  const clouds = [[3, -2, 3], [3, 11, 3], [12, 8, 2]].map(([x, y, z]) => box(x, y, z, 2.2, 1.2, 0.5, '#ffffff') + box(x + 0.4, y + 0.1, z + 0.5, 1.2, 0.9, 0.4, '#ffffff')).join('');
   return `<svg class="vx-island" viewBox="0 0 1366 768" width="1366" height="768" aria-hidden="true">${clouds}${svg}</svg>`;
 }
 
@@ -134,8 +134,9 @@ const tabIcon = { world: '#78c044', avatar: '#2e86de', type: '#ff7a3d', rewards:
 function shell(tab, inner) {
   const frac = PLAYER.xp / PLAYER.xpMax;
   const head = `<svg viewBox="-34 -78 68 96" width="52" height="72" aria-hidden="true">${heroG(0, 20, 22, 20)}</svg>`;
-  return `<div class="screen cn cn-voxel is-tab-${tab}">
+  return `<div class="screen cn cn-voxel is-tab-${tab}${C.demo ? '' : ' has-home'}">
     ${inner}
+    ${C.demo ? '' : homeButton('vx')}
     <div class="vx-plate"><div class="vx-head">${head}</div>
       <div><div class="vx-name">${PLAYER.name}</div>
       <div class="vx-lvl">Рівень <b data-level>${PLAYER.level}</b></div>${segBar(frac)}
@@ -158,13 +159,21 @@ const avatarTab = () => shell('avatar', `<div class="vx-sky"></div>
   <section class="vx-panel vx-wardrobe"><h2>Налаштуй героя</h2>${avatarControls('vx', C)}${settingsRows('vx', C)}</section>
   <div class="vx-hero" data-avatar>${avatarSvg(360, C.hero)}</div>`);
 
-const typeTab = () => shell('type', `<div class="vx-sky vx-calm"></div>
-  <div class="vx-task"><div class="vx-task-top"><span>Вправа: «Нові землі»</span>
+// Тло екрана «Друк»: бліді кубики-силуети (майже безбарвні, щоб кольори пальців лишались єдиними яскравими)
+const typeDeco = () => {
+  const a = iso(150, 690, 44, 40), b = iso(1230, 150, 44, 40), pale = ['#d4dde8', '#dde5ee', '#cdd7e3'];
+  return `<svg class="vx-deco" viewBox="0 0 1366 768" width="1366" height="768" aria-hidden="true">${a.box(0, 0, 0, 2, 2, 1.2, pale[0])}${a.box(2, 0, 0, 1, 2, 0.6, pale[1])}${a.box(0, 2, 0, 2, 1, 2.2, pale[2])}${b.box(0, 0, 0, 2, 2, 1, pale[0])}${b.box(-1, 1, 0, 1, 1, 2, pale[1])}${b.box(1, -2, 2, 2, 1, 0.5, pale[2])}</svg>`;
+};
+const doneCube = `<svg viewBox="-34 -34 68 68" width="84" height="84" aria-hidden="true">${iso(0, 0, 26, 24).box(-1, -1, -0.7, 2, 2, 1.4, '#aab4c0')}</svg>`;
+
+const typeTab = () => shell('type', `<div class="vx-sky vx-calm">${typeDeco()}</div>
+  <div class="vx-task"><div class="vx-task-top"><span class="vx-task-title">${cubeIcon('#9aa3ad')}Вправа: «Нові землі»</span>
     <span class="vx-stat">Точність <b data-acc>—</b></span><span class="vx-stat">Знаків за хвилину <b data-speed>—</b></span></div>
     <div class="vx-xpbar"><div data-xp-fill style="width:${(PLAYER.xp / PLAYER.xpMax) * 100}%"></div></div>
     ${taskText()}
     <div class="vx-msg" data-msg></div>
-    <div class="vx-done" data-done hidden><b>Вправу пройдено!</b> Точність <span data-done-acc></span>
+    <div class="vx-done" data-done hidden>${doneCube}<div class="vx-done-text"><b>Вправу пройдено!</b>
+      <div class="vx-chips"><span>Точність <b data-done-acc></b></span><span>Знаків за хвилину <b data-done-speed></b></span></div></div>
       <button class="vx-btn" data-again>Ще раз</button></div></div>
   ${keysPanel()}`);
 
@@ -177,4 +186,16 @@ const rewardsTab = () => shell('rewards', `<div class="vx-sky"></div>
   <section class="vx-panel vx-shelf"><h2>Мої нагороди <small>${REWARDS.filter((r) => r.got).length} з ${REWARDS.length}</small></h2>
   <div class="vx-grid">${REWARDS.map((r, i) => `<div class="vx-reward ${r.got ? 'is-got' : ''}">${rewardCube(r, i)}<span>${r.name}</span></div>`).join('')}</div></section>`);
 
-export const screen = (tab, ctx) => { useCtx(ctx); return ({ world: worldTab, avatar: avatarTab, type: typeTab, rewards: rewardsTab }[tab] ?? worldTab)(); };
+
+// Рамка для екранів вступного тесту: тло, «Додому» і панель світу; вміст (inner) малює спільний код
+export const frame = (ctx, inner = '') => {
+  const saved = [C, PLAYER, WORLDS, QUESTS, REWARDS, av];
+  useCtx(ctx);
+  try { return `<div class="screen cn cn-voxel is-tab-test has-home"><div class="vx-sky"></div>${homeButton('vx')}<div class="vx-panel pl-panel" data-pl>${inner}</div></div>`; } finally { [C, PLAYER, WORLDS, QUESTS, REWARDS, av] = saved; }
+};
+
+export const screen = (tab, ctx) => {
+  const saved = [C, PLAYER, WORLDS, QUESTS, REWARDS, av]; // мініатюри світів викликають screen() усередині screen()
+  useCtx(ctx);
+  try { return ({ world: worldTab, avatar: avatarTab, type: typeTab, rewards: rewardsTab }[tab] ?? worldTab)(); } finally { [C, PLAYER, WORLDS, QUESTS, REWARDS, av] = saved; }
+};
