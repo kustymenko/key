@@ -1,0 +1,82 @@
+/* Концепція 3 «Небесні острови»: нічне небо, скляні панелі, м'яке сяйво, гострі грані */
+.cn-sky {
+  --sk-glass: rgb(255 255 255 / .1); --sk-edge: rgb(255 255 255 / .28); --sk-ink: #eef0ff; --sk-soft: #b6b9e6; --sk-aqua: #7ad9ff; --sk-pink: #ff9dd2;
+  font-family: 'Exo 2', system-ui, sans-serif; font-weight: 600; color: var(--sk-ink);
+  background: radial-gradient(ellipse 70% 40% at 60% 105%, #ff8f6b55, transparent), linear-gradient(#090c28, #1d1760 62%, #4a2a7c);
+}
+.cn-sky h2 { font-family: 'Exo 2', sans-serif; font-size: 32px; font-weight: 800; }
+.cn-sky h3 { font-family: 'Exo 2', sans-serif; font-size: 20px; color: var(--sk-soft); font-weight: 600; }
+.sk-stars { position: absolute; inset: 0; }
+.sk-stars i { position: absolute; background: #fff; border-radius: 50%; }
+.sk-world { position: absolute; left: 0; top: 0; }
+.sk-glass { background: var(--sk-glass); border: 1.5px solid var(--sk-edge); border-radius: 26px; backdrop-filter: blur(10px); box-shadow: 0 18px 50px rgb(5 5 40 / .45), inset 0 1px 0 rgb(255 255 255 / .25); }
+
+/* Бокова панель */
+.sk-side { position: absolute; left: 24px; top: 24px; bottom: 84px; width: 108px; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 18px 10px; z-index: 3; background: var(--sk-glass); border: 1.5px solid var(--sk-edge); border-radius: 30px; backdrop-filter: blur(10px); }
+.sk-logo { margin-bottom: 10px; }
+.sk-tab { display: grid; justify-items: center; gap: 4px; width: 88px; padding: 12px 4px 10px; border-radius: 20px; color: var(--sk-soft); text-decoration: none; font-size: 18px; font-weight: 800; }
+.sk-tab:hover { background: rgb(255 255 255 / .08); }
+.sk-tab.is-on { color: #0b1030; background: linear-gradient(#a8e8ff, #7ad9ff); box-shadow: 0 0 26px rgb(122 217 255 / .55); }
+.sk-status { position: absolute; right: 36px; top: 24px; display: flex; align-items: center; gap: 16px; z-index: 3; }
+.sk-coins { display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 20px; font-size: 26px; background: var(--sk-glass); border: 1.5px solid var(--sk-edge); border-radius: 26px; backdrop-filter: blur(10px); }
+.sk-ring { position: relative; width: 72px; height: 72px; }
+.sk-ring b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 28px; font-weight: 800; }
+
+/* Карта */
+.sk-float { animation: sk-float 6s ease-in-out infinite; }
+@keyframes sk-float { 50% { transform: translateY(-8px); } }
+.sk-hero-map { animation: sk-float 3s ease-in-out infinite; }
+.sk-label { fill: var(--sk-ink); font-size: 21px; font-weight: 800; font-family: 'Exo 2', sans-serif; paint-order: stroke; stroke: rgb(9 12 40 / .7); stroke-width: 5px; }
+.sk-quests { position: absolute; left: 156px; right: 36px; bottom: 24px; height: 104px; display: flex; align-items: center; gap: 22px; padding: 0 26px 0 18px; z-index: 2; background: var(--sk-glass); border: 1.5px solid var(--sk-edge); border-radius: 28px; backdrop-filter: blur(10px); }
+.sk-q { flex: 1; display: flex; align-items: center; gap: 12px; font-size: 19px; line-height: 1.15; }
+.sk-q > div { flex: 1; }
+.sk-q i { flex: none; width: 30px; height: 30px; border-radius: 50%; border: 2.5px solid var(--sk-soft); display: grid; place-items: center; font-style: normal; font-size: 18px; color: #0b1030; }
+.sk-q.is-done i { background: #6fe3a0; border-color: #6fe3a0; }
+.sk-q small { display: block; font-size: 16px; color: var(--sk-soft); font-weight: 600; }
+.sk-q > span { color: var(--sk-aqua); font-weight: 800; font-size: 18px; }
+
+/* Герой */
+.sk-podium { position: absolute; left: 240px; top: 470px; width: 330px; height: 120px; }
+.sk-podium i { position: absolute; left: 50%; top: 50%; border-radius: 50%; border: 2px solid var(--sk-aqua); transform: translate(-50%, -50%); box-shadow: 0 0 30px rgb(122 217 255 / .5); }
+.sk-podium i:nth-child(1) { width: 330px; height: 90px; opacity: .6; }
+.sk-podium i:nth-child(2) { width: 240px; height: 64px; opacity: .8; }
+.sk-podium i:nth-child(3) { width: 150px; height: 40px; background: rgb(122 217 255 / .25); }
+.sk-hero { position: absolute; left: 280px; top: 80px; }
+.sk-wardrobe { position: absolute; right: 60px; top: 110px; width: 520px; padding: 24px 30px 30px; }
+.sk-group { margin-top: 14px; }
+.sk-row { display: flex; gap: 12px; margin-top: 8px; }
+.sk-opt { min-width: 64px; height: 64px; padding: 0 14px; border-radius: 18px; border: 2px solid var(--sk-edge); background: var(--sw, rgb(255 255 255 / .12)); color: var(--sk-ink); font-family: 'Exo 2', sans-serif; font-size: 20px; font-weight: 800; }
+.sk-opt.opt-hat { background: rgb(255 255 255 / .12); }
+.sk-opt[aria-pressed='true'] { outline: 4px solid var(--sk-aqua); outline-offset: 3px; box-shadow: 0 0 22px rgb(122 217 255 / .6); }
+
+/* Кристали */
+.sk-shelf { position: absolute; left: 156px; right: 36px; top: 112px; bottom: 24px; padding: 22px 34px; }
+.sk-shelf small { font-size: 22px; color: var(--sk-soft); margin-left: 10px; font-weight: 600; }
+.sk-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px 8px; margin-top: 12px; }
+.sk-reward { display: grid; justify-items: center; gap: 2px; text-align: center; font-size: 18px; line-height: 1.15; color: #8a8ec0; }
+.sk-reward.is-got { color: var(--sk-ink); }
+.sk-reward.is-got svg { filter: drop-shadow(0 0 14px rgb(255 255 255 / .3)); }
+
+/* Друк: бічна панель стає рядком угорі; клавіатура на світлій панелі */
+.cn-sky.is-tab-type .sk-side { left: 24px; right: auto; top: 20px; bottom: auto; width: auto; height: 76px; flex-direction: row; padding: 8px 14px; gap: 8px; border-radius: 24px; }
+.cn-sky.is-tab-type .sk-logo { margin: 0 6px 0 0; }
+.cn-sky.is-tab-type .sk-tab { grid-auto-flow: column; width: auto; padding: 0 18px; height: 56px; align-items: center; gap: 8px; }
+.cn-sky.is-tab-type .sk-tab svg { width: 24px; height: 24px; }
+.cn-sky.is-tab-type .sk-status { top: 20px; }
+.sk-task { position: absolute; left: 24px; right: 24px; top: 118px; height: 244px; padding: 16px 30px; background: #f3f4fb; color: #1b2430; border-radius: 26px; box-shadow: 0 18px 50px rgb(5 5 40 / .45); }
+.sk-task-top { display: flex; gap: 26px; font-size: 22px; font-weight: 700; }
+.sk-task-top > span:first-child { flex: 1; color: #4a4f6e; }
+.sk-task-top b { font-size: 26px; margin-left: 4px; }
+.sk-xpt { color: #4a4f6e; }
+.sk-bar { height: 14px; margin: 10px 0 6px; border-radius: 7px; background: #d5d8ea; overflow: hidden; }
+.sk-bar div { height: 100%; border-radius: 7px; background: linear-gradient(90deg, #5a607e, #3a3f5c); transition: width .25s; }
+.cn-sky.is-tab-type .tt { font-family: 'Exo 2', sans-serif; }
+.sk-msg { position: absolute; left: 30px; right: 30px; bottom: 10px; min-height: 40px; font-size: 22px; color: #4a4f6e; }
+.sk-done { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 18px; font-size: 27px; background: #f3f4fb; border-radius: 26px; }
+.sk-done[hidden] { display: none; }
+.sk-btn { height: 58px; padding: 0 28px; border-radius: 29px; border: 0; font-family: 'Exo 2', sans-serif; font-size: 22px; font-weight: 800; background: #2b3a4a; color: #fff; }
+.cn-sky.is-tab-type .keys-panel { position: absolute; left: 24px; right: 24px; top: 392px; background: #e6e9f6; border-radius: 26px; box-shadow: 0 18px 50px rgb(5 5 40 / .45); }
+.cn-sky.is-tab-type .tt-ch.is-current { background: #dfe2f1; }
+.sk-grid { gap: 34px 8px; margin-top: 22px; }
+.sk-reward { font-size: 19px; gap: 6px; }
+.sk-reward svg { width: 104px; height: 127px; }

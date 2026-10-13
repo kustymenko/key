@@ -1,0 +1,88 @@
+/* Концепція 2 «Піксель-аркада»: нічне небо, кутасті рамки без заокруглень, піксельний шрифт */
+.cn-pixel {
+  --px-bg: #14122a; --px-panel: #262046; --px-panel2: #342c5e; --px-edge: #efeaff; --px-pink: #ff5fa2; --px-gold: #ffd23f; --px-cyan: #59d3ff;
+  font-family: 'Press Start 2P', system-ui, sans-serif; font-weight: 400; line-height: 1.35; color: var(--px-edge);
+  background: linear-gradient(#0e0c22, #1b1740 60%, #2a2057);
+}
+.cn-pixel h2 { font-family: 'Press Start 2P', sans-serif; font-size: 24px; font-weight: 400; line-height: 1.4; color: var(--px-edge); }
+.cn-pixel h3 { font-family: var(--font); font-size: 20px; font-weight: 800; color: #b7b0e6; }
+.px-stars { position: absolute; inset: 0; }
+.px-stars i { position: absolute; width: 4px; height: 4px; background: #cfc8ff; opacity: .7; }
+
+/* Ступінчасті рамки (без border-radius) */
+.px-panel, .px-quests, .px-task, .px-sprite, .px-where, .px-lvl, .px-coins, .px-tab, .px-btn, .px-opt, .cn-pixel .keys-panel {
+  margin: 4px; background: var(--px-panel);
+  box-shadow: 0 -4px 0 0 var(--px-edge), 0 4px 0 0 var(--px-edge), -4px 0 0 0 var(--px-edge), 4px 0 0 0 var(--px-edge), 0 8px 0 4px #07061a;
+}
+.px-top { position: absolute; left: 32px; right: 32px; top: 24px; display: flex; align-items: center; gap: 22px; z-index: 3; }
+.px-nav { display: flex; gap: 16px; flex: 1; }
+.px-tab { display: grid; place-items: center; min-width: 138px; height: 64px; padding: 0 12px; color: var(--px-edge); text-decoration: none; font-size: 14px; }
+.px-tab:hover { background: var(--px-panel2); }
+.px-tab.is-on { background: var(--px-pink); color: #14122a; }
+.px-lvl { display: flex; align-items: center; gap: 14px; height: 64px; padding: 0 18px; font-size: 16px; }
+.px-lvl b { color: var(--px-cyan); }
+.px-lvl small { font: 800 18px var(--font); color: #b7b0e6; }
+.px-xp { display: flex; gap: 3px; }
+.px-xp i { width: 12px; height: 24px; background: #1a1636; }
+.px-xp i.on { background: var(--px-gold); }
+.px-coins { display: flex; align-items: center; gap: 10px; height: 64px; padding: 0 18px; font-size: 24px; }
+
+/* Карта */
+.px-map { position: absolute; left: 11px; top: 124px; image-rendering: pixelated; }
+.px-now rect:nth-child(2) { animation: px-blink 1s steps(2) infinite; }
+@keyframes px-blink { 50% { fill: #ffb0d3; } }
+.px-hero-map { animation: px-hop 1s steps(2) infinite; }
+@keyframes px-hop { 50% { transform: translate(0, -1px); } }
+.px-hero-map { transform-box: view-box; }
+.px-quests { position: absolute; left: 36px; right: 360px; top: 596px; height: 108px; padding: 14px 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: center; z-index: 2; }
+.px-q { display: flex; gap: 10px; align-items: center; font: 800 19px/1.15 var(--font); }
+.px-q i { flex: none; width: 28px; height: 28px; background: #14122a; border: 3px solid var(--px-edge); display: grid; place-items: center; font-style: normal; color: #14122a; font-size: 22px; }
+.px-q.is-done i { background: #9bf06b; }
+.px-q > div { flex: 1; }
+.px-q small { display: block; font-size: 17px; color: #b7b0e6; font-weight: 600; }
+.px-q > span { font: 400 14px 'Press Start 2P'; color: var(--px-gold); }
+.px-sprite { position: absolute; right: 36px; top: 596px; width: 292px; height: 108px; padding: 14px 18px; display: flex; align-items: center; gap: 12px; font: 800 18px/1.2 var(--font); z-index: 2; }
+.px-sprite > div { animation: px-hop 1.2s steps(2) infinite; flex: none; }
+.px-where { position: absolute; right: 36px; top: 124px; padding: 8px 18px 10px; font: 800 24px var(--font); z-index: 2; display: grid; }
+.px-where small { font-size: 16px; color: #b7b0e6; font-weight: 600; }
+
+/* Герой */
+.px-platform { position: absolute; left: 140px; top: 520px; width: 420px; height: 40px; background: repeating-linear-gradient(90deg, #5c6280 0 28px, #8d93a8 28px 56px); box-shadow: 0 8px 0 #07061a; }
+.px-hero { position: absolute; left: 244px; top: 214px; image-rendering: pixelated; }
+.px-wardrobe { position: absolute; right: 60px; top: 124px; width: 540px; padding: 22px 28px 28px; }
+.px-group { margin-top: 12px; }
+.px-row { display: flex; gap: 14px; margin-top: 8px; }
+.px-opt { min-width: 64px; height: 64px; padding: 0 12px; color: var(--px-edge); font-family: 'Press Start 2P', sans-serif; font-size: 12px; font-weight: 400; background: var(--sw, var(--px-panel2)); }
+.px-opt.opt-hat { background: var(--px-panel2); }
+.px-opt.opt-skin, .px-opt.opt-outfit { box-shadow: 0 -4px 0 0 #14122a, 0 4px 0 0 #14122a, -4px 0 0 0 #14122a, 4px 0 0 0 #14122a, 0 8px 0 4px #07061a; }
+.px-opt[aria-pressed='true'] { box-shadow: 0 -4px 0 0 var(--px-gold), 0 4px 0 0 var(--px-gold), -4px 0 0 0 var(--px-gold), 4px 0 0 0 var(--px-gold), 0 0 0 8px var(--px-edge); }
+
+/* Нагороди */
+.px-shelf { position: absolute; left: 60px; right: 60px; top: 124px; bottom: 44px; padding: 20px 30px; }
+.px-shelf small { font: 800 22px var(--font); color: #b7b0e6; margin-left: 10px; }
+.px-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px 10px; margin-top: 18px; }
+.px-reward { display: grid; justify-items: center; gap: 4px; text-align: center; font: 800 18px/1.15 var(--font); color: #8e88bd; }
+.px-reward.is-got { color: var(--px-edge); }
+.px-reward svg { image-rendering: pixelated; }
+
+/* Друк: нейтральне оточення, білий-лавандовий інтерфейс */
+.px-task { position: absolute; left: 36px; right: 36px; top: 124px; height: 234px; padding: 16px 28px; background: #ecebf6; color: #1b2430; width: auto; }
+.px-task-top { display: flex; gap: 28px; font: 800 22px var(--font); }
+.px-task-top > span:first-child { flex: 1; color: #4a4768; }
+.px-task-top b { font-size: 26px; margin-left: 6px; color: #1b2430; }
+.px-bar { height: 20px; margin: 10px 0 4px; background: #c9c7de; border: 3px solid #1b2430; }
+.px-bar div { height: 100%; background: repeating-linear-gradient(90deg, #4a4768 0 14px, #ecebf6 14px 17px); transition: width .25s; }
+.cn-pixel.is-tab-type .tt { font-family: var(--font); font-weight: 800; font-size: 46px; }
+.px-msg { position: absolute; left: 28px; right: 28px; bottom: 10px; min-height: 38px; font: 800 22px var(--font); color: #4a4768; }
+.px-done { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 18px; font: 800 26px var(--font); background: #ecebf6; }
+.px-done[hidden] { display: none; }
+.px-btn { height: 56px; padding: 0 24px; font-family: 'Press Start 2P', sans-serif; font-size: 14px; background: var(--px-pink); color: #14122a; }
+.cn-pixel.is-tab-type .px-lvl .px-xp i.on { background: #e9e6ff; }
+.cn-pixel.is-tab-type .keys-panel { position: absolute; left: 36px; right: 36px; top: 400px; background: #dcdfea; margin: 4px; }
+.cn-pixel.is-tab-type .px-top { top: 22px; }
+.cn-pixel.is-tab-type .px-task { top: 118px; height: 244px; }
+.cn-pixel.is-tab-type .keys-panel { top: 396px; }
+.cn-pixel.is-tab-type .tt-ch.is-current { background: #c9c7de; }
+.px-grid { gap: 40px 10px; margin-top: 28px; }
+.px-reward { font-size: 19px; gap: 10px; }
+.px-reward svg { width: 104px; height: 104px; }

@@ -55,6 +55,11 @@ export function demoPage(state) {
   </section>
 
   <section class="block">
+    <h2>Для 5–6 класів (макети стилю)</h2>
+    <div class="row"><a class="btn light" href="#concepts" style="text-decoration:none"><span>Концепції стилю: три варіанти для голосування</span></a></div>
+  </section>
+
+  <section class="block">
     <h2>Клавик — помічник</h2>
     <div class="emotions">${EMOTIONS.map((e) => `<figure class="emotion">${klavik(e, 170)}<figcaption>${CAPTIONS[e]}</figcaption></figure>`).join('')}</div>
     <h3>Тваринки для карток</h3>

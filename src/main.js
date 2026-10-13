@@ -2,6 +2,16 @@ import '@fontsource/nunito/cyrillic-600.css';
 import '@fontsource/nunito/latin-600.css';
 import '@fontsource/nunito/cyrillic-800.css';
 import '@fontsource/nunito/latin-800.css';
+import '@fontsource/press-start-2p/cyrillic-400.css';
+import '@fontsource/press-start-2p/latin-400.css';
+import '@fontsource/rubik/cyrillic-600.css';
+import '@fontsource/rubik/latin-600.css';
+import '@fontsource/rubik/cyrillic-800.css';
+import '@fontsource/rubik/latin-800.css';
+import '@fontsource/exo-2/cyrillic-600.css';
+import '@fontsource/exo-2/latin-600.css';
+import '@fontsource/exo-2/cyrillic-800.css';
+import '@fontsource/exo-2/latin-800.css';
 import './styles/tokens.css';
 import './styles/base.css';
 import './styles/components.css';
@@ -23,6 +33,7 @@ import { createStore } from './storage/store.js';
 import { stopSpeech } from './audio/speech.js';
 import { sfx } from './audio/sfx.js';
 import { createActivity } from './session.js';
+import { conceptRoute, conceptScreen, conceptBackdrop, conceptBadge, mountConcept } from './concepts/index.js';
 
 const app = document.getElementById('app');
 const freshProgress = () => ({ ua: {}, en: {} });
@@ -101,10 +112,23 @@ function routeName() {
   return name;
 }
 
+// Демонстраційні концепції стилю для 5–6 класів (лише за адресами #concepts, #voxel, #pixel, #sky)
+function renderConcept(route) {
+  document.body.classList.add('is-screen');
+  setBackdrop(false);
+  document.body.style.background = conceptBackdrop(route);
+  app.innerHTML = `<div class="stage">${conceptScreen(route)}</div>${conceptBadge(route)}`;
+  fitStage();
+  unmount = mountConcept(app, route);
+}
+
 function render() {
   unmount?.();
   unmount = null;
   stopSpeech();
+  document.body.style.background = '';
+  const concept = conceptRoute(location.hash.replace('#', ''));
+  if (concept) return renderConcept(concept);
   const name = routeName();
   if (name === 'demo') {
     state.demo = true;

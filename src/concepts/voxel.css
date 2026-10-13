@@ -1,0 +1,100 @@
+/* Концепція 1 «Кубічний світ»: денне небо, кубики, товсті «об'ємні» рамки */
+.cn-voxel {
+  --vx-ink: #2a2f3d; --vx-panel: #f6f0df; --vx-panel-edge: #d9ceb0; --vx-orange: #ff7a3d; --vx-gold: #ffc531;
+  font-family: 'Rubik', system-ui, sans-serif; font-weight: 600; color: var(--vx-ink);
+  background: linear-gradient(#8fd0ff, #d8f0ff 70%, #f1fbff);
+}
+.cn-voxel h2 { font-family: 'Rubik', sans-serif; font-weight: 800; font-size: 30px; letter-spacing: .01em; color: var(--vx-ink); }
+.cn-voxel h3 { font-family: 'Rubik', sans-serif; font-size: 20px; color: #5b5445; }
+.vx-sky, .vx-island, .vx-hero { position: absolute; }
+.vx-sky { inset: 0; }
+.vx-island { left: 0; top: 0; }
+
+/* Об'ємні панелі: світла грань зверху-ліворуч, темна знизу-праворуч */
+.vx-panel, .vx-plate, .vx-coins, .vx-task, .keys-panel {
+  background: var(--vx-panel); border: 4px solid var(--vx-ink); border-radius: 10px;
+  box-shadow: inset 4px 4px 0 #fffaf0, inset -4px -4px 0 var(--vx-panel-edge), 0 8px 0 var(--vx-ink);
+}
+
+/* Верхня панель героя */
+.vx-plate { position: absolute; left: 36px; top: 28px; display: flex; gap: 14px; align-items: center; padding: 10px 22px 10px 14px; z-index: 3; }
+.vx-head { width: 64px; height: 84px; display: grid; place-items: center; background: #cfeaff; border: 3px solid var(--vx-ink); border-radius: 8px; overflow: hidden; }
+.vx-name { font-size: 24px; font-weight: 800; line-height: 1.1; }
+.vx-lvl { font-size: 20px; color: #5b5445; }
+.vx-lvl b { color: var(--vx-ink); }
+.vx-seg { display: flex; gap: 3px; margin: 6px 0 2px; }
+.vx-seg i { width: 20px; height: 14px; background: #d5ccb2; border: 2px solid var(--vx-ink); }
+.vx-seg i.on { background: #4fb848; }
+.vx-seg i.half { background: linear-gradient(90deg, #4fb848 55%, #d5ccb2 55%); }
+.vx-xpt { font-size: 18px; color: #5b5445; }
+.vx-coins { position: absolute; right: 36px; top: 28px; display: flex; align-items: center; gap: 10px; padding: 8px 20px; font-size: 30px; z-index: 3; }
+
+/* Нижнє меню з кубиків */
+.vx-nav { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); display: flex; gap: 16px; z-index: 3; }
+.vx-tab {
+  display: flex; align-items: center; gap: 10px; min-width: 150px; height: 72px; padding: 0 22px; justify-content: center;
+  background: var(--vx-panel); border: 4px solid var(--vx-ink); border-radius: 10px; color: var(--vx-ink); text-decoration: none; font-size: 24px; font-weight: 800;
+  box-shadow: inset 3px 3px 0 #fffaf0, inset -3px -3px 0 var(--vx-panel-edge), 0 6px 0 var(--vx-ink);
+}
+.vx-tab:hover { transform: translateY(-2px); }
+.vx-tab.is-on { background: var(--vx-gold); box-shadow: inset 3px 3px 0 #ffe9a3, inset -3px -3px 0 #d99d0e, 0 6px 0 var(--vx-ink); }
+
+/* Світ: завдання праворуч */
+.vx-quests { position: absolute; right: 36px; top: 124px; width: 340px; padding: 20px 22px 18px; z-index: 2; }
+.vx-quests h2 { margin-bottom: 10px; }
+.vx-q { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 2px dashed var(--vx-panel-edge); }
+.vx-q b { display: block; font-size: 19px; line-height: 1.2; }
+.vx-q small { font-size: 16px; color: #6a6250; font-weight: 600; }
+.vx-q > div { flex: 1; }
+.vx-box { flex: none; width: 30px; height: 30px; border: 3px solid var(--vx-ink); background: #fff; display: grid; place-items: center; font-style: normal; font-size: 22px; font-weight: 800; color: #fff; }
+.vx-q.is-done .vx-box { background: #4fb848; }
+.vx-xp { flex: none; font-size: 18px; font-weight: 800; color: #b46a00; background: #fff1c4; border: 2px solid #e0b445; padding: 2px 8px; border-radius: 6px; }
+.vx-bot { display: flex; align-items: center; gap: 10px; margin-top: 14px; padding: 10px 12px; background: #fff; border: 3px solid var(--vx-ink); border-radius: 10px; }
+.vx-bot p { font-size: 17px; line-height: 1.25; }
+.vx-tag.is-now { animation: vx-bob 1.8s ease-in-out infinite; }
+@keyframes vx-bob { 50% { transform: translate(var(--tx, 0), -6px); } }
+.vx-tag { font-family: 'Rubik', sans-serif; }
+
+/* Герой */
+.vx-hero { left: 150px; top: 150px; filter: drop-shadow(0 8px 0 rgb(20 30 50 / .1)); }
+.vx-wardrobe { position: absolute; right: 60px; top: 110px; width: 520px; padding: 22px 28px 26px; }
+.vx-group { margin-top: 14px; }
+.vx-row { display: flex; gap: 12px; margin-top: 8px; }
+.vx-opt {
+  min-width: 64px; height: 64px; padding: 0 12px; border: 4px solid var(--vx-ink); border-radius: 8px; background: var(--sw, #fff); color: var(--vx-ink);
+  font-family: 'Rubik', sans-serif; font-size: 20px; font-weight: 800; box-shadow: inset 3px 3px 0 rgb(255 255 255 / .45), inset -3px -3px 0 rgb(0 0 0 / .18), 0 5px 0 var(--vx-ink);
+}
+.vx-opt.opt-hat { background: #fff; }
+.vx-opt[aria-pressed='true'] { outline: 5px solid var(--vx-orange); outline-offset: 3px; transform: translateY(2px); }
+
+/* Нагороди */
+.vx-shelf { position: absolute; left: 60px; right: 60px; top: 150px; bottom: 120px; padding: 22px 30px; }
+.vx-shelf small { font-size: 20px; color: #6a6250; margin-left: 10px; }
+.vx-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 22px 10px; margin-top: 18px; }
+.vx-reward { display: grid; justify-items: center; gap: 2px; text-align: center; font-size: 18px; line-height: 1.15; color: #6a6250; }
+.vx-reward.is-got { color: var(--vx-ink); }
+
+.vx-reward svg { width: 100px; height: 111px; filter: drop-shadow(0 4px 0 rgb(20 30 50 / .12)); }
+
+/* Друк: спокійний, світло-сірий екран (кольорові лише пальці) */
+.cn-voxel.is-tab-type { background: #e9ecef; }
+.vx-calm { background: repeating-linear-gradient(60deg, rgb(20 30 50 / .035) 0 2px, transparent 2px 38px), repeating-linear-gradient(-60deg, rgb(20 30 50 / .035) 0 2px, transparent 2px 38px); }
+.vx-task { position: absolute; left: 36px; right: 36px; top: 116px; height: 238px; padding: 18px 30px; background: #fff; box-shadow: 0 8px 0 var(--vx-ink); }
+.vx-task-top { display: flex; align-items: center; gap: 28px; font-size: 22px; font-weight: 800; }
+.vx-task-top > span:first-child { flex: 1; color: #4b5360; }
+.vx-stat { font-size: 20px; color: #4b5360; }
+.vx-stat b { color: var(--vx-ink); font-size: 26px; margin-left: 4px; }
+.vx-xpbar { height: 18px; margin: 12px 0 8px; border: 3px solid var(--vx-ink); background: #fff; }
+.vx-xpbar div { height: 100%; background: repeating-linear-gradient(90deg, #4b5360 0 18px, #fff 18px 21px); transition: width .25s; }
+.vx-msg { position: absolute; left: 30px; right: 30px; bottom: 12px; min-height: 40px; font-size: 22px; color: #4b5360; }
+.vx-msg .bubble { padding: 4px 14px; }
+.vx-done { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 14px; font-size: 28px; background: #fff; border-radius: 6px; }
+.vx-done[hidden] { display: none; }
+.vx-btn { font-family: 'Rubik', sans-serif; font-size: 24px; font-weight: 800; height: 60px; padding: 0 28px; background: var(--vx-ink); color: #fff; border: 4px solid var(--vx-ink); border-radius: 8px; }
+.cn-voxel.is-tab-type .keys-panel { position: absolute; left: 36px; right: 36px; top: 392px; padding: 16px 20px; display: flex; gap: 20px; align-items: center; background: #f6f7f9; box-shadow: 0 8px 0 var(--vx-ink); }
+.cn-voxel.is-tab-type .vx-nav { top: 28px; bottom: auto; }
+.cn-voxel.is-tab-type .vx-tab { min-width: 118px; height: 64px; padding: 0 12px; font-size: 21px; }
+.cn-voxel.is-tab-type .vx-task { top: 168px; height: 206px; }
+.cn-voxel.is-tab-type .keys-panel { top: 400px; }
+.vx-grid { gap: 40px 10px; margin-top: 26px; }
+.vx-reward { font-size: 19px; }
