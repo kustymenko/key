@@ -2,6 +2,8 @@ import { klavik } from '../character/klavik.js';
 import { AVATARS } from '../character/avatars.js';
 import { icons } from '../design/icons.js';
 import { btn, homeButton, esc } from './common.js';
+import { heroIconOf } from '../teen/worlds/index.js';
+import { isTeen, homeRoute } from '../teen/logic/profile.js';
 
 export const adultScreen = () => '<div class="screen screen-adult theme-warm" data-adult></div>';
 
@@ -30,12 +32,12 @@ export function mountAdult(root, state) {
   function panel(msg = '') {
     const prof = p();
     if (!prof) { state.go(''); return; }
-    screen.innerHTML = `${top(btn({ label: 'Карта', icon: 'map', kind: 'primary', attrs: 'data-go="map"' }))}<div class="adult-main">
-      <div class="adult-who">${AVATARS[prof.avatar]?.(110) ?? ''}<div class="ach-name">${esc(prof.name)}</div></div>
+    const teen = isTeen(prof.level);
+    screen.innerHTML = `${top(btn({ label: teen ? 'Мій світ' : 'Карта', icon: 'map', kind: 'primary', attrs: `data-go="${homeRoute(prof)}"` }))}<div class="adult-main">
+      <div class="adult-who">${teen ? heroIconOf(prof.world, prof.hero, 110) : AVATARS[prof.avatar]?.(110) ?? ''}<div class="ach-name">${esc(prof.name)}</div></div>
       <div class="adult-block"><span class="adult-label">Клас</span>
         <div class="segmented" role="group" aria-label="Клас">
-          <button class="btn seg" data-set-level="1-2" aria-pressed="${prof.level === '1-2'}">1–2 клас</button>
-          <button class="btn seg" data-set-level="3-4" aria-pressed="${prof.level === '3-4'}">3–4 клас</button>
+          ${['1-2', '3-4', '5', '6'].map((l) => `<button class="btn seg" data-set-level="${l}" aria-pressed="${prof.level === l}">${l === '5' || l === '6' ? `${l} клас` : `${l.replace('-', '–')} клас`}</button>`).join('')}
         </div></div>
       <div class="row">
         ${btn({ label: 'Скинути прогрес', icon: 'replay', kind: 'light', attrs: 'data-ask="reset"' })}
@@ -48,12 +50,15 @@ export function mountAdult(root, state) {
     const prof = p();
     const text = kind === 'reset'
       ? `Скинути прогрес: ${esc(prof.name)}? Зірочки й значки зникнуть.`
-      : `Видалити картку: ${esc(prof.name)}? Її не можна повернути.`;
+      : kind.startsWith('level:')
+        ? `Змінити клас: ${esc(prof.name)} → ${kind.slice(6)} клас? Прогрес і вивчені літери збережуться.`
+        : `Видалити картку: ${esc(prof.name)}? Її не можна повернути.`;
+    const isLevel = kind.startsWith('level:');
     screen.insertAdjacentHTML('beforeend', `<div class="pause-layer confirm-layer" role="dialog" aria-label="Підтвердження">
       <div>${klavik('think', 170)}</div>
       <p class="confirm-text">${text}</p>
       <div class="row">${btn({ label: 'Ні, лишити', icon: 'back', kind: 'primary', size: 'big', attrs: 'data-act="cancel"' })}
-        ${btn({ label: kind === 'reset' ? 'Так, скинути' : 'Так, видалити', icon: kind === 'reset' ? 'replay' : 'trash', kind: 'light', size: 'big', attrs: `data-do="${kind}"` })}</div></div>`);
+        ${btn({ label: isLevel ? 'Так, змінити' : kind === 'reset' ? 'Так, скинути' : 'Так, видалити', icon: isLevel ? 'check' : kind === 'reset' ? 'replay' : 'trash', kind: 'light', size: 'big', attrs: `data-do="${kind}"` })}</div></div>`);
   }
 
   const onClick = (e) => {
@@ -63,9 +68,14 @@ export function mountAdult(root, state) {
     if (b.dataset.act === 'cancel') return screen.querySelector('.confirm-layer')?.remove();
     if (b.dataset.ask) return confirm(b.dataset.ask);
     if (b.dataset.setLevel) {
-      state.store.update(state.profileId, { level: b.dataset.setLevel });
-      state.level = b.dataset.setLevel;
-      return panel('Готово');
+      if (b.dataset.setLevel === p().level) return;
+      return confirm(`level:${b.dataset.setLevel}`); // зміна класу — лише після підтвердження
+    }
+    if (b.dataset.do?.startsWith('level:')) {
+      const level = b.dataset.do.slice(6);
+      state.store.update(state.profileId, { level }); // прогрес не чіпаємо: літери, зірочки, значки лишаються
+      state.level = level;
+      return panel(isTeen(level) && !p().world ? 'Готово. Наступного разу учень обере світ.' : 'Готово');
     }
     if (b.dataset.do === 'reset') {
       state.store.resetProgress(state.profileId);

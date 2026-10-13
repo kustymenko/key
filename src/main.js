@@ -33,7 +33,11 @@ import { createStore } from './storage/store.js';
 import { stopSpeech } from './audio/speech.js';
 import { sfx } from './audio/sfx.js';
 import { createActivity } from './session.js';
-import { conceptRoute, conceptScreen, conceptBackdrop, conceptBadge, mountConcept } from './concepts/index.js';
+import { conceptRoute, conceptScreen, conceptBackdrop, conceptBadge, mountConcept } from './teen/screens/concepts.js';
+import { teenRoute, teenScreen, mountTeen } from './teen/screens/index.js';
+import { backdropOf } from './teen/worlds/index.js';
+import { isTeen } from './teen/logic/profile.js';
+import './teen/teen.css';
 
 const app = document.getElementById('app');
 const freshProgress = () => ({ ua: {}, en: {} });
@@ -122,13 +126,33 @@ function renderConcept(route) {
   unmount = mountConcept(app, route);
 }
 
+// Світ 5–6 класів (#teen, #teen/avatar, #teen/type, #teen/rewards, #teen/pick): потрібен профіль учня 5–6 класу
+function renderTeen(route) {
+  const profile = state.store.get(state.profileId);
+  if (!profile || !isTeen(profile.level)) { state.go(''); return; }
+  document.body.classList.add('is-screen');
+  setBackdrop(false);
+  const picking = route.tab === 'pick' || !profile.world;
+  document.body.style.background = picking ? '#14181f' : backdropOf(profile.world, route.tab);
+  app.innerHTML = `<div class="stage">${teenScreen(route, profile)}</div>`;
+  fitStage();
+  unmount = mountTeen(app, route, state);
+}
+
+// Екрани 1–4 класів недоступні учневі 5–6 класу (наприклад, якщо вписати #map вручну)
+const KID_SCREENS = new Set(['map', 'lesson', 'games', 'game', 'achievements']);
+
 function render() {
   unmount?.();
   unmount = null;
   stopSpeech();
   document.body.style.background = '';
-  const concept = conceptRoute(location.hash.replace('#', ''));
+  const hashName = location.hash.replace('#', '');
+  const concept = conceptRoute(hashName);
   if (concept) return renderConcept(concept);
+  const teen = teenRoute(hashName);
+  if (teen) return renderTeen(teen);
+  if (KID_SCREENS.has(hashName) && state.profileId && isTeen(state.store.get(state.profileId)?.level)) { state.go('teen'); return; }
   const name = routeName();
   if (name === 'demo') {
     state.demo = true;

@@ -133,8 +133,9 @@ for (const [w, h] of [[1366, 768], [1920, 1080]]) {
     await A('profiles');
     if (level === '1-2') { // створення профілю
       await page.goto(base + '#new'); await page.waitForTimeout(80); await A('new-name');
-      await page.fill('.name-input', 'Данило'); await page.click('[data-act="name-next"]'); await page.waitForTimeout(80); await A('new-avatar');
-      await page.click('[data-avatar]'); await page.click('[data-act="avatar-next"]'); await page.waitForTimeout(80); await A('new-level');
+      await page.fill('.name-input', 'Данило'); await page.click('[data-act="name-next"]'); await page.waitForTimeout(80); await A('new-level');
+      await page.click('[data-level-pick="1-2"]'); await page.waitForTimeout(80); await A('new-avatar');
+      await page.click('[data-avatar]'); await page.click('[data-act="avatar-next"]'); await page.waitForTimeout(80);
       await page.goto(base); await page.waitForTimeout(80);
     }
     await page.click('[data-profile="p1"]'); await page.waitForSelector('.screen-map');

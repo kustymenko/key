@@ -1,14 +1,22 @@
 // Концепція 3 «Небесні острови»: нічний космос, острови з гострих граней (low-poly), скляні панелі, кристали-нагороди.
 // Усе намальовано кодом: власні форми, власні кольори.
-import { PLAYER, WORLDS, QUESTS, REWARDS, TABS, AV_OPTIONS, av, avatarControls, taskText, keysPanel, shade, noise, hslHex } from './shared.js';
+import { TABS, avatarControls, settingsRows, hideHelperButton } from '../screens/controls.js';
+import { taskText, keysPanel } from '../screens/typing.js';
+import { HERO_OPTIONS as AV_OPTIONS, DEFAULT_HERO } from '../logic/profile.js';
+import { shade, noise, hslHex } from './draw.js';
 
-export const meta = { id: 'sky', name: 'Небесні острови', tag: 'Концепція 3', desc: 'Літаючі острови в нічному небі. Мости, кристали й нові світи за туманом.' };
+// Поточний екран: усе, що залежить від профілю, береться з ctx (задається на початку screen()).
+let C, PLAYER, WORLDS, QUESTS, REWARDS, av = DEFAULT_HERO;
+const useCtx = (ctx) => { C = ctx; PLAYER = ctx.player; WORLDS = ctx.progress.worlds; QUESTS = ctx.progress.quests; REWARDS = ctx.progress.rewards; av = ctx.hero; };
+
+export const heroSize = 250; // розмір великого героя на екрані «Герой»
+export const meta = { id: 'sky', name: 'Небесні острови', desc: 'Літаючі острови в нічному небі. Мости, кристали й нові світи за туманом.' };
 
 const tri = (pts, fill, stroke = 'rgb(255 255 255 / .14)') => `<polygon points="${pts.map((p) => p.map((v) => v.toFixed(1)).join(',')).join(' ')}" fill="${fill}" stroke="${stroke}" stroke-width="1" stroke-linejoin="round"/>`;
 
 // ---------- Герой з граней ----------
-export function heroG(ox, oy, k = 1) {
-  const skin = AV_OPTIONS.skin.vals[av.skin], suit = AV_OPTIONS.outfit.vals[av.outfit], hat = AV_OPTIONS.hat.vals[av.hat];
+export function heroG(ox, oy, k = 1, hero = av) {
+  const skin = AV_OPTIONS.skin.vals[hero.skin], suit = AV_OPTIONS.outfit.vals[hero.outfit], hat = AV_OPTIONS.hat.vals[hero.hat];
   const hair = '#3b2a4a', pants = '#2c3763';
   const P = (x, y) => [ox + x * k, oy + y * k];
   const T = (a, b, c, col) => tri([P(...a), P(...b), P(...c)], col);
@@ -37,7 +45,10 @@ export function heroG(ox, oy, k = 1) {
   if (hat === 'tuft') g += T([40, 12], [46, -12], [52, 12], hair) + T([50, 12], [58, -8], [62, 14], shade(hair, 1.3)) + T([32, 14], [36, -4], [44, 12], shade(hair, 0.8));
   return g;
 }
-export const avatarSvg = (size = 300) => `<svg viewBox="-10 -24 120 192" width="${size}" height="${size * 1.6}" aria-label="Твій герой"><ellipse cx="50" cy="164" rx="42" ry="7" fill="rgb(0 0 0 / .3)"/>${heroG(0, 0)}</svg>`;
+const heroSvg = (hero, w, h) => `<svg viewBox="-10 -24 120 192" width="${w}" height="${h}" aria-label="Твій герой"><ellipse cx="50" cy="164" rx="42" ry="7" fill="rgb(0 0 0 / .3)"/>${heroG(0, 0, 1, hero)}</svg>`;
+export const avatarSvg = (size = 300, hero = av) => heroSvg(hero, size, size * 1.6);
+// Маленький герой для картки на екрані «Хто ти?»
+export const heroIcon = (hero, px) => heroSvg(hero, Math.round(px * 0.625), px);
 
 // ---------- Острів ----------
 const TOPS = { done: ['#5fd48a', '#3fae6e'], now: ['#7ad9ff', '#4aa8e0'], locked: ['#6a6f95', '#4d5278'] };
@@ -97,28 +108,28 @@ const ico = {
 const stars = () => `<div class="sk-stars" aria-hidden="true">${Array.from({ length: 70 }, (_, i) => `<i style="left:${(noise(i, 11) * 1366).toFixed(0)}px;top:${(noise(i, 12) * 720).toFixed(0)}px;opacity:${(0.25 + noise(i, 13) * 0.6).toFixed(2)};width:${noise(i, 14) > 0.9 ? 4 : 2}px;height:${noise(i, 14) > 0.9 ? 4 : 2}px"></i>`).join('')}</div>`;
 
 function shell(tab, inner) {
-  const frac = PLAYER.xp / PLAYER.xpMax, C = 2 * Math.PI * 30;
+  const frac = PLAYER.xp / PLAYER.xpMax, circ = 2 * Math.PI * 30;
   return `<div class="screen cn cn-sky is-tab-${tab}">${stars()}${inner}
     <nav class="sk-side" aria-label="Розділи"><div class="sk-logo" aria-hidden="true"><svg viewBox="-4 -4 32 32" width="38" height="38">${tri([[12, 1], [22, 10], [12, 23], [2, 10]], '#7ad9ff')}${tri([[12, 1], [22, 10], [12, 12]], '#c9f1ff')}${tri([[12, 12], [22, 10], [12, 23]], '#4aa8e0')}</svg></div>
-      ${TABS.map(([id, label]) => `<a class="sk-tab ${id === tab ? 'is-on' : ''}" href="#sky${id === 'world' ? '' : '/' + id}" ${id === tab ? 'aria-current="page"' : ''}><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ico[id]}</svg><span>${label}</span></a>`).join('')}</nav>
+      ${TABS.map(([id, label]) => `<a class="sk-tab ${id === tab ? 'is-on' : ''}" href="${C.href(id)}" ${id === tab ? 'aria-current="page"' : ''}><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ico[id]}</svg><span>${label}</span></a>`).join('')}</nav>
     <div class="sk-status"><div class="sk-coins" aria-label="Кристали: ${PLAYER.coins}"><svg viewBox="0 0 20 24" width="22" height="26" aria-hidden="true">${tri([[10, 1], [18, 8], [10, 23], [2, 8]], '#ff9dd2')}${tri([[10, 1], [18, 8], [10, 10]], '#ffd3ec')}</svg><b>${PLAYER.coins}</b></div>
-      <div class="sk-ring" aria-label="Рівень ${PLAYER.level}"><svg viewBox="0 0 72 72" width="72" height="72"><circle cx="36" cy="36" r="30" fill="rgb(10 14 42 / .6)" stroke="rgb(255 255 255 / .18)" stroke-width="6"/><circle cx="36" cy="36" r="30" fill="none" stroke="#7ad9ff" stroke-width="6" stroke-linecap="round" stroke-dasharray="${(C * frac).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 36 36)" data-ring/></svg><b data-level>${PLAYER.level}</b></div></div>
+      <div class="sk-ring" aria-label="Рівень ${PLAYER.level}"><svg viewBox="0 0 72 72" width="72" height="72"><circle cx="36" cy="36" r="30" fill="rgb(10 14 42 / .6)" stroke="rgb(255 255 255 / .18)" stroke-width="6"/><circle cx="36" cy="36" r="30" fill="none" stroke="#7ad9ff" stroke-width="6" stroke-linecap="round" stroke-dasharray="${(circ * frac).toFixed(1)} ${circ.toFixed(1)}" transform="rotate(-90 36 36)" data-ring/></svg><b data-level>${PLAYER.level}</b></div></div>
   </div>`;
 }
 
-const questStrip = () => `<section class="sk-quests"><div class="sk-orb" aria-hidden="true"><svg viewBox="-24 -28 48 56" width="52" height="60">${tri([[0, -26], [18, 0], [0, 4]], '#e8f9ff')}${tri([[0, -26], [-18, 0], [0, 4]], '#9fe3ff')}${tri([[0, 26], [18, 0], [0, 4]], '#4aa8e0')}${tri([[0, 26], [-18, 0], [0, 4]], '#7ad9ff')}</svg></div>
+const questStrip = () => `<section class="sk-quests ${C.helper ? '' : 'is-wide'}">${C.helper ? `<div class="sk-orb">${C.demo ? '' : hideHelperButton('sk')}<svg viewBox="-24 -28 48 56" width="52" height="60">${tri([[0, -26], [18, 0], [0, 4]], '#e8f9ff')}${tri([[0, -26], [-18, 0], [0, 4]], '#9fe3ff')}${tri([[0, 26], [18, 0], [0, 4]], '#4aa8e0')}${tri([[0, 26], [-18, 0], [0, 4]], '#7ad9ff')}</svg><span class="sk-tip">${C.tip}</span></div>` : ''}
   ${QUESTS.map((q) => `<div class="sk-q ${q.done ? 'is-done' : ''}"><i>${q.done ? '✓' : ''}</i><div><b>${q.t}</b><small>${q.done ? 'Виконано' : q.now}</small></div><span>+${q.xp}</span></div>`).join('')}</section>`;
 
 const worldTab = () => shell('world', `${worldSvg()}${questStrip()}`);
 
 const avatarTab = () => shell('avatar', `<div class="sk-podium" aria-hidden="true"><i></i><i></i><i></i></div>
-  <div class="sk-hero" data-avatar>${avatarSvg(250)}</div>
-  <section class="sk-glass sk-wardrobe"><h2>Налаштуй героя</h2>${avatarControls('sk')}</section>`);
+  <div class="sk-hero" data-avatar>${avatarSvg(250, C.hero)}</div>
+  <section class="sk-glass sk-wardrobe"><h2>Налаштуй героя</h2>${avatarControls('sk', C)}${settingsRows('sk', C)}</section>`);
 
 const typeTab = () => shell('type', `<div class="sk-task"><div class="sk-task-top"><span>Вправа «Нові землі»</span><span>Точність <b data-acc>—</b></span><span>Знаків за хвилину <b data-speed>—</b></span><span data-xp-text class="sk-xpt">${PLAYER.xp} / ${PLAYER.xpMax}</span></div>
   <div class="sk-bar"><div data-xp-fill style="width:${(PLAYER.xp / PLAYER.xpMax) * 100}%"></div></div>
   ${taskText()}<div class="sk-msg" data-msg></div>
-  <div class="sk-done" data-done hidden><b>Вправу пройдено!</b><span>Точність <span data-done-acc></span> · +160 досвіду</span><button class="sk-btn" data-again>Ще раз</button></div></div>
+  <div class="sk-done" data-done hidden><b>Вправу пройдено!</b><span>Точність <span data-done-acc></span></span><button class="sk-btn" data-again>Ще раз</button></div></div>
   ${keysPanel()}`);
 
 const crystal = (r, i) => {
@@ -130,4 +141,4 @@ const crystal = (r, i) => {
 const rewardsTab = () => shell('rewards', `<section class="sk-glass sk-shelf"><h2>Мої кристали <small>${REWARDS.filter((r) => r.got).length} з ${REWARDS.length}</small></h2>
   <div class="sk-grid">${REWARDS.map((r, i) => `<div class="sk-reward ${r.got ? 'is-got' : ''}">${crystal(r, i)}<span>${r.name}</span></div>`).join('')}</div></section>`);
 
-export const screen = (tab) => ({ world: worldTab, avatar: avatarTab, type: typeTab, rewards: rewardsTab }[tab] ?? worldTab)();
+export const screen = (tab, ctx) => { useCtx(ctx); return ({ world: worldTab, avatar: avatarTab, type: typeTab, rewards: rewardsTab }[tab] ?? worldTab)(); };

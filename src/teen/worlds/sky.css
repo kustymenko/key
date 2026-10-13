@@ -80,3 +80,12 @@
 .sk-grid { gap: 34px 8px; margin-top: 22px; }
 .sk-reward { font-size: 19px; gap: 6px; }
 .sk-reward svg { width: 104px; height: 127px; }
+.sk-orb { position: relative; display: flex; align-items: center; gap: 10px; width: 250px; flex: none; padding-right: 40px; font-size: 17px; line-height: 1.2; }
+.sk-orb .sk-hide { right: -8px; top: -14px; color: var(--sk-ink); }
+.sk-tip { font-weight: 600; color: var(--sk-soft); }
+.sk-wardrobe { top: 92px; padding: 18px 28px 22px; width: 560px; }
+.sk-wardrobe h2 { font-size: 28px; }
+.sk-wardrobe .sk-group { margin-top: 8px; }
+.sk-wardrobe .sk-group h3 { font-size: 18px; }
+.sk-wardrobe .sk-row { margin-top: 6px; gap: 10px; }
+.sk-wardrobe .sk-opt { min-width: 52px; height: 52px; font-size: 18px; white-space: nowrap; display: inline-grid; place-items: center; text-decoration: none; }
