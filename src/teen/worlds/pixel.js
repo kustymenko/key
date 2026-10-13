@@ -1,8 +1,16 @@
-// Концепція 2 «Піксель-аркада»: нічна 8-бітна карта, герой 12×16 пікселів, нагороди-спрайти.
+// Концепція 2 «Піксель-аркада»: піксельна 8-бітна карта (поле вдень, інтерфейс на нічному тлі), герой 12×16 пікселів, нагороди-спрайти.
 // Усі спрайти намальовані вручну буквами в цьому файлі: власні, нічого не скопійовано.
-import { PLAYER, WORLDS, QUESTS, REWARDS, TABS, AV_OPTIONS, av, avatarControls, taskText, keysPanel, shade, noise } from './shared.js';
+import { TABS, avatarControls, settingsRows, hideHelperButton } from '../screens/controls.js';
+import { taskText, keysPanel } from '../screens/typing.js';
+import { HERO_OPTIONS as AV_OPTIONS, DEFAULT_HERO } from '../logic/profile.js';
+import { shade, noise } from './draw.js';
 
-export const meta = { id: 'pixel', name: 'Піксель-аркада', tag: 'Концепція 2', desc: 'Нічна 8-бітна карта. Рівні, скарби й герой із пікселів.' };
+// Поточний екран: усе, що залежить від профілю, береться з ctx (задається на початку screen()).
+let C, PLAYER, WORLDS, QUESTS, REWARDS, av = DEFAULT_HERO;
+const useCtx = (ctx) => { C = ctx; PLAYER = ctx.player; WORLDS = ctx.progress.worlds; QUESTS = ctx.progress.quests; REWARDS = ctx.progress.rewards; av = ctx.hero; };
+
+export const heroSize = 18; // розмір великого героя на екрані «Герой»
+export const meta = { id: 'pixel', name: 'Піксель-аркада', desc: 'Піксельна 8-бітна карта пригод. Рівні, скарби й герой із пікселів.' };
 
 // ---------- Спрайти ----------
 const PAL = {
@@ -47,19 +55,22 @@ const HATS = {
   tuft: ['...h.hh.h...', '...hhhhhh...', '...hhhhhh...'],
 };
 
-export function playerRects(x0 = 0, y0 = 0) {
-  const outfit = AV_OPTIONS.outfit.vals[av.outfit];
-  const pal = { h: '#4a3020', a: AV_OPTIONS.skin.vals[av.skin], e: '#14122a', c: outfit, C: shade(outfit, 0.7), p: '#394a7a', k: '#14122a', H: outfit, V: shade(outfit, 0.7), y: '#ffd23f' };
-  const rows = [...HATS[AV_OPTIONS.hat.vals[av.hat]], ...PLAYER_ROWS.slice(HATS[AV_OPTIONS.hat.vals[av.hat]].length)];
+export function playerRects(x0 = 0, y0 = 0, hero = av) {
+  const outfit = AV_OPTIONS.outfit.vals[hero.outfit];
+  const pal = { h: '#4a3020', a: AV_OPTIONS.skin.vals[hero.skin], e: '#14122a', c: outfit, C: shade(outfit, 0.7), p: '#394a7a', k: '#14122a', H: outfit, V: shade(outfit, 0.7), y: '#ffd23f' };
+  const hat = HATS[AV_OPTIONS.hat.vals[hero.hat]];
+  const rows = [...hat, ...PLAYER_ROWS.slice(hat.length)];
   return rects(rows, pal, x0, y0);
 }
-export const avatarSvg = (size = 18) => `<svg viewBox="0 0 12 16" width="${12 * size}" height="${16 * size}" shape-rendering="crispEdges" aria-label="Твій герой">${playerRects()}</svg>`;
+const heroSvg = (hero, w, h) => `<svg viewBox="0 0 12 16" width="${w}" height="${h}" shape-rendering="crispEdges" aria-label="Твій герой">${playerRects(0, 0, hero)}</svg>`;
+export const avatarSvg = (size = 18, hero = av) => heroSvg(hero, 12 * size, 16 * size);
+// Маленький герой для картки на екрані «Хто ти?»
+export const heroIcon = (hero, px) => heroSvg(hero, Math.round(px * 0.75), px);
 
 // ---------- Карта ----------
 const COLS = 42, ROWS = 14;
 const ROUTE = [[3, 10], [9, 10], [9, 6], [16, 6], [16, 10], [24, 10], [24, 4], [31, 4], [31, 9], [38, 9], [38, 4]];
 const NODE_AT = [[3, 10], [9, 6], [16, 10], [24, 4], [31, 9], [38, 4]];
-const NODE_STATE = ['done', 'done', 'done', 'now', 'locked', 'locked'];
 
 function mapSvg() {
   const grid = Array.from({ length: ROWS }, () => Array(COLS).fill('g'));
@@ -89,7 +100,7 @@ function mapSvg() {
   tiles += use('px-castle', 37 * 8, 1 * 8, 16);
   let marks = '';
   NODE_AT.forEach(([cx, cy], i) => {
-    const st = NODE_STATE[i], px = cx * 8 + 4, py = cy * 8 + 4;
+    const st = WORLDS[i]?.state ?? 'locked', px = cx * 8 + 4, py = cy * 8 + 4;
     const fill = st === 'done' ? '#ffd23f' : st === 'now' ? '#ff5fa2' : '#8d93a8';
     marks += `<g transform="translate(${px - 8} ${py - 8})" class="${st === 'now' ? 'px-now' : ''}">
       <rect x="-1" y="-1" width="18" height="18" fill="#14122a"/><rect x="1" y="1" width="14" height="14" fill="${fill}"/>
@@ -108,7 +119,7 @@ const stars = () => `<div class="px-stars" aria-hidden="true">${Array.from({ len
 function shell(tab, inner) {
   return `<div class="screen cn cn-pixel is-tab-${tab}">${stars()}
     <header class="px-top">
-      <nav class="px-nav" aria-label="Розділи">${TABS.map(([id, label]) => `<a class="px-tab ${id === tab ? 'is-on' : ''}" href="#pixel${id === 'world' ? '' : '/' + id}" ${id === tab ? 'aria-current="page"' : ''}>${label}</a>`).join('')}</nav>
+      <nav class="px-nav" aria-label="Розділи">${TABS.map(([id, label]) => `<a class="px-tab ${id === tab ? 'is-on' : ''}" href="${C.href(id)}" ${id === tab ? 'aria-current="page"' : ''}>${label}</a>`).join('')}</nav>
       <div class="px-lvl"><span>РІВ. <b>${PLAYER.level}</b></span>${xpBar()}<small data-xp-text>${PLAYER.xp}/${PLAYER.xpMax}</small></div>
       <div class="px-coins" aria-label="Монети: ${PLAYER.coins}"><svg viewBox="0 0 8 8" width="32" height="32" shape-rendering="crispEdges" aria-hidden="true">${rects(COIN, PAL)}</svg><b>${PLAYER.coins}</b></div>
     </header>
@@ -118,19 +129,19 @@ function shell(tab, inner) {
 const ghost = `<svg viewBox="0 0 8 8" width="40" height="40" shape-rendering="crispEdges" aria-hidden="true">${rects(['..nnnn..', '.nnnnnn.', 'nnknnknn', 'nnnnnnnn', 'nnnnnnnn', 'nnnnnnnn', 'nn.nn.nn', 'n..nn..n'], { ...PAL, n: '#e9e6ff' })}</svg>`;
 
 const worldTab = () => shell('world', `${mapSvg()}
-  <section class="px-quests">${QUESTS.map((q) => `<div class="px-q ${q.done ? 'is-done' : ''}"><i>${q.done ? '✓' : ''}</i><div><b>${q.t}</b><small>${q.done ? 'Виконано' : q.now}</small></div><span>+${q.xp}</span></div>`).join('')}</section>
-  <div class="px-sprite"><div>${ghost}</div><p>Точність важливіша за швидкість!</p></div>
-  <div class="px-where"><small>Світ</small><b>${WORLDS[1].name}</b></div>`);
+  <section class="px-quests ${C.helper ? '' : 'is-wide'}">${QUESTS.map((q) => `<div class="px-q ${q.done ? 'is-done' : ''}"><i>${q.done ? '✓' : ''}</i><div><b>${q.t}</b><small>${q.done ? 'Виконано' : q.now}</small></div><span>+${q.xp}</span></div>`).join('')}</section>
+  ${C.helper ? `<div class="px-sprite">${C.demo ? '' : hideHelperButton('px')}<div>${ghost}</div><p>${C.tip}</p></div>` : ''}
+  <div class="px-where"><small>Світ</small><b>${(WORLDS.find((w) => w.state === 'now') ?? WORLDS[0]).name}</b></div>`);
 
 const avatarTab = () => shell('avatar', `<div class="px-platform"></div>
-  <div class="px-hero" data-avatar>${avatarSvg(18)}</div>
-  <section class="px-panel px-wardrobe"><h2>Налаштуй героя</h2>${avatarControls('px')}</section>`);
+  <div class="px-hero" data-avatar>${avatarSvg(18, C.hero)}</div>
+  <section class="px-panel px-wardrobe"><h2>Налаштуй героя</h2>${avatarControls('px', C)}${settingsRows('px', C)}</section>`);
 
 const typeTab = () => shell('type', `<div class="px-task"><div class="px-task-top"><span>Вправа «Нові землі»</span>
   <span>Точність <b data-acc>—</b></span><span>Знаків за хвилину <b data-speed>—</b></span></div>
   <div class="px-bar"><div data-xp-fill style="width:${(PLAYER.xp / PLAYER.xpMax) * 100}%"></div></div>
   ${taskText()}<div class="px-msg" data-msg></div>
-  <div class="px-done" data-done hidden><b>Вправу пройдено!</b><span>Точність <span data-done-acc></span> · +160 досвіду</span><button class="px-btn" data-again>Ще раз</button></div></div>
+  <div class="px-done" data-done hidden><b>Вправу пройдено!</b><span>Точність <span data-done-acc></span></span><button class="px-btn" data-again>Ще раз</button></div></div>
   ${keysPanel()}`);
 
 const GEMS = [
@@ -147,4 +158,4 @@ const rewardArt = (r, i) => {
 const rewardsTab = () => shell('rewards', `<section class="px-panel px-shelf"><h2>Мої нагороди <small>${REWARDS.filter((r) => r.got).length} з ${REWARDS.length}</small></h2>
   <div class="px-grid">${REWARDS.map((r, i) => `<div class="px-reward ${r.got ? 'is-got' : ''}">${rewardArt(r, i)}<span>${r.name}</span></div>`).join('')}</div></section>`);
 
-export const screen = (tab) => ({ world: worldTab, avatar: avatarTab, type: typeTab, rewards: rewardsTab }[tab] ?? worldTab)();
+export const screen = (tab, ctx) => { useCtx(ctx); return ({ world: worldTab, avatar: avatarTab, type: typeTab, rewards: rewardsTab }[tab] ?? worldTab)(); };

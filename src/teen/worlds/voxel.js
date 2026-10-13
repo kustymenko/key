@@ -1,8 +1,16 @@
 // Концепція 1 «Кубічний світ»: денний острів з кубиків (ізометрія), герой із кубиків, нагороди-кубики.
 // Усе намальовано кодом: жодних чужих текстур, назв чи персонажів.
-import { PLAYER, WORLDS, QUESTS, REWARDS, TABS, AV_OPTIONS, av, avatarControls, taskText, keysPanel, shade, noise, hslHex } from './shared.js';
+import { TABS, avatarControls, settingsRows, hideHelperButton } from '../screens/controls.js';
+import { taskText, keysPanel } from '../screens/typing.js';
+import { HERO_OPTIONS as AV_OPTIONS, DEFAULT_HERO } from '../logic/profile.js';
+import { shade, noise, hslHex } from './draw.js';
 
-export const meta = { id: 'voxel', name: 'Кубічний світ', tag: 'Концепція 1', desc: 'Острів із кубиків. Збудуй свій світ і відкривай нові землі.' };
+// Поточний екран: усе, що залежить від профілю, береться з ctx (задається на початку screen()).
+let C, PLAYER, WORLDS, QUESTS, REWARDS, av = DEFAULT_HERO;
+const useCtx = (ctx) => { C = ctx; PLAYER = ctx.player; WORLDS = ctx.progress.worlds; QUESTS = ctx.progress.quests; REWARDS = ctx.progress.rewards; av = ctx.hero; };
+
+export const heroSize = 360; // розмір великого героя на екрані «Герой»
+export const meta = { id: 'voxel', name: 'Кубічний світ', desc: 'Острів із кубиків. Збудуй свій світ і відкривай нові землі.' };
 
 // ---------- Ізометричні кубики ----------
 function iso(ox, oy, S, V) {
@@ -19,9 +27,9 @@ function iso(ox, oy, S, V) {
 }
 
 // Герой із кубиків; ноги стоять у точці (ox, oy)
-export function heroG(ox, oy, S, V) {
+export function heroG(ox, oy, S, V, hero = av) {
   const { poly, box } = iso(ox, oy, S, V);
-  const skin = AV_OPTIONS.skin.vals[av.skin], suit = AV_OPTIONS.outfit.vals[av.outfit], hat = AV_OPTIONS.hat.vals[av.hat];
+  const skin = AV_OPTIONS.skin.vals[hero.skin], suit = AV_OPTIONS.outfit.vals[hero.outfit], hat = AV_OPTIONS.hat.vals[hero.hat];
   const hair = '#4a3020', pants = '#3b4a6b';
   let g = box(0.15, 0.2, 0, 0.3, 0.6, 0.55, pants) + box(0.55, 0.2, 0, 0.3, 0.6, 0.55, pants);
   g += box(0.1, 0.15, 0.55, 0.8, 0.7, 0.7, suit);
@@ -38,15 +46,17 @@ export function heroG(ox, oy, S, V) {
   return g;
 }
 
-export const avatarSvg = (size = 360) => `<svg viewBox="-110 50 220 230" width="${size}" height="${size * 1.045}" aria-label="Твій герой">
-  ${iso(0, 170, 50, 46).box(-0.5, -0.5, -0.5, 2, 2, 0.5, '#c4ccd6')}${heroG(0, 170, 50, 46)}</svg>`;
+const heroSvg = (hero, w, h) => `<svg viewBox="-110 50 220 230" width="${w}" height="${h}" aria-label="Твій герой">
+  ${iso(0, 170, 50, 46).box(-0.5, -0.5, -0.5, 2, 2, 0.5, '#c4ccd6')}${heroG(0, 170, 50, 46, hero)}</svg>`;
+export const avatarSvg = (size = 360, hero = av) => heroSvg(hero, size, size * 1.045);
+// Маленький герой для картки на екрані «Хто ти?»
+export const heroIcon = (hero, px) => heroSvg(hero, px, px);
 
 // ---------- Острів ----------
 const N = 11;
 // Стежка зигзагом: вздовж осей, щоб позначки рівнів не накладались (рух по x і по y дає різні напрямки на екрані)
 const PATH = [[2, 8], [3, 8], [4, 8], [5, 8], [6, 8], [6, 7], [6, 6], [6, 5], [7, 5], [8, 5], [9, 5], [9, 4], [9, 3], [9, 2]];
 const NODES = [0, 2, 4, 7, 10, 13]; // індекси на стежці
-const NODE_STATE = ['done', 'done', 'done', 'now', 'locked', 'locked'];
 const PALETTE = { grass: '#78c044', dirt: '#9b6a45', stone: '#9ba4b0', sand: '#ecd596', path: '#efe0ac', water: '#52a9e6' };
 
 function island(ox, oy) {
@@ -92,7 +102,7 @@ function island(ox, oy) {
     if (c.type === 'grass' && n < 0.12) svg += box(x + 0.4, y + 0.4, c.h, 0.2, 0.2, 0.22, '#f4d03f') ;
     const ni = NODES.findIndex((pi) => pathKey.get(`${x},${y}`) === pi);
     if (ni >= 0) {
-      const st = NODE_STATE[ni];
+      const st = WORLDS[ni]?.state ?? 'locked';
       const col = st === 'done' ? '#ffc531' : st === 'now' ? '#ff7a3d' : '#8d96a3';
       svg += box(x + 0.2, y + 0.2, c.h, 0.6, 0.6, 0.28, col);
       const [tx, ty] = P(x + 0.5, y + 0.5, c.h + 0.28).split(',').map(Number);
@@ -132,21 +142,21 @@ function shell(tab, inner) {
       <div class="vx-xpt"><span data-xp-text>${PLAYER.xp} / ${PLAYER.xpMax}</span> досвіду</div></div></div>
     <div class="vx-coins" aria-label="Кубики: ${PLAYER.coins}">${cubeIcon('#ffc531')}<b>${PLAYER.coins}</b></div>
     <nav class="vx-nav" aria-label="Розділи">${TABS.map(([id, label]) =>
-      `<a class="vx-tab ${id === tab ? 'is-on' : ''}" href="#voxel${id === 'world' ? '' : '/' + id}" ${id === tab ? 'aria-current="page"' : ''}>${cubeIcon(tabIcon[id])}<span>${label}</span></a>`).join('')}</nav>
+      `<a class="vx-tab ${id === tab ? 'is-on' : ''}" href="${C.href(id)}" ${id === tab ? 'aria-current="page"' : ''}>${cubeIcon(tabIcon[id])}<span>${label}</span></a>`).join('')}</nav>
   </div>`;
 }
 
 // ---------- Вкладки ----------
 const questPanel = () => `<aside class="vx-panel vx-quests"><h2>Завдання дня</h2>
   ${QUESTS.map((q) => `<div class="vx-q ${q.done ? 'is-done' : ''}"><i class="vx-box">${q.done ? '✓' : ''}</i><div><b>${q.t}</b><small>${q.done ? 'Виконано' : q.now}</small></div><span class="vx-xp">+${q.xp}</span></div>`).join('')}
-  <div class="vx-bot"><svg viewBox="-24 -34 48 56" width="48" height="56" aria-hidden="true">${iso(0, 0, 14, 14).box(-0.7, -0.7, 0.2, 1.4, 1.4, 1.4, '#e9eef5')}<polygon points="-10,-3 -3,-3 -3,-9 -10,-9" fill="#2a2f3d"/></svg>
-  <p>Точність важливіша за швидкість. Не поспішай!</p></div></aside>`;
+  ${C.helper ? `<div class="vx-bot">${C.demo ? '' : hideHelperButton('vx')}<svg viewBox="-24 -34 48 56" width="48" height="56" aria-hidden="true">${iso(0, 0, 14, 14).box(-0.7, -0.7, 0.2, 1.4, 1.4, 1.4, '#e9eef5')}<polygon points="-10,-3 -3,-3 -3,-9 -10,-9" fill="#2a2f3d"/></svg>
+  <p>${C.tip}</p></div>` : ''}</aside>`;
 
-const worldTab = () => shell('world', `<div class="vx-sky"></div>${island(560, 118)}${questPanel()}`);
+const worldTab = () => shell('world', `<div class="vx-sky"></div>${island(592, 150)}${questPanel()}`);
 
 const avatarTab = () => shell('avatar', `<div class="vx-sky"></div>
-  <section class="vx-panel vx-wardrobe"><h2>Налаштуй героя</h2>${avatarControls('vx')}</section>
-  <div class="vx-hero" data-avatar>${avatarSvg(360)}</div>`);
+  <section class="vx-panel vx-wardrobe"><h2>Налаштуй героя</h2>${avatarControls('vx', C)}${settingsRows('vx', C)}</section>
+  <div class="vx-hero" data-avatar>${avatarSvg(360, C.hero)}</div>`);
 
 const typeTab = () => shell('type', `<div class="vx-sky vx-calm"></div>
   <div class="vx-task"><div class="vx-task-top"><span>Вправа: «Нові землі»</span>
@@ -154,7 +164,7 @@ const typeTab = () => shell('type', `<div class="vx-sky vx-calm"></div>
     <div class="vx-xpbar"><div data-xp-fill style="width:${(PLAYER.xp / PLAYER.xpMax) * 100}%"></div></div>
     ${taskText()}
     <div class="vx-msg" data-msg></div>
-    <div class="vx-done" data-done hidden><b>Вправу пройдено!</b> Точність <span data-done-acc></span> · +160 досвіду
+    <div class="vx-done" data-done hidden><b>Вправу пройдено!</b> Точність <span data-done-acc></span>
       <button class="vx-btn" data-again>Ще раз</button></div></div>
   ${keysPanel()}`);
 
@@ -167,4 +177,4 @@ const rewardsTab = () => shell('rewards', `<div class="vx-sky"></div>
   <section class="vx-panel vx-shelf"><h2>Мої нагороди <small>${REWARDS.filter((r) => r.got).length} з ${REWARDS.length}</small></h2>
   <div class="vx-grid">${REWARDS.map((r, i) => `<div class="vx-reward ${r.got ? 'is-got' : ''}">${rewardCube(r, i)}<span>${r.name}</span></div>`).join('')}</div></section>`);
 
-export const screen = (tab) => ({ world: worldTab, avatar: avatarTab, type: typeTab, rewards: rewardsTab }[tab] ?? worldTab)();
+export const screen = (tab, ctx) => { useCtx(ctx); return ({ world: worldTab, avatar: avatarTab, type: typeTab, rewards: rewardsTab }[tab] ?? worldTab)(); };

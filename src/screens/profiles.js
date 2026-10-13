@@ -2,6 +2,8 @@ import { klavik } from '../character/klavik.js';
 import { AVATARS } from '../character/avatars.js';
 import { icons } from '../design/icons.js';
 import { bubble, esc, soundButton } from './common.js';
+import { heroIconOf } from '../teen/worlds/index.js';
+import { isTeen, homeRoute } from '../teen/logic/profile.js';
 
 // Скільки карток — такий розмір: одна дитина-двоє великі, клас — менші (до 18 карток, без прокручування)
 export const cardSize = (count) => (count <= 4 ? 'l' : count <= 10 ? 'm' : 's');
@@ -12,7 +14,10 @@ export function profilesScreen({ profiles = [], persistent = true, canCreate = t
   const size = cardSize(count);
   const avatarPx = { l: 150, m: 110, s: 84 }[size];
   const cards = profiles
-    .map((k) => `<button class="profile-card is-${size}" data-profile="${k.id}" aria-label="${esc(k.name)}">${AVATARS[k.avatar]?.(avatarPx) ?? ''}<span class="profile-name">${esc(k.name)}</span></button>`)
+    .map((k) => isTeen(k.level)
+      // 5–6 клас: «доросліша» картка, замість тваринки — герой учня в стилі його світу
+      ? `<button class="profile-card is-teen is-${size} tw-${k.world ?? 'none'}" data-profile="${k.id}" aria-label="${esc(k.name)}, ${k.level} клас">${heroIconOf(k.world, k.hero, avatarPx)}<span class="profile-name">${esc(k.name)}</span><span class="profile-tag">${k.level} клас</span></button>`
+      : `<button class="profile-card is-${size}" data-profile="${k.id}" aria-label="${esc(k.name)}">${AVATARS[k.avatar]?.(avatarPx) ?? ''}<span class="profile-name">${esc(k.name)}</span></button>`)
     .join('');
   const add = canCreate
     ? `<button class="profile-card is-new is-${size}" data-go="new" aria-label="Новий друг">${icons.plus(size === 'l' ? 72 : size === 'm' ? 56 : 44)}<span class="profile-name">Новий</span></button>`
@@ -35,7 +40,7 @@ export function mountProfiles(root, state) {
     const b = e.target.closest('[data-profile]');
     if (!b) return;
     state.openProfile(b.dataset.profile);
-    state.go('map');
+    state.go(homeRoute(state.store.get(b.dataset.profile)));
   };
   root.addEventListener('click', onClick);
   return () => root.removeEventListener('click', onClick);

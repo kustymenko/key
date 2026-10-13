@@ -86,3 +86,12 @@
 .px-grid { gap: 40px 10px; margin-top: 28px; }
 .px-reward { font-size: 19px; gap: 10px; }
 .px-reward svg { width: 104px; height: 104px; }
+.px-quests.is-wide { right: 36px; }
+.px-sprite { position: absolute; }
+.px-sprite .px-hide { top: 4px; right: 4px; color: var(--px-edge); }
+.px-wardrobe { top: 112px; padding: 16px 26px 22px; width: 560px; }
+.px-wardrobe h2 { font-size: 20px; }
+.px-wardrobe .px-group { margin-top: 8px; }
+.px-wardrobe .px-group h3 { font-size: 18px; }
+.px-wardrobe .px-row { margin-top: 6px; gap: 12px; }
+.px-wardrobe .px-opt { min-width: 52px; height: 52px; font-size: 11px; white-space: nowrap; display: inline-grid; place-items: center; text-decoration: none; }

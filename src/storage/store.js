@@ -1,11 +1,12 @@
 import { awardBadges } from './badges.js';
+import { WORLD_IDS, cleanHero } from '../teen/logic/profile.js';
 
 // Профілі й прогрес у localStorage. Кожне звернення — в try/catch:
 // якщо сховище недоступне (приватне вікно, заборона, переповнення), тренажер працює далі, але без збереження.
 export const KEY = 'klaviaturka.v1';
 export const MAX_PROFILES = 17;
 export const MAX_NAME = 12;
-export const LEVELS = ['1-2', '3-4'];
+export const LEVELS = ['1-2', '3-4', '5', '6']; // 5 і 6 — світ 5–6 класів (див. src/teen)
 export const LAYOUTS = ['ua', 'en'];
 
 const emptyStats = () => ({ typed: 0, errors: 0, ms: 0, chars: 0, missed: {} });
@@ -38,6 +39,11 @@ export function cleanProfile(p) {
     badges,
     games,
     flags: { clean: !!p.flags?.clean },
+    // Світ 5–6 класів: тема оформлення, вигляд героя, помічник, досвід. Для 1–4 класів просто лежать без діла
+    world: WORLD_IDS.includes(p.world) ? p.world : null,
+    hero: cleanHero(p.hero),
+    helperHidden: !!p.helperHidden,
+    xp: num(p.xp),
     resume: p.resume && typeof p.resume === 'object' && Array.isArray(p.resume.steps) ? p.resume : null,
   };
 }
@@ -85,10 +91,10 @@ export function createStore(storage = safeStorage()) {
     get: find,
     canCreate: () => profiles.length < MAX_PROFILES,
 
-    create({ name, avatar, level = '1-2', layout = 'ua' }) {
+    create({ name, avatar, level = '1-2', layout = 'ua', world = null, hero = null }) {
       const clean = String(name).trim().slice(0, MAX_NAME);
       if (!clean || !api.canCreate()) return null;
-      const p = cleanProfile({ id: `p${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`, name: clean, avatar, level, layout });
+      const p = cleanProfile({ id: `p${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`, name: clean, avatar, level, layout, world, hero });
       profiles.push(p);
       save();
       return p;
@@ -99,6 +105,9 @@ export function createStore(storage = safeStorage()) {
       if (!p) return null;
       if (LEVELS.includes(patch.level)) p.level = patch.level;
       if (LAYOUTS.includes(patch.layout)) p.layout = patch.layout;
+      if (WORLD_IDS.includes(patch.world)) p.world = patch.world;
+      if (patch.hero) p.hero = cleanHero(patch.hero);
+      if (typeof patch.helperHidden === 'boolean') p.helperHidden = patch.helperHidden;
       save();
       return p;
     },
@@ -138,11 +147,11 @@ export function createStore(storage = safeStorage()) {
       return { record, best: p.games[key].best };
     },
 
-    // Скинути прогрес: зірочки, значки, статистика; ім'я, тваринка й рівень лишаються
+    // Скинути прогрес: зірочки, значки, статистика, досвід; ім'я, тваринка, клас, світ, герой і помічник лишаються
     resetProgress(id) {
       const p = find(id);
       if (!p) return;
-      Object.assign(p, cleanProfile({ id: p.id, name: p.name, avatar: p.avatar, level: p.level, layout: p.layout }));
+      Object.assign(p, cleanProfile({ id: p.id, name: p.name, avatar: p.avatar, level: p.level, layout: p.layout, world: p.world, hero: p.hero, helperHidden: p.helperHidden }));
       save();
     },
 

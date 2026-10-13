@@ -39,9 +39,9 @@ async function createKid(page, name, animalIdx, level) {
   await page.click('[data-go="new"]');
   await page.fill('.name-input', name);
   await page.click('[data-act="name-next"]');
+  await page.click(`[data-level-pick="${level}"]`); // порядок: ім'я → клас → тваринка
   await page.click(`.avatar-pick >> nth=${animalIdx}`);
   await page.click('[data-act="avatar-next"]');
-  await page.click(`[data-level-pick="${level}"]`);
   await page.waitForSelector('.screen-map');
 }
 
@@ -72,12 +72,12 @@ for (const [w, h] of [[1366, 768], [1920, 1080]]) {
   await shot(page, 'new-name');
   await page.fill('.name-input', 'Соня');
   await page.click('[data-act="name-next"]');
+  await shot(page, 'new-level');
+  await page.click('[data-level-pick="1-2"]');
   await shot(page, 'new-avatar');
   await page.click('[data-act="more"]'); await page.click('.avatar-pick >> nth=0'); // совеня... (друга сторінка: зайчик)
   await page.click('[data-act="more"]'); await page.click('.avatar-pick >> nth=0'); // лисичка
   await page.click('[data-act="avatar-next"]');
-  await shot(page, 'new-level');
-  await page.click('[data-level-pick="1-2"]');
   await page.waitForSelector('.screen-map'); await page.waitForTimeout(100);
   await shot(page, 'map-new');
   ok((await text(page, '.map-title .bubble-text')) === 'Урок 1: літери А і О', `заголовок карти: ${await text(page, '.map-title .bubble-text')}`);
@@ -127,6 +127,7 @@ for (const [w, h] of [[1366, 768], [1920, 1080]]) {
   await page.fill('.sum-input', String(a * b)); await page.click('[data-act="check"]');
   await shot(page, 'adult-panel');
   await page.click('[data-set-level="3-4"]');
+  await page.click('[data-do="level:3-4"]'); // зміна класу — після підтвердження
   await page.click('[data-ask="reset"]'); await page.waitForTimeout(80);
   await shot(page, 'adult-confirm');
   await page.click('[data-act="cancel"]');
