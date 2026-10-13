@@ -1,7 +1,8 @@
 // Концепція 3 «Небесні острови»: нічний космос, острови з гострих граней (low-poly), скляні панелі, кристали-нагороди.
 // Усе намальовано кодом: власні форми, власні кольори.
-import { TABS, avatarControls, settingsRows, hideHelperButton, homeButton } from '../screens/controls.js';
+import { TABS, avatarControls, settingsRows, hideHelperButton, homeButton, playBar } from '../screens/controls.js';
 import { taskText, keysPanel } from '../screens/typing.js';
+import { hintToggle, lessonBody, lessonDone } from '../screens/lessonView.js';
 import { HERO_OPTIONS as AV_OPTIONS, DEFAULT_HERO } from '../logic/profile.js';
 import { shade, noise, hslHex } from './draw.js';
 
@@ -120,7 +121,7 @@ function shell(tab, inner) {
 const questStrip = () => `<section class="sk-quests ${C.helper ? '' : 'is-wide'}">${C.helper ? `<div class="sk-orb">${C.demo ? '' : hideHelperButton('sk')}<svg viewBox="-24 -28 48 56" width="52" height="60">${tri([[0, -26], [18, 0], [0, 4]], '#e8f9ff')}${tri([[0, -26], [-18, 0], [0, 4]], '#9fe3ff')}${tri([[0, 26], [18, 0], [0, 4]], '#4aa8e0')}${tri([[0, 26], [-18, 0], [0, 4]], '#7ad9ff')}</svg><span class="sk-tip">${C.tip}</span></div>` : ''}
   ${QUESTS.map((q) => `<div class="sk-q ${q.done ? 'is-done' : ''}"><i>${q.done ? '✓' : ''}</i><div><b>${q.t}</b><small>${q.done ? 'Виконано' : q.now}</small></div><span>+${q.xp}</span></div>`).join('')}</section>`;
 
-const worldTab = () => shell('world', `${worldSvg()}${questStrip()}`);
+const worldTab = () => shell('world', `${worldSvg()}${questStrip()}${playBar('sk', C)}`);
 
 const avatarTab = () => shell('avatar', `<div class="sk-podium" aria-hidden="true"><i></i><i></i><i></i></div>
   <div class="sk-hero" data-avatar>${avatarSvg(250, C.hero)}</div>
@@ -130,11 +131,14 @@ const avatarTab = () => shell('avatar', `<div class="sk-podium" aria-hidden="tru
 const typeDeco = () => `<svg class="sk-deco" viewBox="0 0 1366 768" width="1366" height="768" aria-hidden="true">${island(150, 700, 120, 21, 'locked')}${island(1230, 720, 110, 23, 'locked')}</svg>`;
 const doneCrystal = `<svg viewBox="0 0 60 76" width="70" height="86" aria-hidden="true">${tri([[30, 4], [52, 24], [30, 66], [8, 24]], '#8a8ec0')}${tri([[30, 4], [52, 24], [30, 28]], '#c5c8ea')}${tri([[30, 28], [52, 24], [30, 66]], '#6a6ea0')}${tri([[30, 4], [8, 24], [30, 28]], '#a9acd6')}${tri([[30, 28], [8, 24], [30, 66]], '#7d81b4')}</svg>`;
 
-const typeTab = () => shell('type', `${typeDeco()}<div class="sk-task"><div class="sk-task-top"><span class="sk-task-title">Вправа «Нові землі»</span><span>Точність <b data-acc>—</b></span><span>Знаків за хвилину <b data-speed>—</b></span><span data-xp-text class="sk-xpt">${PLAYER.xp} / ${PLAYER.xpMax}</span></div>
-  <div class="sk-bar"><div data-xp-fill style="width:${(PLAYER.xp / PLAYER.xpMax) * 100}%"></div></div>
-  ${taskText()}<div class="sk-msg" data-msg></div>
-  <div class="sk-done" data-done hidden>${doneCrystal}<div class="sk-done-text"><b>Вправу пройдено!</b><div class="sk-chips"><span>Точність <b data-done-acc></b></span><span>Знаків за хвилину <b data-done-speed></b></span></div></div><button class="sk-btn" data-again>Ще раз</button></div></div>
-  ${keysPanel()}`);
+const typeTab = () => {
+  const L = C.lesson;
+  return shell('type', `${typeDeco()}<div class="sk-task"><div class="sk-task-top"><span class="sk-task-title">${L ? L.heading : 'Вправа «Нові землі»'}</span><span>Точність <b data-acc>—</b></span><span>Знаків за хвилину <b data-speed>—</b></span>${L ? hintToggle() : `<span data-xp-text class="sk-xpt">${PLAYER.xp} / ${PLAYER.xpMax}</span>`}</div>
+  <div class="sk-bar"><div ${L ? 'data-bar' : 'data-xp-fill'} style="width:${L ? 0 : (PLAYER.xp / PLAYER.xpMax) * 100}%"></div></div>
+  ${L ? lessonBody() : taskText()}<div class="sk-msg" data-msg></div>
+  <div class="sk-done" data-done hidden>${L ? lessonDone() : `${doneCrystal}<div class="sk-done-text"><b>Вправу пройдено!</b><div class="sk-chips"><span>Точність <b data-done-acc></b></span><span>Знаків за хвилину <b data-done-speed></b></span></div></div><button class="sk-btn" data-again>Ще раз</button>`}</div></div>
+  ${keysPanel({ layout: L ? L.layout : 'ua', demo: !L })}`);
+};
 
 const crystal = (r, i) => {
   const hue = (i * 47 + 190) % 360, c = r.got ? hslHex(hue, 75, 62) : '#59608f';
@@ -156,5 +160,5 @@ export const frame = (ctx, inner = '') => {
 export const screen = (tab, ctx) => {
   const saved = [C, PLAYER, WORLDS, QUESTS, REWARDS, av]; // мініатюри світів викликають screen() усередині screen()
   useCtx(ctx);
-  try { return ({ world: worldTab, avatar: avatarTab, type: typeTab, rewards: rewardsTab }[tab] ?? worldTab)(); } finally { [C, PLAYER, WORLDS, QUESTS, REWARDS, av] = saved; }
+  try { return ({ world: worldTab, avatar: avatarTab, type: typeTab, lesson: typeTab, rewards: rewardsTab }[tab] ?? worldTab)(); } finally { [C, PLAYER, WORLDS, QUESTS, REWARDS, av] = saved; }
 };

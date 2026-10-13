@@ -1,6 +1,7 @@
 import { awardBadges } from './badges.js';
 import { WORLD_IDS, cleanHero } from '../teen/logic/profile.js';
 import { cleanPlacement } from '../teen/logic/placement.js';
+import { cleanTeenProgress } from '../teen/logic/progress.js';
 
 // Профілі й прогрес у localStorage. Кожне звернення — в try/catch:
 // якщо сховище недоступне (приватне вікно, заборона, переповнення), тренажер працює далі, але без збереження.
@@ -46,6 +47,7 @@ export function cleanProfile(p) {
     helperHidden: !!p.helperHidden,
     xp: num(p.xp),
     placement: cleanPlacement(p.placement), // розміщення за вступним тестом (5–6 клас)
+    teen: cleanTeenProgress(p.teen), // пройдені уроки швидкого курсу 5–6 класів: { ua: { id: { stars, acc, cpm, by } }, en: {} }
     resume: p.resume && typeof p.resume === 'object' && Array.isArray(p.resume.steps) ? p.resume : null,
   };
 }
@@ -138,6 +140,22 @@ export function createStore(storage = safeStorage()) {
       return fresh;
     },
 
+    // Урок швидкого курсу 5–6 класів пройдено (зірочки лише більше за попередні; by: 'lesson' | 'quick')
+    finishTeenLesson(id, { layout, lessonId, stars, acc, cpm, by = 'lesson' }) {
+      const p = find(id);
+      if (!p || !LAYOUTS.includes(layout) || ![1, 2, 3].includes(stars)) return false;
+      const old = p.teen[layout][lessonId];
+      p.teen[layout][lessonId] = {
+        stars: Math.max(old?.stars ?? 0, stars),
+        acc: Math.max(old?.acc ?? 0, Math.round(acc)),
+        cpm: Math.max(old?.cpm ?? 0, Math.round(cpm)),
+        by: old?.by === 'lesson' ? 'lesson' : by,
+      };
+      p.teen = cleanTeenProgress(p.teen);
+      save();
+      return true;
+    },
+
     // Гру зіграно: запам'ятовуємо найкращий результат (порівняння лише з самим собою); record — чи побито
     saveGame(id, kind, layout, score) {
       const p = find(id);
@@ -154,7 +172,7 @@ export function createStore(storage = safeStorage()) {
     resetProgress(id) {
       const p = find(id);
       if (!p) return;
-      Object.assign(p, cleanProfile({ id: p.id, name: p.name, avatar: p.avatar, level: p.level, layout: p.layout, world: p.world, hero: p.hero, helperHidden: p.helperHidden }));
+      Object.assign(p, cleanProfile({ id: p.id, name: p.name, avatar: p.avatar, level: p.level, layout: p.layout, world: p.world, hero: p.hero, helperHidden: p.helperHidden })); // teen і placement скидаються разом із прогресом
       save();
     },
 

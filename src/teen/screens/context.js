@@ -1,6 +1,7 @@
 // Контекст екрана 5–6 класів: усе, що світ має знати, щоб намалювати екран. Логіка не залежить від світу.
 import { levelInfo, DEFAULT_HERO, pickTip } from '../logic/profile.js';
 import { emptyProgress, sampleProgress } from '../logic/stub.js';
+import { lessonStates, currentLesson, worldsFromLessons } from '../logic/progress.js';
 import { esc } from '../../screens/common.js';
 
 const hrefFor = (base) => (tab) => base + (tab === 'world' ? '' : `/${tab}`);
@@ -8,9 +9,13 @@ const hrefFor = (base) => (tab) => base + (tab === 'world' ? '' : `/${tab}`);
 let lastTip = '';
 const tip = () => (lastTip = pickTip(lastTip));
 
-// Справжній профіль
-export function teenContext(profile) {
+// Справжній профіль. extra.lesson — дані поточного уроку (екран уроку)
+export function teenContext(profile, extra = {}) {
   const info = levelInfo(profile.xp);
+  const layout = profile.layout === 'en' ? 'en' : 'ua';
+  const states = lessonStates(layout, profile);
+  const progress = emptyProgress();
+  progress.worlds = worldsFromLessons(layout, states);
   return {
     demo: false,
     href: hrefFor('#teen'),
@@ -19,7 +24,11 @@ export function teenContext(profile) {
     helper: !profile.helperHidden,
     world: profile.world,
     tip: tip(),
-    progress: emptyProgress(),
+    progress,
+    layout,
+    states,
+    next: currentLesson(states), // поточний урок швидкого курсу (або null, якщо літерні уроки пройдено)
+    ...extra,
   };
 }
 

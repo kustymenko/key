@@ -20,7 +20,11 @@ export function taskText() {
   return `<div class="tt" data-task aria-label="Завдання">${words.join('')}</div>`;
 }
 
-export const keysPanel = () => `<div class="keys-panel">${keyboard({ layout: 'ua', next: codeOfChar(TEXT[0], 'ua'), hint: 'next', rows: ROWS.slice(1) })}${hands({ active: fingerOf(codeOfChar(TEXT[0], 'ua')) })}</div>`;
+// Клавіатура з долонями. layout — мова підписів; demo — підсвітити першу клавішу пробного тексту
+export const keysPanel = ({ layout = 'ua', demo = true } = {}) => {
+  const first = demo ? codeOfChar(TEXT[0], 'ua') : null;
+  return `<div class="keys-panel">${keyboard({ layout, next: first, hint: 'next', rows: ROWS.slice(1) })}${hands({ active: first ? fingerOf(first) : null })}</div>`;
+};
 
 /**
  * Оживляє вправу: слухає справжню клавіатуру, рухає курсор, рахує точність/швидкість і досвід.

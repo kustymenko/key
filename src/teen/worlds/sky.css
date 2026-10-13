@@ -117,3 +117,8 @@
 .sk-done-text > b { display: block; font-size: 34px; font-weight: 800; }
 .sk-chips span { padding: 6px 16px; border-radius: 18px; background: #fff; border: 1.5px solid #b9bde3; font-size: 20px; }
 .sk-chips b { margin-left: 4px; font-size: 24px; }
+
+/* Панель «Далі: урок» */
+.sk-play { left: 160px; top: 22px; width: 860px; height: 76px; background: var(--sk-glass); border: 1.5px solid var(--sk-edge); border-radius: 38px; backdrop-filter: blur(10px); color: var(--sk-ink); font-family: 'Exo 2', sans-serif; --pb-accent: var(--sk-aqua); --pb-ink: #0b1030; padding: 0 20px; }
+.sk-play .pb-lang, .sk-play .pb-go, .sk-play .pb-list { font-family: 'Exo 2', sans-serif; border-radius: 24px; }
+.cn-sky .ld-btns .pl-btn.primary { --pl-accent: #2b3a4a; --pl-ink: #fff; }

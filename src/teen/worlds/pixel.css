@@ -146,3 +146,12 @@
 .px-wardrobe .px-group { margin-top: 4px; }
 .px-wardrobe .px-row { margin-top: 4px; }
 .px-wardrobe .px-adult-row { margin-top: 6px; }
+
+/* Панель «Далі: урок» */
+.px-play { left: 28px; top: 112px; width: 760px; margin: 4px; background: var(--px-panel); color: var(--px-edge); box-shadow: 0 -4px 0 0 var(--px-edge), 0 4px 0 0 var(--px-edge), -4px 0 0 0 var(--px-edge), 4px 0 0 0 var(--px-edge), 0 8px 0 4px #07061a; --pb-accent: var(--px-pink); --pb-ink: #14122a; height: 76px; }
+.px-play .pb-lang, .px-play .pb-go, .px-play .pb-list { border-radius: 0; }
+.cn-pixel .ll { font-family: var(--font); }
+.cn-pixel .ld-btns .pl-btn.primary { --pl-accent: var(--px-pink); --pl-ink: #14122a; }
+.px-play .pb-text, .px-play .pb-text b, .px-play .pb-text small { font-family: var(--font); }
+.px-play .pb-text b { font-weight: 800; font-size: 20px; }
+.px-play .pb-text small { font-size: 16px; }

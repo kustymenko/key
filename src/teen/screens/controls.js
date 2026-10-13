@@ -30,5 +30,16 @@ export const settingsRows = (cls, ctx) => ctx.demo ? '' : `
     <button class="${cls}-opt opt-hat" data-set-helper="0" aria-pressed="${!ctx.helper}"><span>Сховати</span></button></div></div>
   <div class="${cls}-adult-row"><a class="${cls}-adult" href="#teen/start">${icons.pencil(24)}<span>Вступний тест</span></a> <a class="${cls}-adult" href="#adult">${icons.gear(24)}<span>Для дорослого</span></a></div>`;
 
+// Панель «Далі: урок» на карті: який урок наступний, мова, «Грай», усі уроки. Лише у справжньому профілі.
+export const playBar = (cls, ctx) => {
+  if (ctx.demo || !ctx.states) return '';
+  const n = ctx.next;
+  const label = n ? `${n.quick ? 'Швидка перевірка · ' : ''}Урок ${n.id} · ${n.title}` : 'Літерні уроки пройдено';
+  const lang = ['ua', 'en'].map((l) => `<button class="pb-lang" data-set-layout="${l}" aria-pressed="${ctx.layout === l}">${l === 'ua' ? 'УКР' : 'ENG'}</button>`).join('');
+  return `<div class="pb ${cls}-play"><div class="pb-text"><small>${n ? 'Далі' : 'Чудово'}</small><b>${label}</b></div>
+    <div class="pb-langs" role="group" aria-label="Мова курсу">${lang}</div>
+    ${n ? `<a class="pb-go" href="#teen/lesson">Грай</a>` : ''}<a class="pb-list" href="#teen/lessons">Усі уроки</a></div>`;
+};
+
 // Кнопка «сховати» біля помічника
 export const hideHelperButton = (cls) => `<button class="${cls}-hide" data-act="hide-helper" aria-label="Сховати помічника"><span aria-hidden="true">×</span></button>`;
