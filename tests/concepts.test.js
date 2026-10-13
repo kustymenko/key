@@ -22,7 +22,7 @@ describe('концепції стилю для 5–6 класів', () => {
       expect(html).not.toMatch(/https?:\/\/(?!www\.w3\.org)/);
       expect(html).not.toMatch(/undefined|NaN|\[object/);
     }
-    expect(conceptScreen({ menu: true })).toContain('Обери стиль');
+    expect(conceptScreen({ menu: true })).toContain('Обери свій світ');
   });
 
   it('на екрані друку є клавіатура з кольорами пальців і долоні', () => {

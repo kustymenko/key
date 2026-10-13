@@ -27,8 +27,8 @@ const thumb = (c, n) => `<div class="cm-card">
   <a class="cm-link" href="#${c.meta.id}" aria-label="Концепція ${n}: ${c.meta.name}"></a></div>`;
 
 const menu = () => `<div class="screen cn cn-menu">
-  <h1>Обери стиль свого світу</h1>
-  <p class="cm-lead">Відкрий кожен варіант, змінюй героя й спробуй надрукувати вправу. Потім голосуємо!</p>
+  <h1>Обери свій світ</h1>
+  <p class="cm-lead">Відкрий кожен світ, змін героя й спробуй надрукувати вправу. Свій світ можна змінити будь-коли.</p>
   <div class="cm-row">${Object.values(CONCEPTS).map((c, i) => thumb(c, i + 1)).join('')}</div>
   <p class="cm-foot">Це макети: дані умовні, прогрес не зберігається.</p></div>`;
 
