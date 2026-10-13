@@ -1,0 +1,39 @@
+/* Спільне для концепцій 5–6 класів: вправа з друком і екранна клавіатура.
+   Клавіатура завжди лежить на світлій панелі й має нейтральне оточення: кольори пальців лишаються єдиними яскравими. */
+.cn { position: relative; width: 1366px; height: 768px; overflow: hidden; }
+.cn a { -webkit-tap-highlight-color: transparent; }
+.cn .tt { display: flex; flex-wrap: wrap; gap: 8px 0; margin-top: 14px; font-family: var(--font); font-size: 46px; font-weight: 800; line-height: 1.25; color: #1b2430; }
+.cn .tt-w { white-space: nowrap; }
+.cn .tt-ch { display: inline-block; padding: 0 1px; border-radius: 8px; border-bottom: 5px solid transparent; }
+.cn .tt-ch.is-done { color: #8a93a0; }
+.cn .tt-ch.is-current { background: #e8ebef; outline: 4px solid #2b3a4a; outline-offset: -2px; }
+.cn .tt-sp { min-width: 26px; }
+.cn .keys-panel { padding: 16px 20px; display: flex; gap: 20px; align-items: center; color: #1b2430; }
+.cn .keys-panel .kb { flex: none; width: 860px; gap: 7px; }
+.cn .keys-panel .kb-row { gap: 7px; }
+.cn .keys-panel .key { --h: 62px; font-size: 26px; }
+.cn .keys-panel .key.is-next { font-size: 30px; }
+.cn .keys-panel .hands { flex: 1; }
+.cn .keys-panel .hand { width: 150px; }
+.cn .keys-panel .hands-caption { font-size: 20px; }
+/* Лише для показу: підпис концепції і повернення до списку */
+.cn-badge { position: fixed; left: 12px; bottom: 8px; z-index: 6; display: flex; gap: 8px; font: 800 18px/1 var(--font); }
+.cn-badge a, .cn-badge span { background: #fff; color: #2b3a4a; border: 2px solid #2b3a4a; border-radius: 10px; padding: 8px 12px; text-decoration: none; }
+.cn-badge a:hover { background: #2b3a4a; color: #fff; }
+
+/* Список концепцій: три картки для голосування */
+.cn-menu { background: #14181f; color: #fff; padding: 56px 52px; font-family: var(--font); }
+.cn-menu h1 { font-size: 60px; font-weight: 800; line-height: 1.1; }
+.cm-lead { margin-top: 12px; font-size: 26px; color: #b9c2cf; }
+.cm-row { display: flex; gap: 28px; margin-top: 44px; }
+.cm-card { position: relative; width: 400px; display: block; color: inherit; text-decoration: none; background: #1f2630; border: 4px solid #3a4452; border-radius: 22px; padding: 16px 16px 22px; transition: transform .15s, border-color .15s; }
+.cm-link { position: absolute; inset: 0; border-radius: 22px; z-index: 2; }
+.cm-card:hover, .cm-card:focus-within { transform: translateY(-6px); border-color: #fff; }
+.cm-shot { width: 366px; height: 206px; overflow: hidden; border-radius: 12px; position: relative; }
+.cm-scale { width: 1366px; height: 768px; transform: scale(.268); transform-origin: 0 0; pointer-events: none; }
+.cm-num { position: absolute; left: -14px; top: -18px; width: 62px; height: 62px; display: grid; place-items: center; background: #fff; color: #14181f; border-radius: 16px; font-size: 40px; font-weight: 800; box-shadow: 0 5px 0 #000; }
+.cm-text { padding: 16px 6px 0; }
+.cm-text h2 { font-size: 32px; font-weight: 800; }
+.cm-text p { margin-top: 8px; font-size: 22px; line-height: 1.3; color: #b9c2cf; }
+.cm-foot { position: absolute; left: 52px; bottom: 36px; font-size: 20px; color: #8893a3; }
+.cn .keys-panel { font-family: var(--font); }
