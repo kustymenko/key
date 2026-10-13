@@ -64,7 +64,7 @@ export function mountPlacement(app, route, state) {
     const kind = place({ find: run.find, words: run.words }, run.self);
     const info = KIND_INFO[kind];
     host.innerHTML = `<div class="pl-step">Результат</div><h2 class="pl-h">${info.title}</h2><p class="pl-lead">${info.text}</p>
-      <div class="pl-stats"><span>Літера: <b>${sec(run.find?.medianMs)}</b></span><span>Точність слів: <b>${pct(run.words?.accuracy)}</b></span><span>Швидкість: <b>${Math.round(run.words?.cpm ?? 0)}</b> знаків за хвилину</span><span>Речення: <b>${pct(run.sent?.accuracy)}</b></span></div>
+      <div class="pl-stats"><span>Літера: <b>${sec(run.find?.medianMs)}</b></span><span>Точність слів: <b>${pct(run.words?.accuracy)}</b></span><span>Швидкість: <b>${Math.min(999, Math.round(run.words?.cpm ?? 0))}</b> знаків за хвилину</span><span>Речення: <b>${pct(run.sent?.accuracy)}</b></span></div>
       <p class="pl-note">Розміщення збережеться. Уроки цього рівня з’являться в наступних оновленнях.</p>
       <div class="pl-actions">${btn('Прийняти', `data-act="accept" data-kind="${kind}"`, true)}${btn('Пройти ще раз', 'data-act="again"')}</div>
       <div class="pl-manual"><span>Або обери старт сам:</span>${['zero', 'mid', 'pro'].map((k) => btn(KIND_INFO[k].short, `data-act="accept" data-kind="${k}" data-manual="1"`)).join('')}</div>`;
