@@ -20,10 +20,13 @@ export function mountNewProfile(root, state) {
   const back = () => btn({ label: 'Назад', icon: 'back', kind: 'light', size: 'big', attrs: 'data-act="back"' });
 
   function paint() {
-    if (!(w.step === 3 && isTeen(w.level))) { screen.className = 'screen screen-new theme-warm'; dark(false); }
+    const animalStep = w.step === 3 && !isTeen(w.level);
+    const worldStep = w.step === 3 && isTeen(w.level);
+    // «Ім'я» і «клас» — нейтральні, без Клавика (ще невідомо, з якого учень класу); тваринка — дитяча, тепла
+    if (!worldStep) { screen.className = `screen screen-new ${animalStep ? 'theme-warm' : 'theme-neutral'}`; dark(false); setBackdrop(animalStep); }
     if (w.step === 1) {
       screen.innerHTML = `${top()}<div class="new-main">
-        <div class="new-head">${klavik('cheer', 190)}${bubble('Як тебе звати?', { speak: false })}</div>
+        <h1 class="new-title">Як тебе звати?</h1>
         <input class="name-input" type="text" maxlength="${MAX_NAME}" value="${esc(w.name)}" autocomplete="off" autocapitalize="words" spellcheck="false" aria-label="Як тебе звати?">
         <div class="row">${btn({ label: 'Далі', icon: 'next', kind: 'primary', size: 'big', attrs: 'data-act="name-next"' })}</div></div>`;
       const input = screen.querySelector('.name-input');
@@ -34,7 +37,7 @@ export function mountNewProfile(root, state) {
       input.focus();
     } else if (w.step === 2) {
       screen.innerHTML = `${top()}<div class="new-main">
-        <div class="new-head">${klavik('cheer', 150)}${bubble('Який ти клас?', { speak: false })}</div>
+        <h1 class="new-title">Який ти клас?</h1>
         <div class="level-picks is-four">
           ${[['1-2', '1–2'], ['3-4', '3–4'], ['5', '5'], ['6', '6']].map(([v, t]) => `<button class="level-pick" data-level-pick="${v}"><b>${t}</b><span>клас</span></button>`).join('')}
         </div>

@@ -66,3 +66,18 @@ button.cm-link { background: transparent; border: 0; cursor: pointer; }
 .level-picks.is-four { gap: 28px; }
 .level-picks.is-four .level-pick { width: 230px; height: 210px; border-radius: 30px; }
 .level-picks.is-four .level-pick b { font-size: 96px; }
+
+/* Змінити світ: три мініатюри в розділі «Герой» (однаково у всіх світах; світ лише задає колір рамки вибраного) */
+.wt-row { display: flex; gap: 10px; margin-top: 6px; }
+.wt { position: relative; width: 150px; flex: none; --wt-accent: #ff7a3d; }
+.wt-shot { width: 150px; height: 84px; overflow: hidden; border-radius: 8px; position: relative; border: 3px solid rgb(0 0 0 / .4); background: #14181f; }
+.wt-scale { width: 1366px; height: 768px; transform: scale(.1098); transform-origin: 0 0; pointer-events: none; }
+.wt-name { position: absolute; left: 3px; right: 3px; bottom: 3px; padding: 1px 6px 2px; font: 800 18px/1.15 var(--font); color: #fff; background: rgb(10 14 30 / .78); border-radius: 0 0 5px 5px; }
+.wt-btn { position: absolute; inset: 0; background: transparent; border: 0; border-radius: 8px; cursor: pointer; }
+.wt.is-on .wt-shot { outline: 5px solid var(--wt-accent); outline-offset: 2px; }
+.wt-btn:focus-visible { outline: 5px solid var(--wt-accent); outline-offset: 2px; }
+
+/* Перші кроки створення профілю: нейтральні, без Клавика (ще невідомо, з якого учень класу) */
+.screen-new.theme-neutral .new-title { font-size: 60px; font-weight: 800; line-height: 1.1; color: var(--ui-text); text-align: center; }
+.screen-new.theme-neutral .new-main { gap: 40px; }
+.screen-new.theme-neutral .level-pick { border-radius: 18px; box-shadow: 0 8px 0 var(--ui-main); }

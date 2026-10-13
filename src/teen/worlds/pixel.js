@@ -1,6 +1,6 @@
 // Концепція 2 «Піксель-аркада»: піксельна 8-бітна карта (поле вдень, інтерфейс на нічному тлі), герой 12×16 пікселів, нагороди-спрайти.
 // Усі спрайти намальовані вручну буквами в цьому файлі: власні, нічого не скопійовано.
-import { TABS, avatarControls, settingsRows, hideHelperButton } from '../screens/controls.js';
+import { TABS, avatarControls, settingsRows, hideHelperButton, homeButton } from '../screens/controls.js';
 import { taskText, keysPanel } from '../screens/typing.js';
 import { HERO_OPTIONS as AV_OPTIONS, DEFAULT_HERO } from '../logic/profile.js';
 import { shade, noise } from './draw.js';
@@ -10,7 +10,7 @@ let C, PLAYER, WORLDS, QUESTS, REWARDS, av = DEFAULT_HERO;
 const useCtx = (ctx) => { C = ctx; PLAYER = ctx.player; WORLDS = ctx.progress.worlds; QUESTS = ctx.progress.quests; REWARDS = ctx.progress.rewards; av = ctx.hero; };
 
 export const heroSize = 18; // розмір великого героя на екрані «Герой»
-export const meta = { id: 'pixel', name: 'Піксель-аркада', desc: 'Піксельна 8-бітна карта пригод. Рівні, скарби й герой із пікселів.' };
+export const meta = { id: 'pixel', name: 'Піксель-аркада', short: 'Піксель', desc: 'Піксельна 8-бітна карта пригод. Рівні, скарби й герой із пікселів.' };
 
 // ---------- Спрайти ----------
 const PAL = {
@@ -113,14 +113,15 @@ function mapSvg() {
 }
 
 // ---------- Оболонка ----------
-const xpBar = () => `<div class="px-xp" aria-label="Досвід">${Array.from({ length: 14 }, (_, i) => `<i class="${i < Math.round((PLAYER.xp / PLAYER.xpMax) * 14) ? 'on' : ''}"></i>`).join('')}</div>`;
+const xpBar = () => `<div class="px-xp" aria-label="Досвід">${Array.from({ length: 10 }, (_, i) => `<i class="${i < Math.round((PLAYER.xp / PLAYER.xpMax) * 10) ? 'on' : ''}"></i>`).join('')}</div>`;
 const stars = () => `<div class="px-stars" aria-hidden="true">${Array.from({ length: 34 }, (_, i) => `<i style="left:${(noise(i, 1) * 1346).toFixed(0)}px;top:${(noise(i, 2) * 340).toFixed(0)}px;${i % 5 === 0 ? 'width:6px;height:6px' : ''}"></i>`).join('')}</div>`;
 
 function shell(tab, inner) {
   return `<div class="screen cn cn-pixel is-tab-${tab}">${stars()}
     <header class="px-top">
+      ${C.demo ? '' : homeButton('px')}
       <nav class="px-nav" aria-label="Розділи">${TABS.map(([id, label]) => `<a class="px-tab ${id === tab ? 'is-on' : ''}" href="${C.href(id)}" ${id === tab ? 'aria-current="page"' : ''}>${label}</a>`).join('')}</nav>
-      <div class="px-lvl"><span>РІВ. <b>${PLAYER.level}</b></span>${xpBar()}<small data-xp-text>${PLAYER.xp}/${PLAYER.xpMax}</small></div>
+      <div class="px-lvl"><div class="px-who"><span class="px-name">${PLAYER.name}</span><span class="px-rank">РІВ. <b data-level>${PLAYER.level}</b></span></div>${xpBar()}<small data-xp-text>${PLAYER.xp}/${PLAYER.xpMax}</small></div>
       <div class="px-coins" aria-label="Монети: ${PLAYER.coins}"><svg viewBox="0 0 8 8" width="32" height="32" shape-rendering="crispEdges" aria-hidden="true">${rects(COIN, PAL)}</svg><b>${PLAYER.coins}</b></div>
     </header>
     ${inner}</div>`;
@@ -137,11 +138,13 @@ const avatarTab = () => shell('avatar', `<div class="px-platform"></div>
   <div class="px-hero" data-avatar>${avatarSvg(18, C.hero)}</div>
   <section class="px-panel px-wardrobe"><h2>Налаштуй героя</h2>${avatarControls('px', C)}${settingsRows('px', C)}</section>`);
 
-const typeTab = () => shell('type', `<div class="px-task"><div class="px-task-top"><span>Вправа «Нові землі»</span>
+const doneStar = `<svg viewBox="0 0 8 8" width="80" height="80" shape-rendering="crispEdges" aria-hidden="true">${rects(STAR, { ...PAL, y: '#5b5880' })}</svg>`;
+const typeTab = () => shell('type', `<div class="px-ground" aria-hidden="true"></div>
+  <div class="px-task"><div class="px-task-tag">ЗАВДАННЯ</div><div class="px-task-top"><span>Вправа «Нові землі»</span>
   <span>Точність <b data-acc>—</b></span><span>Знаків за хвилину <b data-speed>—</b></span></div>
   <div class="px-bar"><div data-xp-fill style="width:${(PLAYER.xp / PLAYER.xpMax) * 100}%"></div></div>
   ${taskText()}<div class="px-msg" data-msg></div>
-  <div class="px-done" data-done hidden><b>Вправу пройдено!</b><span>Точність <span data-done-acc></span></span><button class="px-btn" data-again>Ще раз</button></div></div>
+  <div class="px-done" data-done hidden>${doneStar}<div class="px-done-text"><b>ГОТОВО!</b><div class="px-chips"><span>Точність <b data-done-acc></b></span><span>Знаків за хвилину <b data-done-speed></b></span></div></div><button class="px-btn" data-again>Ще раз</button></div></div>
   ${keysPanel()}`);
 
 const GEMS = [
@@ -158,4 +161,8 @@ const rewardArt = (r, i) => {
 const rewardsTab = () => shell('rewards', `<section class="px-panel px-shelf"><h2>Мої нагороди <small>${REWARDS.filter((r) => r.got).length} з ${REWARDS.length}</small></h2>
   <div class="px-grid">${REWARDS.map((r, i) => `<div class="px-reward ${r.got ? 'is-got' : ''}">${rewardArt(r, i)}<span>${r.name}</span></div>`).join('')}</div></section>`);
 
-export const screen = (tab, ctx) => { useCtx(ctx); return ({ world: worldTab, avatar: avatarTab, type: typeTab, rewards: rewardsTab }[tab] ?? worldTab)(); };
+export const screen = (tab, ctx) => {
+  const saved = [C, PLAYER, WORLDS, QUESTS, REWARDS, av]; // мініатюри світів викликають screen() усередині screen()
+  useCtx(ctx);
+  try { return ({ world: worldTab, avatar: avatarTab, type: typeTab, rewards: rewardsTab }[tab] ?? worldTab)(); } finally { [C, PLAYER, WORLDS, QUESTS, REWARDS, av] = saved; }
+};

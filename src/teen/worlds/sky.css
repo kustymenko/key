@@ -89,3 +89,31 @@
 .sk-wardrobe .sk-group h3 { font-size: 18px; }
 .sk-wardrobe .sk-row { margin-top: 6px; gap: 10px; }
 .sk-wardrobe .sk-opt { min-width: 52px; height: 52px; font-size: 18px; white-space: nowrap; display: inline-grid; place-items: center; text-decoration: none; }
+
+/* ---------- Етап Т1+: «Додому», ім'я, налаштування світу, екран «Друк» у стилі світу ---------- */
+.sk-home { display: grid; justify-items: center; gap: 4px; width: 88px; margin-top: auto; padding: 12px 4px 10px; border-radius: 20px; border: 2px solid var(--sk-aqua); color: var(--sk-ink); background: rgb(122 217 255 / .14); font: 800 18px 'Exo 2', sans-serif; cursor: pointer; }
+.sk-home:hover { background: rgb(122 217 255 / .3); }
+.sk-name { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 800 22px 'Exo 2', sans-serif; }
+.cn-sky .wt { --wt-accent: var(--sk-aqua); }
+.cn-sky .wt-shot { border-radius: 14px; border-color: var(--sk-edge); }
+.sk-adult-row { margin-top: 12px; text-align: right; }
+.sk-adult { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px; border-radius: 22px; border: 1.5px dashed var(--sk-edge); color: var(--sk-soft); font: 800 18px 'Exo 2', sans-serif; text-decoration: none; }
+.sk-adult:hover { background: rgb(255 255 255 / .12); color: #fff; }
+.cn-sky.is-tab-type .sk-home { grid-auto-flow: column; width: auto; height: 56px; margin: 0 0 0 8px; padding: 0 16px; align-items: center; gap: 8px; border-radius: 28px; }
+.cn-sky.is-tab-type .sk-home svg { width: 24px; height: 24px; }
+
+.sk-deco { position: absolute; inset: 0; opacity: .5; }
+.cn-sky.is-tab-type .sk-task { background: #f3f4fb; box-shadow: 0 0 0 1.5px rgb(122 217 255 / .8), 0 0 36px rgb(122 217 255 / .28), 0 18px 50px rgb(5 5 40 / .45); }
+.sk-task-title { display: inline-flex; align-items: center; gap: 10px; }
+.sk-task-title::before { content: ''; width: 16px; height: 20px; background: linear-gradient(135deg, #a9acd6, #6a6ea0); clip-path: polygon(50% 0, 100% 35%, 50% 100%, 0 35%); }
+.cn-sky.is-tab-type .keys-panel { background: #e6e9f6; border-radius: 32px; box-shadow: 0 0 0 1.5px rgb(122 217 255 / .8), 0 0 36px rgb(122 217 255 / .28), 0 18px 50px rgb(5 5 40 / .45); }
+.cn-sky .keys-panel .key { border-radius: 16px; }
+.cn-sky .keys-panel .finger:not(.is-active) { stroke: #5a5f86; stroke-width: 3; }
+.cn-sky .keys-panel .finger.is-active { stroke: #3a3f66; }
+.cn-sky .keys-panel .palm { fill: #fff; stroke: #5a5f86; stroke-width: 3; }
+.cn-sky .keys-panel .hands-caption { border-radius: 20px; border: 2px solid #7a7fb0; background: #fff; font-family: 'Exo 2', sans-serif; }
+.cn-sky .sk-done { gap: 22px; padding: 0 34px; justify-content: flex-start; font-family: 'Exo 2', sans-serif; }
+.sk-done-text { flex: 1; }
+.sk-done-text > b { display: block; font-size: 34px; font-weight: 800; }
+.sk-chips span { padding: 6px 16px; border-radius: 18px; background: #fff; border: 1.5px solid #b9bde3; font-size: 20px; }
+.sk-chips b { margin-left: 4px; font-size: 24px; }

@@ -60,6 +60,8 @@ export function mountTyping(app, { xpBase = 0, xpMax = 500, animate = false } = 
     const acc = Math.round((i / total) * 100);
     q('[data-done]').hidden = false;
     q('[data-done-acc]').textContent = `${acc}%`;
+    const sp = q('[data-done-speed]');
+    if (sp) sp.textContent = String(Math.min(999, Math.round(i / Math.max((performance.now() - t0) / 60000, 1 / 600))));
     q('[data-msg]').innerHTML = acc >= 95 ? 'Чиста робота!' : 'Вправу пройдено. Спробуй ще раз — точніше!';
   };
 

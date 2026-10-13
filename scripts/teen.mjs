@@ -116,12 +116,12 @@ for (const [w, h] of [[1366, 768], [1920, 1080]]) {
   await page.goto(base); await page.reload(); await page.click('.profile-card.is-teen >> nth=0'); await page.waitForSelector('.cn-voxel'); // сховище читається заново
   await page.goto(`${base}#teen/avatar`); await page.waitForSelector('[data-opt]');
   for (const world of ['sky', 'pixel', 'voxel']) {
-    await page.click(`[data-set-world="${world}"]`); await page.waitForSelector(`.cn-${world}`);
+    await page.click(`[data-set-world="${world}"]`); await page.waitForSelector(`.stage > .cn-${world}`);
     const p = (await store(page))[1];
     ok(p.world === world && p.xp === 730 && p.hero.hat === 2, `після зміни світу на ${world} щось втрачено`);
     if (w === 1366 && world === 'sky') await shot('change-world-sky');
   }
-  ok((await page.locator('.cn-voxel').count()) === 1 && /Рівень\s*2/.test(await page.locator('.vx-lvl').innerText()), 'рівень за досвідом 730 має бути 2');
+  const lvlText = await page.locator('.stage > .cn-voxel > .vx-plate .vx-lvl').first().innerText(); ok(/Рівень\s*2/.test(lvlText), `рівень за досвідом 730 має бути 2, а на екрані: ${lvlText}`);
 
   // Для дорослого: зміна класу 3–4 → 5 із підтвердженням, прогрес зберігається, світ обирається при вході
   await page.goto(base); await page.reload(); await page.click('.profile-card:not(.is-teen):not(.is-new) >> nth=0'); await page.waitForSelector('.screen-map');
