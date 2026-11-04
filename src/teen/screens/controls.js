@@ -9,10 +9,17 @@ export const TABS = [['world', 'Світ'], ['avatar', 'Герой'], ['type', '
 // «Додому» (повернення до «Хто ти?»): є на кожному екрані кожного світу, окрім демо-сторінки
 export const homeButton = (cls) => `<button class="${cls}-home" data-home aria-label="Додому">${icons.home(30)}<span>Додому</span></button>`;
 
-// Вигляд героя: ряди кнопок із кольорами / назвами
+// Вигляд героя: ряди кнопок із кольорами / назвами. Закритий предмет — замочок; натиснеш — рядок внизу підкаже, як його відкрити (ctx.locks)
+export const LOCK_DEFAULT = 'Закрито? Натисни — підкажу, як відкрити.';
 export const avatarControls = (cls, ctx) => Object.entries(HERO_OPTIONS).map(([key, o]) =>
-  `<div class="${cls}-group"><h3>${o.label}</h3><div class="${cls}-row">${o.vals.map((v, i) =>
-    `<button class="${cls}-opt opt-${key}" data-opt="${key}" data-val="${i}" aria-pressed="${ctx.hero[key] === i}" aria-label="${o.names ? o.names[i] : o.label + ' ' + (i + 1)}" ${key === 'hat' ? '' : `style="--sw:${v}"`}>${key === 'hat' ? `<span>${o.names[i]}</span>` : ''}</button>`).join('')}</div></div>`).join('');
+  `<div class="${cls}-group"><h3>${o.label}</h3><div class="${cls}-row">${o.vals.map((v, i) => {
+    const lock = ctx.locks?.[`${key}:${i}`] ?? '';
+    const name = o.names ? o.names[i] : `${o.label} ${i + 1}`;
+    return `<button class="${cls}-opt opt-${key}${lock ? ' is-locked' : ''}" data-opt="${key}" data-val="${i}" aria-pressed="${ctx.hero[key] === i}" aria-label="${lock ? `${name} (закрито). ${lock}` : name}" ${lock ? `aria-disabled="true" data-lock="${lock}"` : ''} ${key === 'hat' ? '' : `style="--sw:${v}"`}>${lock ? icons.lock(key === 'hat' ? 16 : 24) : ''}${key === 'hat' ? `<span>${o.names[i]}</span>` : ''}</button>`;
+  }).join('')}</div></div>`).join('') + (Object.keys(ctx.locks ?? {}).length ? `<small class="${cls}-lockinfo" data-lockinfo aria-live="polite">${LOCK_DEFAULT}</small>` : '');
+
+// Нагорода в колекції: відкрита показує подарунок (якщо є), закрита — підказку «як отримати» (до 6 слів)
+export const rewardNote = (r) => `<small class="rw-note">${r.got ? (r.gift ? `Предмет: ${r.gift.replace(/^Одяг: /, 'одяг ').toLowerCase()}` : 'Є!') : r.hint ?? ''}</small>`;
 
 // Змінити світ: мініатюри карт трьох світів. Поверх мініатюри лежить кнопка (мініатюра сама не клікабельна).
 const worldThumbs = (cls, ctx) => WORLD_IDS.map((id) => {
@@ -38,7 +45,7 @@ export const playBar = (cls, ctx) => {
   const lang = ['ua', 'en'].map((l) => `<button class="pb-lang" data-set-layout="${l}" aria-pressed="${ctx.layout === l}">${l === 'ua' ? 'УКР' : 'ENG'}</button>`).join('');
   return `<div class="pb ${cls}-play"><div class="pb-text"><small>${n ? 'Далі' : 'Чудово'}</small><b>${label}</b></div>
     <div class="pb-langs" role="group" aria-label="Мова курсу">${lang}</div>
-    ${n ? `<a class="pb-go" href="#teen/lesson">Грай</a>` : ''}<a class="pb-list" href="#teen/lessons">Усі уроки</a></div>`;
+    ${n ? `<a class="pb-go" href="#teen/lesson">Грай</a>` : ''}<div class="pb-links"><a class="pb-list" href="#teen/lessons">Усі уроки</a><a class="pb-list" href="#teen/worlds">Світи</a></div></div>`;
 };
 
 // Кнопка «сховати» біля помічника

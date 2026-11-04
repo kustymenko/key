@@ -8,6 +8,8 @@ import { compose, fallback, usable, hasMark } from './marks.js';
 // Довжини вправ: числа складні для пальців, тому вони коротші, ніж у знаків (Т4)
 export const NUMBER_RANGES = [[40, 60], [70, 90], [100, 120]];
 export const MIXED_RANGES = [[40, 70], [80, 120], [130, 180]];
+// Імена для вигаданих адрес (домен завжди example.com — справжніх адрес не буває)
+const MAIL_NAMES = ['olena', 'tom', 'anna', 'maks', 'sofia', 'kate', 'club', 'class6', 'team5', 'max'];
 const SYMBOLS = ['№', '%', '*', '+', '=', '#', '$', '&', '@'];
 const UNITS = {
   ua: ['кг', 'г', 'м', 'см', 'км', 'мм', 'л', 'мл', 'хв', 'год', 'с', 'грн'],
@@ -69,7 +71,7 @@ function tokensText(rng, make, [min, max], { sep = ' ', end = '', must = [], nee
   return null;
 }
 
-// Токени для знаків: кожен містить свій знак (№ 7, 25%, 6 * 7, #4, $12, 3 @ $4, 15 + 27 = 42)
+// Токени для знаків: кожен містить свій знак (№ 7, 25%, 6 * 7, #4, $12, olena@example.com, 15 + 27 = 42)
 function symbolToken(rng, key, digs, known, layout) {
   const n = () => { let s; do s = number(rng, digs, 1 + rnd(rng, 2)); while (/^0+$/.test(s)); return s; }; // не «0» і не «00»
   switch (key) {
@@ -77,7 +79,7 @@ function symbolToken(rng, key, digs, known, layout) {
     case '%': return `${n()}%`;
     case '#': return `#${n()}`;
     case '$': return `$${n()}`;
-    case '@': return `${pick(rng, digs.filter((d) => d !== '0'))} @ $${n()}`;
+    case '@': return `${pick(rng, MAIL_NAMES)}@example.com`; // лише вигадані адреси на example.com
     case '&': return pick(rng, PAIRS[layout]);
     case '*': return sum(rng, digs, ['*'], known.has('='));
     case '+': return sum(rng, digs, known.has('-') ? ['+', '-'] : ['+'], known.has('='));

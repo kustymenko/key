@@ -210,3 +210,40 @@ button.cm-link { background: transparent; border: 0; cursor: pointer; }
 .li-key.has-how { height: auto; min-height: 56px; padding: 6px 14px; gap: 0; align-content: center; }
 .li-key.has-how small { font-size: 16px; font-weight: 700; opacity: .85; white-space: nowrap; }
 .ll-ch { min-width: .6em; text-align: center; }
+
+/* ---------- Ігрова оболонка (Етап Т6): нагороди з підказками, закриті предмети героя, карта світів, підсумок ---------- */
+.cn .rw-note { display: block; margin: 0; font-size: 15px; font-weight: 700; line-height: 1.15; opacity: .85; color: inherit; font-family: inherit; max-width: 150px; }
+.cn [data-opt].is-locked { opacity: .6; filter: saturate(.35); position: relative; }
+.cn [data-opt].is-locked svg { color: #1b2430; }
+.cn .opt-hat.is-locked { display: inline-flex; align-items: center; gap: 6px; }
+.cn [data-lockinfo] { display: block; margin-top: 6px; font-size: 15px; font-weight: 700; opacity: .9; line-height: 1.2; font-family: var(--font); }
+.cn [data-opt].opt-hat { padding: 0 8px; min-width: 0; font-size: 15px; }
+.pb-links { display: grid; justify-items: start; }
+.pb-links .pb-list { min-height: 28px; padding: 0 6px; font-size: 16px; }
+.cn [data-opt].opt-outfit, .cn [data-opt].opt-skin { min-width: 44px; width: 44px; height: 44px; }
+.cn-pixel .ld-h { color: #14122a; }
+.cn .opt-hat.is-locked { gap: 4px; }
+.cn .is-locked[data-opt] { cursor: help; }
+
+.wl-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 6px 0; }
+.wl-card { display: flex; align-items: center; gap: 16px; padding: 12px 18px; min-height: 96px; border: 3px solid currentColor; border-radius: 12px; font-family: var(--font); }
+.wl-card.is-now { background: var(--pl-accent); border-color: var(--pl-accent); color: var(--pl-ink); }
+.wl-card.is-locked { opacity: .62; border-style: dashed; }
+.wl-mark { flex: 0 0 52px; height: 52px; display: grid; place-items: center; border: 3px solid currentColor; border-radius: 12px; font-size: 28px; }
+.wl-body { display: grid; gap: 2px; min-width: 0; }
+.wl-body b { font-size: 22px; line-height: 1.15; }
+.wl-body span { font-size: 17px; font-weight: 700; opacity: .85; }
+.wl-body small { font-size: 16px; font-weight: 700; }
+.wl-hint { opacity: .95; }
+.wl-bar { height: 8px; border-radius: 4px; background: rgb(128 128 128 / .3); overflow: hidden; margin-top: 3px; }
+.wl-bar i { display: block; height: 100%; background: currentColor; }
+.cn-pixel .wl-card, .cn-pixel .wl-mark { border-radius: 0; }
+.cn-sky .wl-card { border-radius: 20px; }
+.cn-voxel .wl-card, .cn-voxel .wl-body { font-family: 'Rubik', sans-serif; }
+.cn-sky .wl-card { font-family: 'Exo 2', sans-serif; }
+
+/* Підсумок уроку: досвід, нове */
+.ld-new { display: flex; flex-wrap: wrap; gap: 8px; }
+.ld-new span { border: 2px solid currentColor; border-radius: 10px; padding: 1px 10px; font-size: 17px; font-weight: 800; }
+.ld-new .is-lvl { background: var(--pb-accent, #2b3a4a); border-color: var(--pb-accent, #2b3a4a); color: var(--pb-ink, #fff); }
+.cn-pixel .ld-new span { border-radius: 0; }

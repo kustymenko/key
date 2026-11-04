@@ -64,13 +64,16 @@ export function worldsFromLessons(layout, states) {
   let nowSet = false;
   return WORLD_NAMES.map(([name, sub], i) => {
     const ids = groups[i];
-    if (!ids?.length) return { name, sub, state: 'locked', pct: 0 };
+    // Закритий світ: підказка, як його відкрити (до 6 слів)
+    const hint = ids?.length ? `Спершу пройди «${WORLD_NAMES[Math.max(0, i - 1)][0]}»` : 'Відкриється з випробуваннями';
+    const range = ids?.length ? (ids.length > 1 ? `Уроки ${ids[0]}–${ids[ids.length - 1]}` : `Урок ${ids[0]}`) : 'Випробування на час';
+    if (!ids?.length) return { name, sub, state: 'locked', pct: 0, hint, range };
     const mine = states.filter((l) => ids.includes(l.id));
     const finished = mine.filter((l) => l.state === 'done' || l.state === 'credited').length;
     const pct = Math.round((finished / mine.length) * 100);
-    if (finished === mine.length) return { name, sub, state: 'done', pct: 100 };
-    if (!nowSet) { nowSet = true; return { name, sub, state: 'now', pct }; }
-    return { name, sub, state: 'locked', pct };
+    if (finished === mine.length) return { name, sub, state: 'done', pct: 100, range };
+    if (!nowSet) { nowSet = true; return { name, sub, state: 'now', pct, range }; }
+    return { name, sub, state: 'locked', pct, hint, range };
   });
 }
 

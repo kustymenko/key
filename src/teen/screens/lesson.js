@@ -15,6 +15,7 @@ import { getTeenLesson, lessonTitleOf, isPunctKey, needsNumberRow } from '../log
 import { buildTeenLesson } from '../logic/lessons.js';
 import { toLines } from '../logic/placement.js';
 import { lessonStates, currentLesson, teenStars, QUICK_ACC, PASS_ACC, playable } from '../logic/progress.js';
+import { levelInfo } from '../logic/profile.js';
 
 const LINE = 42; // знаків у рядку тексту
 // Рядки вправи; абзаци (\n) починаються з нового рядка, а кінець абзацу позначається символом ↵ (клавіша Enter)
@@ -100,7 +101,8 @@ export function mountLesson(app, route, state) {
   let quick = !!lesson.quick;
   let built = buildTeenLesson({ layout, id: lesson.id, rng, quick, grade });
   let hintOn = true;
-  const sum = { typed: 0, errors: 0, ms: 0, missed: {} }; // підсумок по уроку
+  const sum = { typed: 0, errors: 0, ms: 0, missed: {}, steps: 0, words: 0 }; // підсумок по уроку (steps — вправи, words — слова без помилок: для завдань дня)
+  const word = { len: 0, clean: true }; // поточне слово
   let run = null; // стан поточного кроку
   let stage = 'step'; // step | result
   let fell = false; // швидка перевірка не вдалась — проходимо урок повністю
@@ -203,14 +205,24 @@ export function mountLesson(app, route, state) {
     const states = lessonStates(layout, profile());
     return { next: currentLesson(states), states };
   }
-  function resultHtml({ acc, cpm, stars, pass, credited, hard, next }) {
-    const chips = `<div class="ld-chips"><span>Точність <b>${acc}%</b></span><span>Знаків за хвилину <b>${cpm}</b></span>${hard.length ? `<span>Потренуй: <b>${hard.map((c) => c.toUpperCase()).join(', ')}</b></span>` : ''}</div>`;
+  // Що нового: рівень, виконані завдання, нагороди — одним коротким рядком, без вигуків
+  function newHtml(game) {
+    if (!game) return '';
+    const items = [
+      ...(game.levelUp ? [`<span class="is-lvl">Новий рівень: ${game.levelUp}</span>`] : []),
+      ...(game.quests.length ? [`<span>Завдань: ${game.quests.length} · +${game.bonus}</span>`] : []),
+      ...(game.rewards.length ? [`<span>${game.rewards.length > 1 ? 'Нагороди' : 'Нагорода'}: ${game.rewards.slice(0, 2).map((r) => escText(r.name)).join(', ')}${game.rewards.length > 2 ? ` і ще ${game.rewards.length - 2}` : ''}</span>`] : []),
+    ];
+    return items.length ? `<div class="ld-new">${items.join('')}</div>` : '';
+  }
+  function resultHtml({ acc, cpm, stars, pass, credited, hard, next, game }) {
+    const chips = `<div class="ld-chips"><span>Точність <b>${acc}%</b></span><span>Знаків за хвилину <b>${cpm}</b></span>${game ? `<span>Досвід <b>+${game.gain + game.bonus}</b></span>` : ''}${hard.length ? `<span>Потренуй: <b>${hard.map((c) => c.toUpperCase()).join(', ')}</b></span>` : ''}</div>`;
     const head = pass
       ? `<div class="ld-stars">${starsIcons(stars, 3, 34)}</div><h2 class="ld-h">${credited ? 'Зараховано з першої спроби!' : 'Урок пройдено!'}</h2>`
       : `<h2 class="ld-h">Ще трохи точності</h2><p class="ld-p">Для наступного уроку потрібно ${PASS_ACC}%. Спробуй ще раз: спокійно, без поспіху.</p>`;
     const nextBtn = pass && next && next.id !== lesson.id ? `<a class="pl-btn primary" href="#teen/lesson/${next.id}" data-next>Далі: урок ${next.id}</a>` : '';
     const doneAll = pass && !next ? '<p class="ld-p">Усі уроки цієї мови пройдено: літери, знаки, абзаци, цифри й символи.</p>' : '';
-    return `<div class="ld-main">${head}${chips}${doneAll}</div>
+    return `<div class="ld-main">${head}${chips}${newHtml(game)}${doneAll}</div>
       <div class="ld-btns">${nextBtn}<button class="pl-btn ${nextBtn ? '' : 'primary'}" data-act="again">${icons.replay(22)}<span>Ще раз</span></button><a class="pl-btn" href="#teen">До світу</a></div>`;
   }
 
@@ -220,7 +232,7 @@ export function mountLesson(app, route, state) {
     // швидка перевірка: з першої спроби не нижче порога — зараховано; інакше йдемо повним уроком
     if (quick && acc < QUICK_ACC) {
       quick = false; fell = true;
-      Object.assign(sum, { typed: 0, errors: 0, ms: 0, missed: {} });
+      Object.assign(sum, { typed: 0, errors: 0, ms: 0, missed: {}, steps: 0, words: 0 });
       built = buildTeenLesson({ layout, id: lesson.id, rng, quick: false, grade });
       run = { i: 0 };
       showStep();
@@ -232,16 +244,21 @@ export function mountLesson(app, route, state) {
     const pass = stars > 0;
     const hard = hardLetters(sum.missed, 3, 2);
     state.store.saveStep(state.profileId, { typed: sum.typed, errors: sum.errors, ms: sum.ms, chars: sum.typed, missed: sum.missed, keepResume: true });
-    if (pass) state.store.finishTeenLesson(state.profileId, { layout, lessonId: lesson.id, stars, acc, cpm, by: quick ? 'quick' : 'lesson' });
+    // зараховуємо урок (якщо пройдено), досвід, завдання дня, нагороди; помилка лише зменшує приріст досвіду
+    const game = state.store.finishTeenRun(state.profileId, { layout, lessonId: lesson.id, stars, acc, cpm, by: quick ? 'quick' : 'lesson', typed: sum.typed, errors: sum.errors, steps: sum.steps, words: sum.words });
+    if (game) themeOf(p0.world).setXp?.(app, levelInfo(game.xpTotal));
     const { next } = nextInfo();
     lightKeys([], { fingers: false });
     const done = q('[data-done]');
-    q('[data-ld]').innerHTML = resultHtml({ acc, cpm, stars, pass, credited: quick && !fell, hard, next });
+    q('[data-ld]').innerHTML = resultHtml({ acc, cpm, stars, pass, credited: quick && !fell, hard, next, game });
     done.hidden = false;
     q('[data-bar]').style.width = '100%';
     playSfx(pass ? 'stars' : 'hint', stars);
     done.querySelector('.pl-btn.primary')?.focus?.();
   }
+
+  // Слово закінчилось (пробіл, абзац або кінець вправи): якщо без помилок і не коротше двох знаків — зараховуємо
+  const endWord = () => { if (word.len >= 2 && word.clean) sum.words += 1; word.len = 0; word.clean = true; };
 
   // ----- клавіші -----
   const onKey = ({ code, key, kind }) => {
@@ -264,10 +281,12 @@ export function mountLesson(app, route, state) {
     const now = performance.now();
     if (run.last != null) run.ms += Math.min(now - run.last, IDLE_CAP);
     run.last = now;
+    const want0 = currentChar(run.ex); // клавіша, яку ждали (для слів без помилок)
     const { state: st, result } = pressChar(run.ex, key);
     run.ex = st;
     if (result === 'error') {
       sum.errors += 1;
+      word.clean = false;
       const want = currentChar(st);
       playSfx('hint');
       if (hintOn && run.step.hint) {
@@ -281,7 +300,10 @@ export function mountLesson(app, route, state) {
       sum.typed += 1;
       playSfx('tap');
       msg('');
+      if (want0 === ' ' || want0 === PARAGRAPH || want0 === '\n') endWord(); else word.len += 1;
       if (result === 'done') {
+        endWord();
+        sum.steps += 1;
         sum.ms += run.ms;
         sum.missed = mergeMissed(sum.missed, st.missed);
         playSfx('step');

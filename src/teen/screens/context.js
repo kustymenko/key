@@ -2,6 +2,7 @@
 import { levelInfo, DEFAULT_HERO, pickTip } from '../logic/profile.js';
 import { emptyProgress, sampleProgress } from '../logic/stub.js';
 import { lessonStates, currentLesson, worldsFromLessons } from '../logic/progress.js';
+import { questsView, rewardsOf, coinsOf, heroLocks } from '../logic/game.js';
 import { esc } from '../../screens/common.js';
 
 const hrefFor = (base) => (tab) => base + (tab === 'world' ? '' : `/${tab}`);
@@ -16,11 +17,14 @@ export function teenContext(profile, extra = {}) {
   const states = lessonStates(layout, profile);
   const progress = emptyProgress();
   progress.worlds = worldsFromLessons(layout, states);
+  progress.quests = questsView(profile); // завдання дня (одні й ті самі протягом доби)
+  progress.rewards = rewardsOf(profile); // колекція: відкриті й закриті з підказками
   return {
     demo: false,
     href: hrefFor('#teen'),
-    player: { name: esc(profile.name), level: info.level, xp: info.xp, xpMax: info.xpMax, coins: 0 },
+    player: { name: esc(profile.name), level: info.level, xp: info.xp, xpMax: info.xpMax, coins: coinsOf(profile) },
     hero: profile.hero,
+    locks: heroLocks(profile), // закриті предмети героя й підказки
     helper: !profile.helperHidden,
     world: profile.world,
     tip: tip(),

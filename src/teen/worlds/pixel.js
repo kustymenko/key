@@ -1,6 +1,6 @@
 // Концепція 2 «Піксель-аркада»: піксельна 8-бітна карта (поле вдень, інтерфейс на нічному тлі), герой 12×16 пікселів, нагороди-спрайти.
 // Усі спрайти намальовані вручну буквами в цьому файлі: власні, нічого не скопійовано.
-import { TABS, avatarControls, settingsRows, hideHelperButton, homeButton, playBar } from '../screens/controls.js';
+import { TABS, avatarControls, settingsRows, hideHelperButton, homeButton, playBar, rewardNote } from '../screens/controls.js';
 import { taskText, keysPanel } from '../screens/typing.js';
 import { hintToggle, lessonBody, lessonDone } from '../screens/lessonView.js';
 import { HERO_OPTIONS as AV_OPTIONS, DEFAULT_HERO } from '../logic/profile.js';
@@ -54,11 +54,13 @@ const HATS = {
   cap: ['....HHHH....', '...HHHHHH...', '...HHHHHHVV.'],
   crown: ['...y.yy.y...', '...yyyyyy...', '...hhhhhh...'],
   tuft: ['...h.hh.h...', '...hhhhhh...', '...hhhhhh...'],
+  headset: ['....gggg....', '...ghhhhg...', '..ghhhhhhg..', '..gaaaaaag..', '..gaeaaeag..'],
+  beanie: ['.....yy.....', '...HHHHHH...', '..HHVHVHHH..'],
 };
 
 export function playerRects(x0 = 0, y0 = 0, hero = av) {
   const outfit = AV_OPTIONS.outfit.vals[hero.outfit];
-  const pal = { h: '#4a3020', a: AV_OPTIONS.skin.vals[hero.skin], e: '#14122a', c: outfit, C: shade(outfit, 0.7), p: '#394a7a', k: '#14122a', H: outfit, V: shade(outfit, 0.7), y: '#ffd23f' };
+  const pal = { h: '#4a3020', a: AV_OPTIONS.skin.vals[hero.skin], e: '#14122a', c: outfit, C: shade(outfit, 0.7), p: '#394a7a', k: '#14122a', H: outfit, V: shade(outfit, 0.7), y: '#ffd23f', g: '#c9cfe0' };
   const hat = HATS[AV_OPTIONS.hat.vals[hero.hat]];
   const rows = [...hat, ...PLAYER_ROWS.slice(hat.length)];
   return rects(rows, pal, x0, y0);
@@ -163,7 +165,7 @@ const rewardArt = (r, i) => {
   return `<svg viewBox="0 0 8 8" width="72" height="72" shape-rendering="crispEdges" aria-hidden="true">${rects(GEMS[i % 4], pal, 0, 1)}${r.got ? '' : rects(['..ss..', '.s..s.', 'kkkkkk', 'kSSSSk', 'kSkkSk', 'kkkkkk'], PAL, 1, 2)}</svg>`;
 };
 const rewardsTab = () => shell('rewards', `<section class="px-panel px-shelf"><h2>Мої нагороди <small>${REWARDS.filter((r) => r.got).length} з ${REWARDS.length}</small></h2>
-  <div class="px-grid">${REWARDS.map((r, i) => `<div class="px-reward ${r.got ? 'is-got' : ''}">${rewardArt(r, i)}<span>${r.name}</span></div>`).join('')}</div></section>`);
+  <div class="px-grid">${REWARDS.map((r, i) => `<div class="px-reward ${r.got ? 'is-got' : ''}">${rewardArt(r, i)}<span>${r.name}</span>${rewardNote(r)}</div>`).join('')}</div></section>`);
 
 
 // Рамка для екранів вступного тесту: тло, «Додому» і панель світу; вміст (inner) малює спільний код
@@ -178,3 +180,11 @@ export const screen = (tab, ctx) => {
   useCtx(ctx);
   try { return ({ world: worldTab, avatar: avatarTab, type: typeTab, lesson: typeTab, rewards: rewardsTab }[tab] ?? worldTab)(); } finally { [C, PLAYER, WORLDS, QUESTS, REWARDS, av] = saved; }
 };
+
+// Після вправи: оновити рівень і смугу досвіду на екрані, не перемальовуючи його
+export function setXp(root, { level, xp, xpMax }) {
+  root.querySelectorAll('[data-level]').forEach((e) => { e.textContent = level; });
+  root.querySelectorAll('[data-xp-text]').forEach((e) => { e.textContent = `${xp}/${xpMax}`; });
+  const n = Math.round((xp / xpMax) * 10);
+  root.querySelectorAll('.px-xp i').forEach((el, i) => el.classList.toggle('on', i < n));
+}

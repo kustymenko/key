@@ -1,6 +1,6 @@
 // Концепція 1 «Кубічний світ»: денний острів з кубиків (ізометрія), герой із кубиків, нагороди-кубики.
 // Усе намальовано кодом: жодних чужих текстур, назв чи персонажів.
-import { TABS, avatarControls, settingsRows, hideHelperButton, homeButton, playBar } from '../screens/controls.js';
+import { TABS, avatarControls, settingsRows, hideHelperButton, homeButton, playBar, rewardNote } from '../screens/controls.js';
 import { taskText, keysPanel } from '../screens/typing.js';
 import { hintToggle, lessonBody, lessonDone } from '../screens/lessonView.js';
 import { HERO_OPTIONS as AV_OPTIONS, DEFAULT_HERO } from '../logic/profile.js';
@@ -43,6 +43,8 @@ export function heroG(ox, oy, S, V, hero = av) {
   g += box(0.13, 0.08, 1.9, 0.74, 0.84, 0.1, hair);
   if (hat === 'cap') g += box(0.1, 0.05, 1.98, 0.8, 0.9, 0.2, suit) + box(0.1, 0.95, 1.98, 0.8, 0.28, 0.07, shade(suit, 0.8));
   if (hat === 'crown') g += box(0.14, 0.1, 2.0, 0.72, 0.8, 0.16, '#ffc531') + [0.14, 0.46, 0.7].map((x) => box(x, 0.1, 2.16, 0.16, 0.16, 0.2, '#ffc531')).join('') + [0.14, 0.7].map((x) => box(x, 0.74, 2.16, 0.16, 0.16, 0.2, '#ffc531')).join('');
+  if (hat === 'headset') g += box(0.13, 0.42, 2.0, 0.74, 0.16, 0.07, '#2a2f3d') + box(0.0, 0.4, 1.4, 0.15, 0.2, 0.66, '#2a2f3d') + box(0.85, 0.4, 1.4, 0.15, 0.2, 0.66, '#2a2f3d') + box(-0.04, 0.3, 1.3, 0.2, 0.4, 0.4, '#4a5160') + box(0.84, 0.3, 1.3, 0.2, 0.4, 0.4, '#4a5160');
+  if (hat === 'beanie') g += box(0.1, 0.05, 1.98, 0.8, 0.9, 0.22, shade(suit, 1.25)) + box(0.08, 0.03, 1.92, 0.84, 0.94, 0.1, shade(suit, 0.8)) + box(0.4, 0.4, 2.2, 0.2, 0.2, 0.2, '#ffffff');
   if (hat === 'tuft') g += [0.2, 0.45, 0.65].map((x, i) => box(x, 0.3 + (i % 2) * 0.2, 2.0, 0.17, 0.17, 0.3 + i * 0.05, hair)).join('');
   return g;
 }
@@ -188,7 +190,7 @@ const rewardCube = (r, i) => {
 };
 const rewardsTab = () => shell('rewards', `<div class="vx-sky"></div>
   <section class="vx-panel vx-shelf"><h2>Мої нагороди <small>${REWARDS.filter((r) => r.got).length} з ${REWARDS.length}</small></h2>
-  <div class="vx-grid">${REWARDS.map((r, i) => `<div class="vx-reward ${r.got ? 'is-got' : ''}">${rewardCube(r, i)}<span>${r.name}</span></div>`).join('')}</div></section>`);
+  <div class="vx-grid">${REWARDS.map((r, i) => `<div class="vx-reward ${r.got ? 'is-got' : ''}">${rewardCube(r, i)}<span>${r.name}</span>${rewardNote(r)}</div>`).join('')}</div></section>`);
 
 
 // Рамка для екранів вступного тесту: тло, «Додому» і панель світу; вміст (inner) малює спільний код
@@ -203,3 +205,11 @@ export const screen = (tab, ctx) => {
   useCtx(ctx);
   try { return ({ world: worldTab, avatar: avatarTab, type: typeTab, lesson: typeTab, rewards: rewardsTab }[tab] ?? worldTab)(); } finally { [C, PLAYER, WORLDS, QUESTS, REWARDS, av] = saved; }
 };
+
+// Після вправи: оновити рівень і смугу досвіду на екрані, не перемальовуючи його
+export function setXp(root, { level, xp, xpMax }) {
+  root.querySelectorAll('[data-level]').forEach((e) => { e.textContent = level; });
+  root.querySelectorAll('[data-xp-text]').forEach((e) => { e.textContent = `${xp} / ${xpMax}`; });
+  const f = (xp / xpMax) * 10;
+  root.querySelectorAll('.vx-seg i').forEach((el, i) => { el.className = i < Math.floor(f) ? 'on' : i < f ? 'half' : ''; });
+}
