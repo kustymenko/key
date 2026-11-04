@@ -41,11 +41,11 @@ export const settingsRows = (cls, ctx) => ctx.demo ? '' : `
 export const playBar = (cls, ctx) => {
   if (ctx.demo || !ctx.states) return '';
   const n = ctx.next;
-  const label = n ? `${n.quick ? 'Швидка перевірка · ' : ''}Урок ${n.id} · ${n.title}` : 'Усі уроки цієї мови пройдено';
+  const label = n ? `${n.quick ? 'Швидка перевірка · ' : ''}Урок ${n.id} · ${n.title}` : ctx.challenge?.open ? 'Випробування на час · 2 хвилини' : 'Усі уроки цієї мови пройдено';
   const lang = ['ua', 'en'].map((l) => `<button class="pb-lang" data-set-layout="${l}" aria-pressed="${ctx.layout === l}">${l === 'ua' ? 'УКР' : 'ENG'}</button>`).join('');
   return `<div class="pb ${cls}-play"><div class="pb-text"><small>${n ? 'Далі' : 'Чудово'}</small><b>${label}</b></div>
     <div class="pb-langs" role="group" aria-label="Мова курсу">${lang}</div>
-    ${n ? `<a class="pb-go" href="#teen/lesson">Грай</a>` : ''}<div class="pb-links"><a class="pb-list" href="#teen/lessons">Усі уроки</a><a class="pb-list" href="#teen/worlds">Світи</a></div></div>`;
+    ${n ? `<a class="pb-go" href="#teen/lesson">Грай</a>` : ctx.challenge?.open ? `<a class="pb-chal" href="#teen/challenge">Випробування</a>` : ''}<div class="pb-links"><a class="pb-list" href="#teen/lessons">Усі уроки</a><a class="pb-list" href="#teen/worlds">Світи</a></div></div>`;
 };
 
 // Кнопка «сховати» біля помічника

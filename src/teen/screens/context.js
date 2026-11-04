@@ -3,6 +3,7 @@ import { levelInfo, DEFAULT_HERO, pickTip } from '../logic/profile.js';
 import { emptyProgress, sampleProgress } from '../logic/stub.js';
 import { lessonStates, currentLesson, worldsFromLessons } from '../logic/progress.js';
 import { questsView, rewardsOf, coinsOf, heroLocks } from '../logic/game.js';
+import { challengeOpen, gradeOf, goalsOf } from '../logic/challenge.js';
 import { esc } from '../../screens/common.js';
 
 const hrefFor = (base) => (tab) => base + (tab === 'world' ? '' : `/${tab}`);
@@ -16,7 +17,7 @@ export function teenContext(profile, extra = {}) {
   const layout = profile.layout === 'en' ? 'en' : 'ua';
   const states = lessonStates(layout, profile);
   const progress = emptyProgress();
-  progress.worlds = worldsFromLessons(layout, states);
+  progress.worlds = worldsFromLessons(layout, states, profile.challenge?.rec?.[layout]);
   progress.quests = questsView(profile); // завдання дня (одні й ті самі протягом доби)
   progress.rewards = rewardsOf(profile); // колекція: відкриті й закриті з підказками
   return {
@@ -31,6 +32,7 @@ export function teenContext(profile, extra = {}) {
     progress,
     layout,
     states,
+    challenge: { open: challengeOpen(profile, layout), rec: profile.challenge?.rec?.[layout] ?? null, goals: goalsOf(gradeOf(profile.level)) }, // випробування на час (Етап Т7)
     next: currentLesson(states), // поточний урок швидкого курсу (або null, якщо літерні уроки пройдено)
     ...extra,
   };

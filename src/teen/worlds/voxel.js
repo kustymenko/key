@@ -173,9 +173,9 @@ const typeTab = () => {
   const L = C.lesson; // екран уроку швидкого курсу (null — пробна вправа на демо-сторінці)
   return shell('type', `<div class="vx-sky vx-calm">${typeDeco()}</div>
   <div class="vx-task"><div class="vx-task-top"><span class="vx-task-title">${cubeIcon('#9aa3ad')}${L ? L.heading : 'Вправа: «Нові землі»'}</span>
-    <span class="vx-stat">Точність <b data-acc>—</b></span><span class="vx-stat">Знаків за хвилину <b data-speed>—</b></span>${L ? hintToggle() : ''}</div>
+    <span class="vx-stat">Точність <b data-acc>—</b></span><span class="vx-stat">Знаків за хвилину <b data-speed>—</b></span>${L && !L.challenge ? hintToggle() : ''}</div>
     <div class="vx-xpbar"><div ${L ? 'data-bar' : 'data-xp-fill'} style="width:${L ? 0 : (PLAYER.xp / PLAYER.xpMax) * 100}%"></div></div>
-    ${L ? lessonBody() : taskText()}
+    ${L ? lessonBody(L) : taskText()}
     <div class="vx-msg" data-msg></div>
     <div class="vx-done" data-done hidden>${L ? lessonDone() : `${doneCube}<div class="vx-done-text"><b>Вправу пройдено!</b>
       <div class="vx-chips"><span>Точність <b data-done-acc></b></span><span>Знаків за хвилину <b data-done-speed></b></span></div></div>

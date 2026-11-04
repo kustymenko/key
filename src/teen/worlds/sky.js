@@ -135,9 +135,9 @@ const doneCrystal = `<svg viewBox="0 0 60 76" width="70" height="86" aria-hidden
 
 const typeTab = () => {
   const L = C.lesson;
-  return shell('type', `${typeDeco()}<div class="sk-task"><div class="sk-task-top"><span class="sk-task-title">${L ? L.heading : 'Вправа «Нові землі»'}</span><span>Точність <b data-acc>—</b></span><span>Знаків за хвилину <b data-speed>—</b></span>${L ? hintToggle() : `<span data-xp-text class="sk-xpt">${PLAYER.xp} / ${PLAYER.xpMax}</span>`}</div>
+  return shell('type', `${typeDeco()}<div class="sk-task"><div class="sk-task-top"><span class="sk-task-title">${L ? L.heading : 'Вправа «Нові землі»'}</span><span>Точність <b data-acc>—</b></span><span>Знаків за хвилину <b data-speed>—</b></span>${L ? (L.challenge ? '' : hintToggle()) : `<span data-xp-text class="sk-xpt">${PLAYER.xp} / ${PLAYER.xpMax}</span>`}</div>
   <div class="sk-bar"><div ${L ? 'data-bar' : 'data-xp-fill'} style="width:${L ? 0 : (PLAYER.xp / PLAYER.xpMax) * 100}%"></div></div>
-  ${L ? lessonBody() : taskText()}<div class="sk-msg" data-msg></div>
+  ${L ? lessonBody(L) : taskText()}<div class="sk-msg" data-msg></div>
   <div class="sk-done" data-done hidden>${L ? lessonDone() : `${doneCrystal}<div class="sk-done-text"><b>Вправу пройдено!</b><div class="sk-chips"><span>Точність <b data-done-acc></b></span><span>Знаків за хвилину <b data-done-speed></b></span></div></div><button class="sk-btn" data-again>Ще раз</button>`}</div></div>
   ${keysPanel({ layout: L ? L.layout : 'ua', demo: !L, numRow: !!L?.numRow })}`);
 };

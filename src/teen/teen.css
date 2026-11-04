@@ -181,8 +181,8 @@ button.cm-link { background: transparent; border: 0; cursor: pointer; }
 .pb-langs { display: flex; gap: 4px; }
 .pb-lang { min-width: 52px; min-height: 44px; padding: 0 8px; border: 3px solid currentColor; border-radius: 10px; background: transparent; color: inherit; font: 800 17px var(--font); cursor: pointer; }
 .pb-lang[aria-pressed='true'] { background: var(--pb-accent, #2b3a4a); border-color: var(--pb-accent, #2b3a4a); color: var(--pb-ink, #fff); }
-.pb-go, .pb-list { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; padding: 0 18px; border: 3px solid currentColor; border-radius: 10px; color: inherit; text-decoration: none; font: 800 20px var(--font); white-space: nowrap; }
-.pb-go { background: var(--pb-accent, #2b3a4a); border-color: var(--pb-accent, #2b3a4a); color: var(--pb-ink, #fff); }
+.pb-go, .pb-chal, .pb-list { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; padding: 0 18px; border: 3px solid currentColor; border-radius: 10px; color: inherit; text-decoration: none; font: 800 20px var(--font); white-space: nowrap; }
+.pb-go, .pb-chal { background: var(--pb-accent, #2b3a4a); border-color: var(--pb-accent, #2b3a4a); color: var(--pb-ink, #fff); }
 .pb-list { padding: 0 12px; font-size: 17px; border-color: transparent; text-decoration: underline; }
 
 /* Картка уроку: поточний рядок великий, наступний дрібніший; підказка внизу окремим рядком */
@@ -247,3 +247,20 @@ button.cm-link { background: transparent; border: 0; cursor: pointer; }
 .ld-new span { border: 2px solid currentColor; border-radius: 10px; padding: 1px 10px; font-size: 17px; font-weight: 800; }
 .ld-new .is-lvl { background: var(--pb-accent, #2b3a4a); border-color: var(--pb-accent, #2b3a4a); color: var(--pb-ink, #fff); }
 .cn-pixel .ld-new span { border-radius: 0; }
+
+/* ---------- Випробування на час (Етап Т7): спокійний таймер, цілі, медалі. Форма, а не колір; на екрані з клавіатурою яскраві лише пальці ---------- */
+.ll-time { justify-self: end; font: 800 28px/1 var(--font); font-variant-numeric: tabular-nums; opacity: .75; margin-top: 4px; }
+.cn-voxel .ll-time { font-family: 'Rubik', sans-serif; }
+.cn-sky .ll-time { font-family: 'Exo 2', sans-serif; }
+.ch-goals { list-style: none; display: grid; gap: 4px; padding: 0; margin: 0; }
+.ch-goals li { display: flex; align-items: center; gap: 10px; opacity: .8; }
+.ch-goals li.is-got { opacity: 1; }
+.ch-goals b { margin-right: 6px; }
+.ch-goals { grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 980px; }
+.ch-goals li { align-items: center; padding: 6px 12px; border: 2px solid currentColor; border-radius: 10px; font-size: 18px; line-height: 1.2; }
+.cn-pixel .ch-goals li { border-radius: 0; }
+.cn-sky .ch-goals li { border-radius: 18px; }
+.ch-goals b { display: block; margin: 0; font-size: 20px; }
+.ch-p { font-size: 18px; line-height: 1.25; max-width: 980px; }
+.ch-head { display: flex; align-items: center; gap: 10px; }
+.ch-head .ld-stars { display: inline-flex; }

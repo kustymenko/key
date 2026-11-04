@@ -296,7 +296,7 @@ describe('екрани: світ, світи, нагороди, герой у к
     const html = teenScreen({ tab: 'worlds' }, p);
     expect(html).toContain('Пройдено');
     expect(html).toContain('Ти тут');
-    expect(html).toContain('Відкриється з випробуваннями');
+    expect(html).toContain('Спершу пройди «Цифровий ліс»'); // Т7: «Вершина швидкості» відкривається після всього курсу
   });
   it('нагороди з підказками: закриті — «як отримати», відкриті — «Є!» або предмет; у кожному світі', () => {
     for (const w of WORLD_IDS) {
