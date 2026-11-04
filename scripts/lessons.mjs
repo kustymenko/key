@@ -1,4 +1,5 @@
-// Етап Т3: швидкий курс 5–6 класів наскрізь у кожному світі: node scripts/lessons.mjs
+// Етап Т3: швидкий курс 5–6 класів (літерні уроки й Shift) наскрізь у кожному світі: node scripts/lessons.mjs
+// Уроки знаків, апострофа, Ґ і абзаців (Етап Т4) перевіряє scripts/marks.mjs
 // Проходить усі уроки обох мов, перевіряє розміщення (з нуля / швидка перевірка / досвідчений / перехід з 3–4), провал без запису, знімки.
 import { chromium } from 'playwright';
 import { mkdirSync, existsSync } from 'node:fs';
@@ -91,7 +92,8 @@ for (const [w, h] of [[1366, 768], [1920, 1080]]) {
       const done = (await store())[i].teen[layout];
       ok(Object.keys(done).length === count && Object.values(done).every((x) => x.stars === 3), `${world} ${layout}: не всі уроки записано (${JSON.stringify(done)})`);
       await page.goto(`${base}#teen`); await page.waitForTimeout(100);
-      ok((await page.locator('.pb-go').count()) === 0, `${world} ${layout}: після курсу немає лишитись кнопки «Грай»`);
+      // після літерних уроків (Т3) далі йдуть уроки знаків (Т4): кнопка «Грай» веде на наступний урок
+      ok((await page.locator('.pb-go').count()) === 1, `${world} ${layout}: після літерних уроків «Грай» має вести на уроки знаків`);
       await shot(`${world}-${layout}-course-done`);
     }
     await open(i, 'teen/lessons'); await shot(`${world}-lessons`); await check(`${world}/lessons`);
@@ -115,7 +117,7 @@ for (const [w, h] of [[1366, 768], [1920, 1080]]) {
   await seed([profileFor(0, { placement: { kind: 'pro', source: 'test', at: 1 } })]);
   await open(0, 'teen/lessons');
   const states = await page.$$eval('.lg-card', (c) => c.map((x) => x.className.match(/is-(\w+)/)[1]));
-  ok(states.join() === 'credited,credited,credited,credited,credited,credited,credited,current', `pro: стани уроків ${states.join()}`);
+  ok(states.join().startsWith('credited,credited,credited,credited,credited,credited,credited,current,locked'), `pro: стани уроків ${states.join()}`);
   // 3б. «Середній»: швидка перевірка — без знайомства, одна вправа; успіх → зараховано, невдача → повний урок
   await seed([profileFor(0, { placement: { kind: 'mid', source: 'test', at: 1 } })]);
   await open(0, 'teen/lesson');

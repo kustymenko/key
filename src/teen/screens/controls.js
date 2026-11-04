@@ -34,7 +34,7 @@ export const settingsRows = (cls, ctx) => ctx.demo ? '' : `
 export const playBar = (cls, ctx) => {
   if (ctx.demo || !ctx.states) return '';
   const n = ctx.next;
-  const label = n ? `${n.quick ? 'Швидка перевірка · ' : ''}Урок ${n.id} · ${n.title}` : 'Літерні уроки пройдено';
+  const label = n ? `${n.quick ? 'Швидка перевірка · ' : ''}Урок ${n.id} · ${n.title}` : 'Усі уроки цієї мови пройдено';
   const lang = ['ua', 'en'].map((l) => `<button class="pb-lang" data-set-layout="${l}" aria-pressed="${ctx.layout === l}">${l === 'ua' ? 'УКР' : 'ENG'}</button>`).join('');
   return `<div class="pb ${cls}-play"><div class="pb-text"><small>${n ? 'Далі' : 'Чудово'}</small><b>${label}</b></div>
     <div class="pb-langs" role="group" aria-label="Мова курсу">${lang}</div>

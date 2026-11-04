@@ -191,3 +191,16 @@ button.cm-link { background: transparent; border: 0; cursor: pointer; }
 .cn-voxel .pl-panel, .cn-voxel .pb { --pb-accent: #2a2f3d; --pb-ink: #fff; }
 .cn-pixel .pl-panel { --pb-accent: #ff5fa2; --pb-ink: #14122a; }
 .cn-sky .pl-panel { --pb-accent: #7ad9ff; --pb-ink: #0b1030; }
+
+/* ---------- Уроки знаків (Етап Т4): ряд цифр, Alt Gr, підписи символів у кутах клавіш ---------- */
+.cn .keys-panel.has-numrow .kb { gap: 6px; }
+.cn .keys-panel.has-numrow .kb-row { gap: 6px; }
+.cn .keys-panel.has-numrow .key { --h: 50px; font-size: 22px; }
+.cn .keys-panel.has-numrow .key.is-next { font-size: 26px; }
+.cn .keys-panel.has-numrow .key.is-service { font-size: 16px; }
+.key-sub { position: absolute; top: 2px; right: 5px; font-size: 14px; line-height: 1; font-weight: 800; color: var(--ink, #1b2430); opacity: .72; pointer-events: none; }
+.key.is-next .key-sub { opacity: 1; }
+.cn .keys-panel .key.is-altgr { flex: 0 0 13%; font-size: 15px; }
+.li-key.has-how { height: auto; min-height: 56px; padding: 6px 14px; gap: 0; align-content: center; }
+.li-key.has-how small { font-size: 16px; font-weight: 700; opacity: .85; white-space: nowrap; }
+.ll-ch { min-width: .6em; text-align: center; }

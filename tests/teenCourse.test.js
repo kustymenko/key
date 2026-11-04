@@ -8,6 +8,7 @@ import { teenScreen, teenRoute } from '../src/teen/screens/index.js';
 import { WORLD_IDS } from '../src/teen/logic/profile.js';
 import { codeOfChar } from '../src/keyboard/layouts.js';
 import { fingerOf } from '../src/keyboard/fingers.js';
+import { normChar } from '../src/keyboard/chars.js';
 
 const seeded = (seed = 11) => () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
 const memory = () => { const m = new Map(); return { getItem: (k) => m.get(k) ?? null, setItem: (k, v) => m.set(k, String(v)), removeItem: (k) => m.delete(k) }; };
@@ -27,9 +28,9 @@ describe('курс: дані', () => {
       });
     }
   });
-  it('УКР: усі 33 літери клавіатури вивчаються за курс', () => {
+  it('УКР: усі 33 літери клавіатури та Ґ (Етап Т4) вивчаються за курс', () => {
     const all = new Set(TEEN_COURSE.ua.flatMap((l) => l.letters).filter((c) => !isPunctKey(c)));
-    expect([...all].sort().join('')).toBe([...'йцукенгшщзхїфівапролджєячсмитьбю'].sort().join(''));
+    expect([...all].sort().join('')).toBe([...'йцукенгшщзхїфівапролджєячсмитьбюґ'].sort().join(''));
   });
   it('EN: усі 26 літер', () => {
     const all = TEEN_COURSE.en.flatMap((l) => l.letters).filter((c) => !isPunctKey(c));
@@ -45,17 +46,17 @@ describe('генератор: лише вивчені клавіші', () => {
     for (const layout of LAYOUTS) for (const lesson of TEEN_COURSE[layout]) for (let s = 1; s <= 25; s++) {
       const known = learnedKeys(layout, lesson.id);
       const b = buildTeenLesson({ layout, id: lesson.id, rng: seeded(s) });
-      expect(b.steps.filter((x) => x.kind === 'drill')).toHaveLength(3);
+      expect(b.steps.filter((x) => x.kind === 'drill')).toHaveLength(lesson.kind === 'paragraph' ? 2 : 3);
       for (const step of b.steps) {
         if (step.kind === 'intro') continue;
-        for (const ch of step.text) expect(known.has(ch.toLowerCase()), `${layout} урок ${lesson.id}: «${ch}» у «${step.text}»`).toBe(true);
-        // великі літери — лише після уроку про Shift
-        if (lesson.kind !== 'shift') expect(step.text, `${layout} ${lesson.id}`).toBe(step.text.toLowerCase());
+        for (const ch of step.text) expect(known.has(normChar(ch).toLowerCase()), `${layout} урок ${lesson.id}: «${ch}» у «${step.text}»`).toBe(true);
+        // великі літери — лише після уроку про Shift (уроки знаків ідуть після нього)
+        if (['letters', 'review'].includes(lesson.kind)) expect(step.text, `${layout} ${lesson.id}`).toBe(step.text.toLowerCase());
       }
     }
   });
   it('довжини вправ: 40–60, 70–90, 100–120; остання без підказки', () => {
-    for (const layout of LAYOUTS) for (const lesson of TEEN_COURSE[layout]) for (let s = 1; s <= 10; s++) {
+    for (const layout of LAYOUTS) for (const lesson of TEEN_COURSE[layout].filter((l) => ['letters', 'review', 'shift'].includes(l.kind))) for (let s = 1; s <= 10; s++) {
       const drills = buildTeenLesson({ layout, id: lesson.id, rng: seeded(s) }).steps.filter((x) => x.kind === 'drill');
       drills.forEach((d, i) => {
         expect(d.text.length, `${layout} ${lesson.id} вправа ${i + 1}: ${d.text.length}`).toBeGreaterThanOrEqual(DRILL_RANGES[i][0] - 2);
@@ -119,14 +120,17 @@ describe('зірочки й проходження', () => {
 describe('стани уроків і розміщення', () => {
   const states = (layout, teen = {}, placement = null) => lessonStates(layout, { teen, placement }).map((l) => l.state).join();
   it('без розміщення: перший урок поточний, решта закриті; по черзі відкриваються', () => {
-    expect(states('ua')).toBe('current,locked,locked,locked,locked,locked,locked,locked');
-    expect(states('ua', { ua: { 1: { stars: 2 }, 2: { stars: 3 } } })).toBe('done,done,current,locked,locked,locked,locked,locked');
-    expect(states('en', { en: { 1: { stars: 1 } } })).toBe('done,current,locked,locked,locked,locked,locked');
+    const row = (layout, head) => [...head, ...Array(TEEN_COURSE[layout].length - head.length).fill('locked')].join();
+    expect(states('ua')).toBe(row('ua', ['current']));
+    expect(states('ua', { ua: { 1: { stars: 2 }, 2: { stars: 3 } } })).toBe(row('ua', ['done', 'done', 'current']));
+    expect(states('en', { en: { 1: { stars: 1 } } })).toBe(row('en', ['done', 'current']));
   });
   it('«досвідчений»: літерні уроки зараховані, лишається Shift', () => {
-    expect(states('ua', {}, { kind: 'pro' })).toBe('credited,credited,credited,credited,credited,credited,credited,current');
-    expect(states('en', {}, { kind: 'pro' })).toBe('credited,credited,credited,credited,credited,credited,current');
+    const row = (layout, head) => [...head, ...Array(TEEN_COURSE[layout].length - head.length).fill('locked')].join();
+    expect(states('ua', {}, { kind: 'pro' })).toBe(row('ua', [...Array(7).fill('credited'), 'current'])); // уроки знаків (9+) не зараховуються розміщенням
+    expect(states('en', {}, { kind: 'pro' })).toBe(row('en', [...Array(6).fill('credited'), 'current']));
     expect(lastLetterLesson('ua')).toBe(7);
+    expect(lastLetterLesson('en')).toBe(6);
   });
   it('«середній»: швидка перевірка для уроків 1–6; Shift звичайним', () => {
     const q = lessonStates('ua', { teen: {}, placement: { kind: 'mid' } });
@@ -142,10 +146,10 @@ describe('стани уроків і розміщення', () => {
     expect([...creditedIds('ua', learned(''))]).toEqual([]);
     const all = [...'йцукенгшщзхїфівапролджєячсмитьбю'];
     expect([...creditedIds('ua', learned(all.join('')))]).toEqual([1, 2, 3, 4, 5, 6, 7]); // Shift-урок не зараховується
-    expect(states('ua', {}, learned('фівaолджaо'.replace(/a/g, 'а')))).toBe('credited,current,locked,locked,locked,locked,locked,locked');
+    expect(states('ua', {}, learned('фівaолджaо'.replace(/a/g, 'а'))).startsWith('credited,current,locked')).toBe(true);
   });
   it('пройдений урок має пріоритет, закритий не відкривається раніше часу', () => {
-    expect(states('ua', { ua: { 3: { stars: 3 } } })).toBe('current,locked,done,locked,locked,locked,locked,locked');
+    expect(states('ua', { ua: { 3: { stars: 3 } } }).startsWith('current,locked,done,locked,locked')).toBe(true);
   });
 });
 
@@ -156,7 +160,7 @@ describe('карта світів за уроками', () => {
     expect(w('ua', { ua: { 1: { stars: 3 } } })).toBe('now50 locked0 locked0 locked0 locked0 locked0');
     expect(w('ua', { ua: { 1: { stars: 3 }, 2: { stars: 3 }, 3: { stars: 3 } } })).toBe('done100 now50 locked0 locked0 locked0 locked0');
     const all = Object.fromEntries([1, 2, 3, 4, 5, 6, 7, 8].map((i) => [i, { stars: 3 }]));
-    expect(w('ua', { ua: all })).toBe('done100 done100 done100 locked0 locked0 locked0');
+    expect(w('ua', { ua: all })).toBe('done100 done100 done100 locked0 now0 locked0'); // «Місто знаків» (уроки знаків) відкривається після літер
   });
 });
 
@@ -224,7 +228,7 @@ describe('екрани уроку в усіх трьох світах', () => {
     st.update(p.id, { placement: { kind: 'zero', source: 'skip', at: 1 } });
     const html = teenScreen(teenRoute('teen/lesson/7'), st.get(p.id));
     expect(html).toMatch(/урок 1/i);
-    for (const i of [1, 2, 3, 4, 5, 6, 7, 8]) st.finishTeenLesson(p.id, { layout: 'ua', lessonId: i, stars: 3, acc: 99, cpm: 100 });
+    for (const i of TEEN_COURSE.ua.map((l) => l.id)) st.finishTeenLesson(p.id, { layout: 'ua', lessonId: i, stars: 3, acc: 99, cpm: 100 });
     expect(teenScreen(teenRoute('teen'), st.get(p.id))).not.toContain('pb-go');
   });
 });

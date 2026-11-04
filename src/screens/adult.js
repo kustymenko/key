@@ -4,6 +4,7 @@ import { icons } from '../design/icons.js';
 import { btn, homeButton, esc } from './common.js';
 import { heroIconOf } from '../teen/worlds/index.js';
 import { isTeen, homeRoute } from '../teen/logic/profile.js';
+import { getLaptopFlag, setLaptopFlag, YO_FLAG } from '../storage/laptop.js';
 
 export const adultScreen = () => '<div class="screen screen-adult theme-warm" data-adult></div>';
 
@@ -29,6 +30,15 @@ export function mountAdult(root, state) {
     screen.querySelector('.sum-input').focus();
   }
 
+  // Підказка про ноутбук: замість апострофа друкується «ё» (стара розкладка Windows XP). З'являється лише після такого випадку в уроці
+  function yoNote() {
+    if (!getLaptopFlag(YO_FLAG)) return '';
+    return `<div class="adult-block adult-warn" role="note"><span class="adult-label">Клавіатура цього ноутбука</span>
+      <p>Замість апострофа тут друкується «ё». Це стара розкладка (як у Windows XP), через неї уроки з апострофом не вийдуть.
+      Варто змінити розкладку: у налаштуваннях мови Windows додайте до української стандартну клавіатуру «Українська», а стару приберіть. Якщо не виходить, попросіть вчителя інформатики.</p>
+      ${btn({ label: 'Зрозуміло, не нагадувати', icon: 'check', kind: 'light', attrs: 'data-act="clear-yo"' })}</div>`;
+  }
+
   function panel(msg = '') {
     const prof = p();
     if (!prof) { state.go(''); return; }
@@ -39,6 +49,7 @@ export function mountAdult(root, state) {
         <div class="segmented" role="group" aria-label="Клас">
           ${['1-2', '3-4', '5', '6'].map((l) => `<button class="btn seg" data-set-level="${l}" aria-pressed="${prof.level === l}">${l === '5' || l === '6' ? `${l} клас` : `${l.replace('-', '–')} клас`}</button>`).join('')}
         </div></div>
+      ${yoNote()}
       <div class="row">
         ${btn({ label: 'Скинути прогрес', icon: 'replay', kind: 'light', attrs: 'data-ask="reset"' })}
         ${btn({ label: 'Видалити картку', icon: 'trash', kind: 'light', attrs: 'data-ask="delete"' })}
@@ -66,6 +77,7 @@ export function mountAdult(root, state) {
     if (!b) return;
     if (b.dataset.act === 'check') return check();
     if (b.dataset.act === 'cancel') return screen.querySelector('.confirm-layer')?.remove();
+    if (b.dataset.act === 'clear-yo') { setLaptopFlag(YO_FLAG, false); return panel(); }
     if (b.dataset.ask) return confirm(b.dataset.ask);
     if (b.dataset.setLevel) {
       if (b.dataset.setLevel === p().level) return;

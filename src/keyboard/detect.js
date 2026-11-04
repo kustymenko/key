@@ -22,8 +22,14 @@ const SCRIPT_OF_LAYOUT = { ua: 'cyr', en: 'lat' };
  *  'wrong-layout' — літера не того алфавіту (НЕ помилка: показуємо «Перемкни мову»);
  *  'other'        — цифра, розділовий знак, пробіл, Enter тощо.
  */
-export function classifyKey(e, layout) {
-  if (e.repeat || e.ctrlKey || e.altKey || e.metaKey) return 'ignore';
+// AltGr: правий Alt. У Windows його подія має ще й ctrlKey + altKey, тому окремо перевіряємо, що надруковано символ
+export const isAltGr = (e) =>
+  !!(e.getModifierState?.('AltGraph') || (e.ctrlKey && e.altKey && typeof e.key === 'string' && [...e.key].length === 1));
+
+// altGr: true — AltGr + літера (Ґ) вважається звичайним введенням, а не комбінацією клавіш (лише для 5–6 класів)
+export function classifyKey(e, layout, { altGr = false } = {}) {
+  const viaAltGr = altGr && isAltGr(e);
+  if (e.repeat || e.metaKey || (!viaAltGr && (e.ctrlKey || e.altKey))) return 'ignore';
   if (MODIFIERS.has(e.key)) return 'ignore';
   const script = scriptOf(e.key);
   if (!script) return 'other';
