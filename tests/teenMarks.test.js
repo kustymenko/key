@@ -342,11 +342,11 @@ describe('курс знаків: уроки і генератор', () => {
   it('після Shift-уроку відкривається «Місто знаків»; знаки йдуть по черзі', () => {
     const done = (layout, upTo) => Object.fromEntries(TEEN_COURSE[layout].filter((l) => l.id <= upTo).map((l) => [l.id, { stars: 2 }]));
     const w = (layout, upTo) => worldsFromLessons(layout, lessonStates(layout, { teen: { [layout]: done(layout, upTo) } })).map((x) => `${x.state}${x.pct}`).join(' ');
-    expect(w('ua', 8)).toBe('done100 done100 done100 locked0 now0 locked0');
-    expect(w('ua', 13)).toBe('done100 done100 done100 locked0 now50 locked0');
-    expect(w('ua', 18)).toBe('done100 done100 done100 locked0 done100 locked0');
-    expect(w('en', 7)).toBe('done100 done100 done100 locked0 now0 locked0');
-    expect(w('en', 15)).toBe('done100 done100 done100 locked0 done100 locked0');
+    expect(w('ua', 8)).toBe('done100 done100 done100 now0 locked0 locked0');
+    expect(w('ua', 13)).toBe('done100 done100 done100 now50 locked0 locked0');
+    expect(w('ua', 18)).toBe('done100 done100 done100 done100 now0 locked0');
+    expect(w('en', 7)).toBe('done100 done100 done100 now0 locked0 locked0');
+    expect(w('en', 15)).toBe('done100 done100 done100 done100 now0 locked0');
   });
 });
 

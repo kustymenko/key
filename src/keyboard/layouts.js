@@ -59,6 +59,8 @@ export const SHIFTED = {
   ua: { '!': 'Digit1', '"': 'Digit2', '№': 'Digit3', ';': 'Digit4', '%': 'Digit5', ':': 'Digit6', '?': 'Digit7', '*': 'Digit8', '(': 'Digit9', ')': 'Digit0', ',': 'Slash' },
   en: { '!': 'Digit1', '@': 'Digit2', '#': 'Digit3', $: 'Digit4', '%': 'Digit5', '^': 'Digit6', '&': 'Digit7', '*': 'Digit8', '(': 'Digit9', ')': 'Digit0', ':': 'Semicolon', '"': 'Quote', '?': 'Slash' },
 };
+// Знак + (Етап Т5): Shift + клавіша «=» в обох розкладках; знак = — сама клавіша
+const SHIFTED_EXTRA = { '+': 'Equal' };
 // Символи без Shift, яких немає в підписах основних клавіш: апостроф в українській — клавіша ліворуч від 1
 const PLAIN = { ua: { "'": 'Backquote' }, en: {} };
 // Ґ: правий Alt (AltGr) + Г; велика — AltGr + Shift + Г
@@ -70,6 +72,7 @@ export function codeOfChar(ch, layout) {
   if (ch === ' ') return 'Space';
   if (ch === '\n') return 'Enter';
   if (SHIFTED[layout]?.[ch]) return SHIFTED[layout][ch];
+  if (SHIFTED_EXTRA[ch]) return SHIFTED_EXTRA[ch];
   if (PLAIN[layout]?.[ch]) return PLAIN[layout][ch];
   if (layout === 'ua' && (ch === 'ґ' || ch === 'Ґ')) return GU.code;
   const up = String(ch).toUpperCase();
@@ -78,7 +81,7 @@ export function codeOfChar(ch, layout) {
 
 // Чи треба тримати Shift для символу (велика літера; кома, ? ! : тощо)
 export const needsShift = (ch, layout) =>
-  (ch !== ch.toLowerCase() && ch === ch.toUpperCase()) || SHIFTED[layout]?.[ch] !== undefined;
+  (ch !== ch.toLowerCase() && ch === ch.toUpperCase()) || SHIFTED[layout]?.[ch] !== undefined || SHIFTED_EXTRA[ch] !== undefined;
 
 // Усі клавіші, які треба тримати для символу: основна, Shift (протилежною рукою), AltGr для Ґ.
 // Апостроф у трьох виглядах (' ’ ʼ) — одна клавіша. Порожній масив, якщо клавішу не знайдено.
@@ -96,7 +99,7 @@ export function keysFor(ch, layout) {
 // Показуємо стандартне розташування: апостроф ліворуч від 1 (українська), Ґ на клавіші Г з AltGr,
 // Shift-символи — малим підписом у куті клавіші. Дитяча клавіатура (ROWS) не змінюється.
 const SUB = {
-  ua: { Digit1: '!', Digit2: '"', Digit3: '№', Digit4: ';', Digit5: '%', Digit6: ':', Digit7: '?', Digit8: '*', Digit9: '(', Digit0: ')', Slash: ',', KeyU: 'Ґ' },
+  ua: { Digit1: '!', Digit2: '"', Digit3: '№', Digit4: ';', Digit5: '%', Digit6: ':', Digit7: '?', Digit8: '*', Digit9: '(', Digit0: ')', Equal: '+', Slash: ',', KeyU: 'Ґ' },
   en: { Backquote: '~', Digit1: '!', Digit2: '@', Digit3: '#', Digit4: '$', Digit5: '%', Digit6: '^', Digit7: '&', Digit8: '*', Digit9: '(', Digit0: ')', Minus: '_', Equal: '+', Semicolon: ':', Quote: '"', Slash: '?', Comma: '<', Period: '>' },
 };
 const UA_OVERRIDE = { Backquote: "'" };

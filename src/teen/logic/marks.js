@@ -24,7 +24,7 @@ export const distinctMarks = (text) => MARK_CHARS.filter((m) => m !== '.' && has
 
 // Склеює записи до довжини [min, max]; need — знаки, що обов'язково мають бути; minDistinct — скільки різних знаків
 // avoid — записи, які вже були в цьому уроці (не повторюємо їх у наступних вправах); успішно використані додаються до avoid
-function compose(rng, pool, [min, max], need = [], minDistinct = 0, avoid = new Set()) {
+export function compose(rng, pool, [min, max], need = [], minDistinct = 0, avoid = new Set()) {
   const fresh = pool.filter((e) => e.t.length <= max && !avoid.has(e.t));
   const items = fresh.length ? fresh : pool.filter((e) => e.t.length <= max);
   if (!items.length) return null;
@@ -52,7 +52,7 @@ function compose(rng, pool, [min, max], need = [], minDistinct = 0, avoid = new 
 }
 
 // Запасний варіант, якщо склеїти не вдалося: найкоротший запис із потрібним знаком (тести стежать, щоб цього не траплялось)
-const fallback = (pool, need) => (pool.filter((e) => need.every((m) => hasMark(e.t, m))).sort((a, b) => a.t.length - b.t.length)[0]?.t ?? pool[0]?.t ?? '');
+export const fallback = (pool, need) => (pool.filter((e) => need.every((m) => hasMark(e.t, m))).sort((a, b) => a.t.length - b.t.length)[0]?.t ?? pool[0]?.t ?? '');
 
 // Абзаци для класу, які можна надрукувати вивченими клавішами
 export function paragraphPool(layout, known, grade) {

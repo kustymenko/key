@@ -160,7 +160,7 @@ describe('карта світів за уроками', () => {
     expect(w('ua', { ua: { 1: { stars: 3 } } })).toBe('now50 locked0 locked0 locked0 locked0 locked0');
     expect(w('ua', { ua: { 1: { stars: 3 }, 2: { stars: 3 }, 3: { stars: 3 } } })).toBe('done100 now50 locked0 locked0 locked0 locked0');
     const all = Object.fromEntries([1, 2, 3, 4, 5, 6, 7, 8].map((i) => [i, { stars: 3 }]));
-    expect(w('ua', { ua: all })).toBe('done100 done100 done100 locked0 now0 locked0'); // «Місто знаків» (уроки знаків) відкривається після літер
+    expect(w('ua', { ua: all })).toBe('done100 done100 done100 now0 locked0 locked0'); // «Місто знаків» (уроки знаків) відкривається після літер
   });
 });
 

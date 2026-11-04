@@ -122,7 +122,8 @@ for (const [w, h] of [[1366, 768], [1920, 1080]]) {
       const done = (await store())[i].teen[layout];
       ok(Object.keys(done).length === LAST[layout] && Object.values(done).every((x) => x.stars >= 2), `${world} ${layout}: не всі уроки записано (${Object.keys(done).length} з ${LAST[layout]})`);
       await page.goto(`${base}#teen`); await page.waitForTimeout(100);
-      ok((await page.locator('.pb-go').count()) === 0, `${world} ${layout}: після курсу не має лишитись кнопки «Грай»`);
+      // після уроків знаків (Т4) далі йдуть цифри й символи (Т5): «Грай» веде на перший урок цифр
+      ok((await page.locator('.pb-go').count()) === 1, `${world} ${layout}: після уроків знаків «Грай» має вести на уроки цифр`);
       await shot(`${world}-${layout}-course-done`); await check(`${world}/${layout}/world-done`);
     }
     await open(i, 'teen/lessons'); await shot(`${world}-lessons`); await check(`${world}/lessons`);
