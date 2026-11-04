@@ -145,10 +145,10 @@ const doneStar = `<svg viewBox="0 0 8 8" width="80" height="80" shape-rendering=
 const typeTab = () => {
   const L = C.lesson;
   return shell('type', `<div class="px-ground" aria-hidden="true"></div>
-  <div class="px-task"><div class="px-task-tag">${L ? 'УРОК ' + L.id : 'ЗАВДАННЯ'}</div><div class="px-task-top"><span>${L ? L.title : 'Вправа «Нові землі»'}</span>
-  <span>Точність <b data-acc>—</b></span><span>Знаків за хвилину <b data-speed>—</b></span>${L ? hintToggle() : ''}</div>
+  <div class="px-task"><div class="px-task-tag">${L ? (L.challenge ? 'ВИПРОБУВАННЯ' : 'УРОК ' + L.id) : 'ЗАВДАННЯ'}</div><div class="px-task-top"><span>${L ? L.title : 'Вправа «Нові землі»'}</span>
+  <span>Точність <b data-acc>—</b></span><span>Знаків за хвилину <b data-speed>—</b></span>${L && !L.challenge ? hintToggle() : ''}</div>
   <div class="px-bar"><div ${L ? 'data-bar' : 'data-xp-fill'} style="width:${L ? 0 : (PLAYER.xp / PLAYER.xpMax) * 100}%"></div></div>
-  ${L ? lessonBody() : taskText()}<div class="px-msg" data-msg></div>
+  ${L ? lessonBody(L) : taskText()}<div class="px-msg" data-msg></div>
   <div class="px-done" data-done hidden>${L ? lessonDone() : `${doneStar}<div class="px-done-text"><b>ГОТОВО!</b><div class="px-chips"><span>Точність <b data-done-acc></b></span><span>Знаків за хвилину <b data-done-speed></b></span></div></div><button class="px-btn" data-again>Ще раз</button>`}</div></div>
   ${keysPanel({ layout: L ? L.layout : 'ua', demo: !L, numRow: !!L?.numRow })}`);
 };

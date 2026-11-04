@@ -3,6 +3,7 @@ import { WORLD_IDS, cleanHero } from '../teen/logic/profile.js';
 import { cleanPlacement } from '../teen/logic/placement.js';
 import { cleanTeenProgress } from '../teen/logic/progress.js';
 import { cleanGame, allowedHero, applyRun, snapshot, dayKey } from '../teen/logic/game.js';
+import { cleanChallenge, applyChallenge, gradeOf } from '../teen/logic/challenge.js';
 
 // Профілі й прогрес у localStorage. Кожне звернення — в try/catch:
 // якщо сховище недоступне (приватне вікно, заборона, переповнення), тренажер працює далі, але без збереження.
@@ -49,6 +50,7 @@ export function cleanProfile(p) {
     xp: num(p.xp),
     placement: cleanPlacement(p.placement), // розміщення за вступним тестом (5–6 клас)
     game: cleanGame(p.game), // квести дня, найкращі результати, нагороди (5–6 клас, Етап Т6)
+    challenge: cleanChallenge(p.challenge), // випробування на час 5–6 класів: рекорди, медалі, які тексти вже були (Етап Т7)
     teen: cleanTeenProgress(p.teen), // пройдені уроки швидкого курсу 5–6 класів: { ua: { id: { stars, acc, cpm, by } }, en: {} }
     resume: p.resume && typeof p.resume === 'object' && Array.isArray(p.resume.steps) ? p.resume : null,
   };
@@ -114,6 +116,7 @@ export function createStore(storage = safeStorage()) {
       if (WORLD_IDS.includes(patch.world)) p.world = patch.world;
       if (patch.hero) p.hero = allowedHero(p, cleanHero(patch.hero)); // закриті предмети не приймаються
       if (typeof patch.helperHidden === 'boolean') p.helperHidden = patch.helperHidden;
+      if (typeof patch.challengeOpen === 'boolean') p.challenge.open = patch.challengeOpen; // дорослий відкриває випробування вручну
       if (patch.placement) p.placement = cleanPlacement(patch.placement) ?? p.placement;
       save();
       return p;
@@ -168,6 +171,19 @@ export function createStore(storage = safeStorage()) {
       const res = applyRun(p, { ...run, pass: run.stars > 0 }, today, before);
       save();
       return res;
+    },
+
+    // Випробування на час закінчено: рекорди й медаль, досвід, завдання дня. Нічого не віднімається.
+    // run: { layout, cpm, acc, typed, errors, words, ids (номери речень тексту) }. Повертає { game, out, rec } для екрана результату.
+    finishTeenChallenge(id, run, today = dayKey()) {
+      const p = find(id);
+      if (!p || !LAYOUTS.includes(run.layout) || !['5', '6'].includes(p.level)) return null;
+      const before = snapshot(p);
+      const out = applyChallenge(p.challenge, run.layout, gradeOf(p.level), run);
+      p.challenge.seen = [...p.challenge.seen.filter((x) => !(run.ids ?? []).includes(x)), ...(run.ids ?? [])].slice(-200); // тексти, які вже були
+      const game = applyRun(p, { typed: run.typed, errors: run.errors, acc: run.acc, cpm: run.cpm, words: run.words, steps: 1, pass: false }, today, before);
+      save();
+      return { game, out, rec: { ...p.challenge.rec[run.layout] } };
     },
 
     // Гру зіграно: запам'ятовуємо найкращий результат (порівняння лише з самим собою); record — чи побито

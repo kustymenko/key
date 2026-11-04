@@ -54,20 +54,26 @@ export function lessonStates(layout, { teen = {}, placement = null } = {}) {
 export const currentLesson = (states) => states.find((l) => l.state === 'current') ?? null;
 export const playable = (l) => l.state !== 'locked';
 
-// Шість світів карти йдуть у порядку курсу: літери (3 світи), знаки (Т4), цифри й символи (Т5); «Вершина швидкості» чекає Етапу Т7
+// Шість світів карти йдуть у порядку курсу: літери (3 світи), знаки (Т4), цифри й символи (Т5), «Вершина швидкості» — випробування на час (Т7)
 const WORLD_NAMES = [
   ['Зелена долина', 'Основний ряд'], ['Кам’яні гори', 'Верхній ряд'], ['Піщаний берег', 'Нижній ряд'],
   ['Місто знаків', 'Розділові знаки'], ['Цифровий ліс', 'Цифри й символи'], ['Вершина швидкості', 'Випробування на час'],
 ];
-export function worldsFromLessons(layout, states) {
+export function worldsFromLessons(layout, states, challenge = null) {
   const groups = WORLD_GROUPS[layout];
   let nowSet = false;
   return WORLD_NAMES.map(([name, sub], i) => {
     const ids = groups[i];
     // Закритий світ: підказка, як його відкрити (до 6 слів)
-    const hint = ids?.length ? `Спершу пройди «${WORLD_NAMES[Math.max(0, i - 1)][0]}»` : 'Відкриється з випробуваннями';
+    const hint = `Спершу пройди «${WORLD_NAMES[Math.max(0, i - 1)][0]}»`;
     const range = ids?.length ? (ids.length > 1 ? `Уроки ${ids[0]}–${ids[ids.length - 1]}` : `Урок ${ids[0]}`) : 'Випробування на час';
-    if (!ids?.length) return { name, sub, state: 'locked', pct: 0, hint, range };
+    if (!ids?.length) { // «Вершина швидкості»: відкривається, коли пройдено всі уроки; пройдена — після золота (Етап Т7)
+      if (!nowSet && states.every((l) => l.state === 'done' || l.state === 'credited')) {
+        const medal = challenge?.medal ?? 0;
+        return { name, sub, state: medal >= 3 ? 'done' : 'now', pct: Math.round((medal / 3) * 100), range, medal };
+      }
+      return { name, sub, state: 'locked', pct: 0, hint, range };
+    }
     const mine = states.filter((l) => ids.includes(l.id));
     const finished = mine.filter((l) => l.state === 'done' || l.state === 'credited').length;
     const pct = Math.round((finished / mine.length) * 100);

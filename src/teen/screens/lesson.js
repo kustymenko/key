@@ -16,6 +16,7 @@ import { buildTeenLesson } from '../logic/lessons.js';
 import { toLines } from '../logic/placement.js';
 import { lessonStates, currentLesson, teenStars, QUICK_ACC, PASS_ACC, playable } from '../logic/progress.js';
 import { levelInfo } from '../logic/profile.js';
+import { newHtml } from './lessonView.js';
 
 const LINE = 42; // знаків у рядку тексту
 // Рядки вправи; абзаци (\n) починаються з нового рядка, а кінець абзацу позначається символом ↵ (клавіша Enter)
@@ -204,16 +205,6 @@ export function mountLesson(app, route, state) {
   function nextInfo() {
     const states = lessonStates(layout, profile());
     return { next: currentLesson(states), states };
-  }
-  // Що нового: рівень, виконані завдання, нагороди — одним коротким рядком, без вигуків
-  function newHtml(game) {
-    if (!game) return '';
-    const items = [
-      ...(game.levelUp ? [`<span class="is-lvl">Новий рівень: ${game.levelUp}</span>`] : []),
-      ...(game.quests.length ? [`<span>Завдань: ${game.quests.length} · +${game.bonus}</span>`] : []),
-      ...(game.rewards.length ? [`<span>${game.rewards.length > 1 ? 'Нагороди' : 'Нагорода'}: ${game.rewards.slice(0, 2).map((r) => escText(r.name)).join(', ')}${game.rewards.length > 2 ? ` і ще ${game.rewards.length - 2}` : ''}</span>`] : []),
-    ];
-    return items.length ? `<div class="ld-new">${items.join('')}</div>` : '';
   }
   function resultHtml({ acc, cpm, stars, pass, credited, hard, next, game }) {
     const chips = `<div class="ld-chips"><span>Точність <b>${acc}%</b></span><span>Знаків за хвилину <b>${cpm}</b></span>${game ? `<span>Досвід <b>+${game.gain + game.bonus}</b></span>` : ''}${hard.length ? `<span>Потренуй: <b>${hard.map((c) => c.toUpperCase()).join(', ')}</b></span>` : ''}</div>`;

@@ -49,6 +49,11 @@ export function mountAdult(root, state) {
         <div class="segmented" role="group" aria-label="Клас">
           ${['1-2', '3-4', '5', '6'].map((l) => `<button class="btn seg" data-set-level="${l}" aria-pressed="${prof.level === l}">${l === '5' || l === '6' ? `${l} клас` : `${l.replace('-', '–')} клас`}</button>`).join('')}
         </div></div>
+      ${teen ? `<div class="adult-block"><span class="adult-label">Випробування на час</span>
+        <div class="segmented" role="group" aria-label="Випробування на час">
+          <button class="btn seg" data-act="challenge-open" data-val="0" aria-pressed="${!prof.challenge?.open}">Після всіх уроків</button>
+          <button class="btn seg" data-act="challenge-open" data-val="1" aria-pressed="${!!prof.challenge?.open}">Відкрити зараз</button>
+        </div></div>` : ''}
       ${yoNote()}
       <div class="row">
         ${btn({ label: 'Скинути прогрес', icon: 'replay', kind: 'light', attrs: 'data-ask="reset"' })}
@@ -77,6 +82,7 @@ export function mountAdult(root, state) {
     if (!b) return;
     if (b.dataset.act === 'check') return check();
     if (b.dataset.act === 'cancel') return screen.querySelector('.confirm-layer')?.remove();
+    if (b.dataset.act === 'challenge-open') { state.store.update(state.profileId, { challengeOpen: b.dataset.val === '1' }); return panel(b.dataset.val === '1' ? 'Випробування відкрите для цього учня' : 'Випробування відкриється після всіх уроків'); }
     if (b.dataset.act === 'clear-yo') { setLaptopFlag(YO_FLAG, false); return panel(); }
     if (b.dataset.ask) return confirm(b.dataset.ask);
     if (b.dataset.setLevel) {

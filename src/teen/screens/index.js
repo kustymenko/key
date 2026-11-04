@@ -7,6 +7,7 @@ import { mountTyping } from './typing.js';
 import { worldPickHtml } from './pick.js';
 import { placementScreen, mountPlacement } from './placement.js';
 import { worldsScreen } from './worlds.js';
+import { challengeScreen, mountChallenge } from './challenge.js';
 import { lessonScreen, lessonsListScreen, mountLesson, mountLessonsList } from './lesson.js';
 
 const TAB_IDS = ['world', 'avatar', 'type', 'rewards'];
@@ -16,7 +17,7 @@ export function teenRoute(name) {
   const [root, tab = 'world', arg] = name.split('/');
   if (root !== 'teen') return null;
   if (tab === 'lesson') return arg === undefined || /^\d+$/.test(arg) ? { tab, id: arg === undefined ? null : Number(arg) } : null;
-  return ['pick', 'start', 'test', 'lessons', 'worlds'].includes(tab) || TAB_IDS.includes(tab) ? { tab } : null;
+  return ['pick', 'start', 'test', 'lessons', 'worlds', 'challenge'].includes(tab) || TAB_IDS.includes(tab) ? { tab } : null;
 }
 
 export function teenScreen(route, profile) {
@@ -25,6 +26,7 @@ export function teenScreen(route, profile) {
   if (route.tab === 'lesson') return lessonScreen(profile, route.id);
   if (route.tab === 'lessons') return lessonsListScreen(profile);
   if (route.tab === 'worlds') return worldsScreen(profile);
+  if (route.tab === 'challenge') return challengeScreen(profile);
   return themeOf(profile.world).screen(route.tab, teenContext(profile));
 }
 
@@ -32,6 +34,7 @@ export function teenScreen(route, profile) {
 export function mountTeen(app, route, state) {
   if (route.tab === 'start' || route.tab === 'test') return mountPlacement(app, route, state);
   if (route.tab === 'lesson') return mountLesson(app, route, state);
+  if (route.tab === 'challenge') return mountChallenge(app, route, state);
   if (route.tab === 'lessons') return mountLessonsList(app, state);
   const store = state.store;
   const profile = () => store.get(state.profileId);

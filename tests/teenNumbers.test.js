@@ -55,9 +55,9 @@ describe('курс Т5: уроки цифр і символів', () => {
     const w = (layout, upTo) => worldsFromLessons(layout, lessonStates(layout, { teen: { [layout]: done(layout, upTo) } })).map((x) => `${x.state}${x.pct}`).join(' ');
     expect(w('ua', 18)).toBe('done100 done100 done100 done100 now0 locked0');
     expect(w('ua', 21)).toBe('done100 done100 done100 done100 now50 locked0');
-    expect(w('ua', 24)).toBe('done100 done100 done100 done100 done100 locked0');
+    expect(w('ua', 24)).toBe('done100 done100 done100 done100 done100 now0'); // Т7: усе пройдено — відкрилась «Вершина швидкості»
     expect(w('en', 15)).toBe('done100 done100 done100 done100 now0 locked0');
-    expect(w('en', 21)).toBe('done100 done100 done100 done100 done100 locked0');
+    expect(w('en', 21)).toBe('done100 done100 done100 done100 done100 now0');
   });
   it('учень, що пройшов 18 уроків (до Т5), продовжує з уроку 19 без втрат', () => {
     const teen = { ua: Object.fromEntries(Array.from({ length: 18 }, (_, i) => [i + 1, { stars: 3 }])) };
