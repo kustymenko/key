@@ -8,6 +8,7 @@ import { worldPickHtml } from './pick.js';
 import { placementScreen, mountPlacement } from './placement.js';
 import { worldsScreen } from './worlds.js';
 import { challengeScreen, mountChallenge } from './challenge.js';
+import { boardScreen } from './board.js';
 import { lessonScreen, lessonsListScreen, mountLesson, mountLessonsList } from './lesson.js';
 
 const TAB_IDS = ['world', 'avatar', 'type', 'rewards'];
@@ -17,16 +18,17 @@ export function teenRoute(name) {
   const [root, tab = 'world', arg] = name.split('/');
   if (root !== 'teen') return null;
   if (tab === 'lesson') return arg === undefined || /^\d+$/.test(arg) ? { tab, id: arg === undefined ? null : Number(arg) } : null;
-  return ['pick', 'start', 'test', 'lessons', 'worlds', 'challenge'].includes(tab) || TAB_IDS.includes(tab) ? { tab } : null;
+  return ['pick', 'start', 'test', 'lessons', 'worlds', 'challenge', 'board'].includes(tab) || TAB_IDS.includes(tab) ? { tab } : null;
 }
 
-export function teenScreen(route, profile) {
+export function teenScreen(route, profile, profiles = []) {
   if (route.tab === 'pick' || !profile.world) return worldPickHtml({ back: 'home' });
   if (route.tab === 'start' || route.tab === 'test') return placementScreen(profile);
   if (route.tab === 'lesson') return lessonScreen(profile, route.id);
   if (route.tab === 'lessons') return lessonsListScreen(profile);
   if (route.tab === 'worlds') return worldsScreen(profile);
   if (route.tab === 'challenge') return challengeScreen(profile);
+  if (route.tab === 'board') return boardScreen(profile, profiles); // «Результати»: мій прогрес + п'ятірка ноутбука (якщо не вимкнено)
   return themeOf(profile.world).screen(route.tab, teenContext(profile));
 }
 

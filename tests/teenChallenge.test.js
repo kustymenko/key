@@ -101,7 +101,7 @@ describe('Т7: рекорди нічого не віднімають', () => {
   it('зіпсований запис очищається', () => {
     const c = cleanChallenge({ open: 1, rec: { ua: { runs: -3, medal: 9, bestCpm: 'x', bestAcc: 500 }, en: null }, seen: [3, 'a', -1, 7.5, 9] });
     expect(c.open).toBe(true);
-    expect(c.rec.ua).toEqual({ runs: 0, medal: 0, bestCpm: 0, bestAcc: 100 });
+    expect(c.rec.ua).toEqual({ runs: 0, medal: 0, bestCpm: 0, bestAcc: 100, topCpm: 0, topAcc: 0, hist: [] });
     expect(c.seen).toEqual([3, 9]);
     expect(cleanChallenge(null)).toEqual(emptyChallenge());
   });

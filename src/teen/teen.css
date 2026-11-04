@@ -264,3 +264,34 @@ button.cm-link { background: transparent; border: 0; cursor: pointer; }
 .ch-p { font-size: 18px; line-height: 1.25; max-width: 980px; }
 .ch-head { display: flex; align-items: center; gap: 10px; }
 .ch-head .ld-stars { display: inline-flex; }
+
+/* ---------- Результати (Етап Т8): мій прогрес і п'ятірка ноутбука. Форма, а не колір: свій рядок і остання спроба — в рамці ---------- */
+.bd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 6px 0; align-items: start; }
+.bd-grid.is-solo { grid-template-columns: minmax(0, 760px); }
+.bd-card { border: 3px solid currentColor; border-radius: 12px; padding: 12px 16px; display: grid; gap: 8px; min-width: 0; }
+.cn-pixel .bd-card { border-radius: 0; }
+.cn-sky .bd-card { border-radius: 22px; }
+.bd-h { margin: 0; font-size: 24px; font-weight: 800; line-height: 1.15; }
+.cn-pixel .bd-h { font: 400 15px/1.4 'Press Start 2P', sans-serif; }
+.bd-p { margin: 0; font-size: 18px; line-height: 1.3; }
+.bd-empty { margin: 0; font-size: 18px; opacity: .8; }
+.bd-cap { font-size: 15px; opacity: .75; line-height: 1.2; }
+.bd-chips span { font-size: 16px; padding: 2px 10px; }
+.bd-chips b { font-size: 20px; }
+.bd-bars { list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; align-items: flex-end; }
+.bd-bars li { flex: 1; min-width: 0; display: grid; justify-items: center; gap: 2px; padding: 3px 0; border: 2px solid transparent; border-radius: 8px; font-size: 14px; }
+.bd-bars li.is-last { border-color: currentColor; }
+.bd-bars b { font-size: 16px; }
+.bd-bars i { display: block; width: 70%; background: currentColor; opacity: .55; border-radius: 3px 3px 0 0; }
+.bd-bars li.is-last i { opacity: 1; }
+.bd-rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.bd-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bd-cpm, .bd-acc { white-space: nowrap; }
+.bd-rows li { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto auto; gap: 10px; align-items: baseline; padding: 6px 10px; border: 2px solid currentColor; border-radius: 10px; font-size: 18px; opacity: .9; }
+.cn-pixel .bd-rows li, .cn-pixel .bd-bars li { border-radius: 0; }
+.cn-sky .bd-rows li { border-radius: 16px; }
+.bd-rows li.is-me { border-width: 4px; opacity: 1; font-weight: 800; }
+.bd-place { font-weight: 800; font-size: 22px; }
+.bd-cpm b { font-size: 22px; }
+.bd-acc { min-width: 48px; text-align: right; }
+.ch-link { margin-left: 10px; font-weight: 800; color: inherit; text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }

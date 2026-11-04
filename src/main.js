@@ -37,9 +37,12 @@ import { conceptRoute, conceptScreen, conceptBackdrop, conceptBadge, mountConcep
 import { teenRoute, teenScreen, mountTeen } from './teen/screens/index.js';
 import { backdropOf } from './teen/worlds/index.js';
 import { isTeen } from './teen/logic/profile.js';
+import { setGoalOverrides } from './teen/logic/challenge.js';
+import { getLaptopValue, GOALS_KEY } from './storage/laptop.js';
 import './teen/teen.css';
 
 const app = document.getElementById('app');
+setGoalOverrides(getLaptopValue(GOALS_KEY)); // свої цілі медалей, які вчитель міг змінити в «Для дорослого»
 const freshProgress = () => ({ ua: {}, en: {} });
 // Стан сесії. profileId — яка дитина зараз за комп'ютером (не зберігається: за ноутбук сідають по черзі).
 // Без профілю (лише в демо) прогрес живе в пам'яті вкладки. demo — сторінка для вчителя (#demo).
@@ -136,7 +139,7 @@ function renderTeen(route) {
   if (route.tab === 'type') { state.go('teen/lesson'); return; } // «Друк» веде до поточного уроку швидкого курсу
   const picking = route.tab === 'pick' || !profile.world;
   document.body.style.background = picking ? '#14181f' : backdropOf(profile.world, route.tab);
-  app.innerHTML = `<div class="stage">${teenScreen(route, profile)}</div>`;
+  app.innerHTML = `<div class="stage">${teenScreen(route, profile, state.store.list())}</div>`;
   fitStage();
   unmount = mountTeen(app, route, state);
 }
