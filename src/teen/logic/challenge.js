@@ -14,14 +14,50 @@ export const MEDAL_NAME = { bronze: 'Бронза', silver: 'Срібло', gold
 // Родовий відмінок для фраз «Для бронзи потрібна…»
 const MEDAL_FOR = { bronze: 'бронзи', silver: 'срібла', gold: 'золота' };
 
-// Стартові цілі (чисті знаки за хвилину ТА точність). Після пілоту з класами їх варто уточнити (див. ROADMAP).
+// Стандартні цілі (чисті знаки за хвилину ТА точність). Вчитель може змінити їх у «Для дорослого» (див. setGoalOverrides), стандартні лишаються.
 export const GOALS = {
   5: { bronze: { cpm: 70, acc: 92 }, silver: { cpm: 100, acc: 95 }, gold: { cpm: 130, acc: 97 } },
   6: { bronze: { cpm: 100, acc: 92 }, silver: { cpm: 140, acc: 95 }, gold: { cpm: 180, acc: 97 } },
 };
+// Межі, в яких вчитель може міняти цілі, і крок кнопок «+» і «−»
+export const GOAL_LIMITS = { cpm: { min: 20, max: 400, step: 5 }, acc: { min: 80, max: 100, step: 1 } };
 export const gradeOf = (g) => (String(g) === '6' ? '6' : '5');
-// [{ id, level (1–3), name, cpm, acc }]
-export const goalsOf = (grade) => MEDALS.map((id, i) => ({ id, level: i + 1, name: MEDAL_NAME[id], ...GOALS[gradeOf(grade)][id] }));
+const clamp = (v, { min, max }) => Math.min(max, Math.max(min, Math.round(v)));
+
+// Робить цілі одного класу правильними: числа в межах, а кожна наступна медаль не легша за попередню
+// (швидкість — строго більша, щоб медалі відрізнялись; точність — не менша). Незрозуміле значення замінюється стандартним.
+export function cleanGradeGoals(g, grade) {
+  const std = GOALS[gradeOf(grade)];
+  const out = {};
+  let prev = null;
+  for (const [i, id] of MEDALS.entries()) {
+    const cpmIn = Number.isFinite(g?.[id]?.cpm) ? g[id].cpm : std[id].cpm;
+    const accIn = Number.isFinite(g?.[id]?.acc) ? g[id].acc : std[id].acc;
+    let cpm = clamp(cpmIn, { min: GOAL_LIMITS.cpm.min, max: GOAL_LIMITS.cpm.max - (MEDALS.length - 1 - i) * GOAL_LIMITS.cpm.step }); // запас для наступних медалей
+    let acc = clamp(accIn, GOAL_LIMITS.acc);
+    if (prev) { cpm = Math.max(cpm, prev.cpm + GOAL_LIMITS.cpm.step); acc = Math.max(acc, prev.acc); }
+    out[id] = { cpm, acc };
+    prev = out[id];
+  }
+  return out;
+}
+
+// Свої цілі цього ноутбука: { 5: {bronze:{cpm,acc},…}, 6: {…} } або порожньо. Ставить їх main.js при запуску й екран «Для дорослого».
+let overrides = {};
+export function setGoalOverrides(o) {
+  const next = {};
+  for (const grade of ['5', '6']) if (o?.[grade] && typeof o[grade] === 'object') next[grade] = cleanGradeGoals(o[grade], grade);
+  overrides = next;
+  return overrides;
+}
+export const goalOverrides = () => overrides;
+export const goalsAreCustom = (grade) => !!overrides[gradeOf(grade)];
+export const standardGoals = (grade) => MEDALS.map((id, i) => ({ id, level: i + 1, name: MEDAL_NAME[id], ...GOALS[gradeOf(grade)][id] }));
+// [{ id, level (1–3), name, cpm, acc }] — свої цілі, якщо вчитель їх змінив, інакше стандартні
+export const goalsOf = (grade) => {
+  const g = overrides[gradeOf(grade)] ?? GOALS[gradeOf(grade)];
+  return MEDALS.map((id, i) => ({ id, level: i + 1, name: MEDAL_NAME[id], ...g[id] }));
+};
 
 // Рівень медалі за результатом: 0 — без медалі, 1–3 — бронза/срібло/золото. Потрібні ОБИДВІ умови.
 export function medalFor(grade, cpm, acc) {
@@ -42,7 +78,11 @@ export function goalHint(grade, cpm, acc, level = 0) {
 
 // ---------- Стан у профілі ----------
 const num = (v) => (Number.isFinite(v) && v >= 0 ? v : 0);
-const emptyRec = () => ({ runs: 0, medal: 0, bestCpm: 0, bestAcc: 0 });
+// topCpm/topAcc — найкраща швидкість серед спроб із точністю ≥ 95% (лише вона йде в таблицю лідерів ноутбука);
+// hist — останні спроби (для «Мого прогресу»): { cpm, acc, d (день) }
+const emptyRec = () => ({ runs: 0, medal: 0, bestCpm: 0, bestAcc: 0, topCpm: 0, topAcc: 0, hist: [] });
+export const BOARD_ACC = 95; // у таблицю потрапляє лише результат із точністю не нижче цієї
+export const HIST_MAX = 12;
 export const emptyChallenge = () => ({ open: false, rec: { ua: emptyRec(), en: emptyRec() }, seen: [] });
 
 // Приводить запис зі сховища до безпечного вигляду (зіпсований запис не ламає екран)
@@ -58,6 +98,10 @@ export function cleanChallenge(c) {
       medal: [0, 1, 2, 3].includes(r.medal) ? r.medal : 0,
       bestCpm: Math.min(999, Math.round(num(r.bestCpm))),
       bestAcc: Math.min(100, Math.round(num(r.bestAcc))),
+      topCpm: Math.min(999, Math.round(num(r.topCpm))),
+      topAcc: Math.min(100, Math.round(num(r.topAcc))),
+      hist: (Array.isArray(r.hist) ? r.hist : []).filter((h) => h && Number.isFinite(h.cpm) && Number.isFinite(h.acc) && h.cpm >= 0 && h.acc >= 0)
+        .map((h) => ({ cpm: Math.min(999, Math.round(h.cpm)), acc: Math.min(100, Math.round(h.acc)), d: typeof h.d === 'string' ? h.d.slice(0, 10) : '' })).slice(-HIST_MAX),
     };
   }
   out.seen = Array.isArray(c.seen) ? c.seen.filter((x) => Number.isInteger(x) && x >= 0).slice(-200) : [];
@@ -75,17 +119,20 @@ export function challengeOpen(profile, layout) {
  * Записує результат у рекорди (змінює ch). Нічого не зменшується.
  * Повертає, що нового побачить учень: { medal (рівень цієї спроби), newMedal, newCpm, newAcc, first, short }.
  */
-export function applyChallenge(ch, layout, grade, { cpm, acc, typed }) {
+export function applyChallenge(ch, layout, grade, { cpm, acc, typed }, today = '') {
   const rec = ch.rec[layout];
-  const out = { medal: 0, newMedal: false, newCpm: false, newAcc: false, first: rec.runs === 0, short: typed < MIN_CHARS };
+  const prev = rec.hist[rec.hist.length - 1] ?? null; // минула спроба — для порівняння з собою
+  const out = { medal: 0, newMedal: false, newCpm: false, newAcc: false, first: rec.runs === 0, short: typed < MIN_CHARS, prev };
   if (out.short) return out; // замало знаків: нічого не рахуємо і нічого не віднімаємо
   const level = medalFor(grade, cpm, acc);
   out.medal = level;
   out.newMedal = level > rec.medal;
   if (acc >= RECORD_ACC && cpm > rec.bestCpm) { out.newCpm = !out.first; rec.bestCpm = Math.min(999, Math.round(cpm)); }
   if (acc > rec.bestAcc) { out.newAcc = !out.first; rec.bestAcc = Math.min(100, Math.round(acc)); }
+  if (acc >= BOARD_ACC && (cpm > rec.topCpm || (cpm === rec.topCpm && acc > rec.topAcc))) { rec.topCpm = Math.min(999, Math.round(cpm)); rec.topAcc = Math.min(100, Math.round(acc)); }
   rec.medal = Math.max(rec.medal, level);
   rec.runs += 1;
+  rec.hist = [...rec.hist, { cpm: Math.min(999, Math.round(cpm)), acc: Math.min(100, Math.round(acc)), d: today }].slice(-HIST_MAX);
   return out;
 }
 

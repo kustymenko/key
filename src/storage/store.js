@@ -179,7 +179,7 @@ export function createStore(storage = safeStorage()) {
       const p = find(id);
       if (!p || !LAYOUTS.includes(run.layout) || !['5', '6'].includes(p.level)) return null;
       const before = snapshot(p);
-      const out = applyChallenge(p.challenge, run.layout, gradeOf(p.level), run);
+      const out = applyChallenge(p.challenge, run.layout, gradeOf(p.level), run, today);
       p.challenge.seen = [...p.challenge.seen.filter((x) => !(run.ids ?? []).includes(x)), ...(run.ids ?? [])].slice(-200); // тексти, які вже були
       const game = applyRun(p, { typed: run.typed, errors: run.errors, acc: run.acc, cpm: run.cpm, words: run.words, steps: 1, pass: false }, today, before);
       save();

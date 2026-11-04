@@ -11,6 +11,8 @@ import { icons } from '../../design/icons.js';
 import { playSfx } from '../../audio/sfx.js';
 import { levelInfo } from '../logic/profile.js';
 import { CHALLENGE_MS, MEDAL_NAME, MEDALS, buildChallengeText, challengeOpen, gradeOf, goalsOf, resultLines } from '../logic/challenge.js';
+import { boardLinkLabel } from './board.js';
+import { signed } from '../logic/board.js';
 import { paragraphLines } from './lesson.js';
 import { newHtml } from './lessonView.js';
 
@@ -71,7 +73,7 @@ export function mountChallenge(app, route, state) {
     q('[data-time]').textContent = clock(CHALLENGE_MS);
     q('[data-bar]').style.width = '0%';
     q('[data-ld]').innerHTML = `<div class="ld-main"><ul class="ch-goals" aria-label="Цілі: медаль за швидкість і точність разом">${goals}</ul>
-      <p class="ld-p ch-p">${best} Точність важливіша: друкуй чисто. Підказок немає. Таймер почнеться з першої літери.</p></div>
+      <p class="ld-p ch-p">${best} Точність важливіша: друкуй чисто. Підказок немає. Таймер почнеться з першої літери. <a class="ch-link" href="#teen/board">${boardLinkLabel()}</a></p></div>
       <div class="ld-btns"><button class="pl-btn primary" data-act="start">Почати</button><div class="pb-langs" role="group" aria-label="Мова випробування">${lang}</div><a class="pl-btn" href="#teen">До світу</a></div>`;
     q('[data-done]').hidden = false;
     q('[data-ld] [data-act="start"]')?.focus?.();
@@ -125,12 +127,12 @@ export function mountChallenge(app, route, state) {
 
   // ----- результат -----
   function resultHtml({ acc, cpm, out, rec, game, hard, lines }) {
-    const chips = `<div class="ld-chips"><span>Точність <b>${acc}%</b></span><span>Знаків за хвилину <b>${cpm}</b></span>${game ? `<span>Досвід <b>+${game.gain + game.bonus}</b></span>` : ''}${hard.length ? `<span>Потренуй: <b>${hard.map((c) => escText(c.toUpperCase())).join(', ')}</b></span>` : ''}</div>`;
+    const chips = `<div class="ld-chips"><span>Точність <b>${acc}%</b></span><span>Знаків за хвилину <b>${cpm}</b></span>${out.prev && !out.short ? `<span>Минулого разу <b>${out.prev.cpm}</b> (${signed(cpm - out.prev.cpm)})</span>` : ''}${game ? `<span>Досвід <b>+${game.gain + game.bonus}</b></span>` : ''}${hard.length ? `<span>Потренуй: <b>${hard.map((c) => escText(c.toUpperCase())).join(', ')}</b></span>` : ''}</div>`;
     const head = out.medal
       ? `<div class="ch-head"><span class="ld-stars">${medalIcon(out.medal, 40)}</span><h2 class="ld-h">${MEDAL_NAME[MEDALS[out.medal - 1]]}${out.newMedal ? ' · нова медаль' : ''}</h2></div>`
       : '<h2 class="ld-h">Результат записано</h2>';
     return `<div class="ld-main">${head}${chips}<p class="ld-p ch-p">${lines.map(escText).join(' ')}</p>${newHtml(game)}</div>
-      <div class="ld-btns"><button class="pl-btn primary" data-act="again">${icons.replay(22)}<span>Ще раз</span></button><a class="pl-btn" href="#teen/worlds">Карта світів</a><a class="pl-btn" href="#teen">До світу</a></div>`;
+      <div class="ld-btns"><button class="pl-btn primary" data-act="again">${icons.replay(22)}<span>Ще раз</span></button><a class="pl-btn" href="#teen/board">${boardLinkLabel()}</a><a class="pl-btn" href="#teen">До світу</a></div>`;
   }
 
   function finish(ms) {
