@@ -1,7 +1,7 @@
 // Вправа з друком для світів 5–6 класів: спільна логіка, різне оформлення (малюють світи).
 // Поки це пробна вправа (Етап Т1): досвід за неї не нараховується; справжні уроки — Етапи Т2–Т4.
 import { keyboard, hands } from '../../keyboard/onscreen.js';
-import { ROWS, codeOfChar } from '../../keyboard/layouts.js';
+import { ROWS, TEEN_ROWS, codeOfChar } from '../../keyboard/layouts.js';
 import { attachLiveKeyboard, setActiveFinger } from '../../keyboard/live.js';
 import { fingerOf } from '../../keyboard/fingers.js';
 import { layoutHint } from '../../screens/keyboard.js';
@@ -21,9 +21,11 @@ export function taskText() {
 }
 
 // Клавіатура з долонями. layout — мова підписів; demo — підсвітити першу клавішу пробного тексту
-export const keysPanel = ({ layout = 'ua', demo = true } = {}) => {
+// numRow: уроки знаків — з рядом цифр (апостроф, Shift-символи), клавішею Alt Gr і малими підписами в кутах клавіш
+export const keysPanel = ({ layout = 'ua', demo = true, numRow = false } = {}) => {
   const first = demo ? codeOfChar(TEXT[0], 'ua') : null;
-  return `<div class="keys-panel">${keyboard({ layout, next: first, hint: 'next', rows: ROWS.slice(1) })}${hands({ active: first ? fingerOf(first) : null })}</div>`;
+  const rows = numRow ? TEEN_ROWS : ROWS.slice(1);
+  return `<div class="keys-panel${numRow ? ' has-numrow' : ''}">${keyboard({ layout, next: first, hint: 'next', rows, marks: numRow })}${hands({ active: first ? fingerOf(first) : null })}</div>`;
 };
 
 /**

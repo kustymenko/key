@@ -300,3 +300,8 @@
 /* Пропозиція перерви (поверх екрана завершення, тепла гама) */
 .break-layer { background: var(--warm-bg); gap: 24px; }
 .break-tip { display: flex; align-items: center; gap: 16px; font-size: 36px; font-weight: 800; color: var(--ui-text); }
+
+/* Для дорослого: підказка про розкладку ноутбука (з'являється лише якщо замість апострофа друкувалось «ё») */
+.adult-warn { flex-direction: column; align-items: center; gap: 12px; max-width: 1000px; padding: 14px 22px; border: 3px solid var(--ui-line, #c9d0d8); border-radius: 18px; background: rgb(255 255 255 / .6); }
+.adult-warn .adult-label { font-size: 28px; }
+.adult-warn p { margin: 0; font-size: 22px; line-height: 1.3; text-align: center; }

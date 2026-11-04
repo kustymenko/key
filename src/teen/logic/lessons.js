@@ -5,6 +5,7 @@ import { WORDS_EN } from '../../content/words-en.js';
 import { SENTENCES_UA } from '../../content/sentences-ua.js';
 import { SENTENCES_EN } from '../../content/sentences-en.js';
 import { getTeenLesson, learnedKeys, isPunctKey } from './course.js';
+import { buildMarksLesson } from './marks.js';
 
 const WORDS = { ua: WORDS_UA, en: WORDS_EN };
 const SENTENCES = { ua: SENTENCES_UA, en: SENTENCES_EN };
@@ -106,9 +107,11 @@ function sentencesText(rng, pool, [min, max]) {
  * steps: { kind: 'intro', keys } — знайомство; { kind: 'drill', text, hint } — вправа (hint: false — без підсвічування).
  * quick — «швидка перевірка» (розміщення «Середній»): лише одна довга вправа без підказки, без знайомства.
  */
-export function buildTeenLesson({ layout, id, rng = Math.random, quick = false }) {
+export function buildTeenLesson({ layout, id, rng = Math.random, quick = false, grade = '5' }) {
   const lesson = getTeenLesson(layout, id);
   if (!lesson) throw new Error(`Немає уроку ${id}`);
+  // уроки знаків, апострофа, Ґ і абзаців — окремий генератор (marks.js); grade потрібен для довжини абзаців
+  if (['punct', 'mixed', 'paragraph'].includes(lesson.kind)) return buildMarksLesson({ layout, id, rng, grade: String(grade) });
   const known = learnedKeys(layout, id);
   const knownLetters = [...known].filter((c) => c !== ' ' && !isPunctKey(c));
   const newLetters = lesson.letters.filter((c) => !isPunctKey(c));

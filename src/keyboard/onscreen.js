@@ -10,13 +10,13 @@ const FINGER_HEX = {
 // Колір тексту на насиченій клавіші: білий або темний, залежно від контрасту
 const inkOn = (f) => (contrast('#1b2430', FINGER_HEX[f]) >= contrast('#ffffff', FINGER_HEX[f]) ? '#1b2430' : '#ffffff');
 
-const SERVICE = new Set(['Backspace', 'Tab', 'CapsLock', 'Enter', 'ShiftLeft', 'ShiftRight']);
+const SERVICE = new Set(['Backspace', 'Tab', 'CapsLock', 'Enter', 'ShiftLeft', 'ShiftRight', 'AltRight']);
 
 /**
- * state: { layout: 'ua'|'en', next: code|null, hint: 'next'|'error'|null, rows }
+ * state: { layout: 'ua'|'en', next: code|null, hint: 'next'|'error'|null, rows, marks }
  * Усі клавіші бліді; насичена лише `next`.
  */
-export function keyboard({ layout = 'ua', next = null, hint = 'next', rows = ROWS.slice(1) } = {}) {
+export function keyboard({ layout = 'ua', next = null, hint = 'next', rows = ROWS.slice(1), marks = false } = {}) {
   const html = rows
     .map(
       (row) =>
@@ -24,11 +24,13 @@ export function keyboard({ layout = 'ua', next = null, hint = 'next', rows = ROW
           .map((k) => {
             const f = fingerOf(k.code);
             const isNext = k.code === next;
-            const cls = ['key', `f-${f}`, SERVICE.has(k.code) ? 'is-service' : '', k.code === 'Space' ? 'is-space' : '', isNext ? `is-next is-${hint}` : '']
+            const cls = ['key', `f-${f}`, SERVICE.has(k.code) ? 'is-service' : '', k.code === 'Space' ? 'is-space' : '', k.code === 'AltRight' ? 'is-altgr' : '', isNext ? `is-next is-${hint}` : '']
               .filter(Boolean)
               .join(' ');
-            const style = `flex-grow:${k.code === 'Space' ? 0 : k.w};--ink:${inkOn(f)}`;
-            return `<div class="${cls}" style="${style}" data-code="${k.code}"><span class="key-label">${k[layout]}</span></div>`;
+            const style = `flex-grow:${k.code === 'Space' || k.code === 'AltRight' ? 0 : k.w};--ink:${inkOn(f)}`;
+            // малий підпис у куті: символ із Shift (і Ґ з AltGr) — лише на клавіатурі 5–6 класів
+            const sub = marks && k.sub?.[layout] ? `<span class="key-sub" aria-hidden="true">${k.sub[layout]}</span>` : '';
+            return `<div class="${cls}" style="${style}" data-code="${k.code}"><span class="key-label">${k[layout]}</span>${sub}</div>`;
           })
           .join('')}</div>`,
     )

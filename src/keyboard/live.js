@@ -1,5 +1,5 @@
 // «Жива» екранна клавіатура: показує натискання справжньої клавіатури.
-import { classifyKey } from './detect.js';
+import { classifyKey, isAltGr } from './detect.js';
 import { fingerOf, FINGERS } from './fingers.js';
 import { ROWS } from './layouts.js';
 
@@ -26,10 +26,10 @@ export function setKeyboardLayout(root, layout) {
 
 /**
  * Слухає справжню клавіатуру і підсвічує клавішу та палець у `root`.
- * getLayout() — яка розкладка очікується; trackFinger: false — не міняти палець на долонях (у вправі); onKey({ code, key, label, finger, kind }) — для екрана.
+ * getLayout() — яка розкладка очікується; altGr: true — AltGr + літера (Ґ) вважається введенням (5–6 класи); trackFinger: false — не міняти палець на долонях (у вправі); onKey({ code, key, label, finger, kind }) — для екрана.
  * Повертає функцію, яка вимикає слухачів.
  */
-export function attachLiveKeyboard(root, { getLayout, onKey = () => {}, trackFinger = true }) {
+export function attachLiveKeyboard(root, { getLayout, onKey = () => {}, trackFinger = true, altGr = false }) {
   const since = new Map(); // code -> коли натиснули
   const timers = new Map();
   const keyEl = (code) => root.querySelector(`.key[data-code="${code}"]`);
@@ -42,8 +42,9 @@ export function attachLiveKeyboard(root, { getLayout, onKey = () => {}, trackFin
   };
 
   const onDown = (e) => {
-    if (e.ctrlKey || e.metaKey) return; // Ctrl+R, Ctrl+W тощо працюють як завжди
-    const shortcut = e.altKey || /^F\d+$/.test(e.code) || e.code === 'Escape';
+    const viaAltGr = altGr && isAltGr(e); // AltGr + Г = Ґ (5–6 класи): це введення, а не комбінація
+    if (!viaAltGr && (e.ctrlKey || e.metaKey)) return; // Ctrl+R, Ctrl+W тощо працюють як завжди
+    const shortcut = (e.altKey && !viaAltGr) || /^F\d+$/.test(e.code) || e.code === 'Escape';
     if (!shortcut) e.preventDefault(); // без прокрутки пробілом, повернення Backspace, виходу з поля Tab
     const el = keyEl(e.code);
     if (el) {
@@ -59,7 +60,7 @@ export function attachLiveKeyboard(root, { getLayout, onKey = () => {}, trackFin
       key: e.key,
       label: k ? k[getLayout()] : e.key,
       finger: fingerOf(e.code),
-      kind: classifyKey(e, getLayout()),
+      kind: classifyKey(e, getLayout(), { altGr }),
     });
   };
 

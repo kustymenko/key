@@ -2,13 +2,20 @@
 // Помилка не рухає курсор: дитина продовжує, коли натисне правильну клавішу.
 // missed — скільки разів помилилися саме на цій літері (для «важких літер» 3–4 класу).
 
+import { normChar, isParagraphKey } from '../keyboard/chars.js';
+
 export const createExercise = (text) => ({ text, pos: 0, errors: 0, streak: 0, done: false, missed: {} });
 
 export const currentChar = (st) => st.text[st.pos] ?? null;
 
 // Велика літера в завданні вимагає Shift: маленька «а» її не замінює. Для малих літер регістр не важливий.
-const same = (want, key) =>
-  want !== want.toLowerCase() ? key === want : String(key).toLowerCase() === want.toLowerCase();
+// Апостроф у трьох виглядах (' ’ ʼ) однаковий; кінець абзацу (\n) друкується клавішею Enter.
+const same = (want, key) => {
+  if (isParagraphKey(want)) return isParagraphKey(key);
+  const w = normChar(want);
+  const k = normChar(key);
+  return w !== w.toLowerCase() ? k === w : String(k).toLowerCase() === w.toLowerCase();
+};
 
 /**
  * Обробити введений символ. Повертає { state, result }:

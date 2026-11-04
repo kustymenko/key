@@ -148,7 +148,7 @@ const typeTab = () => {
   <div class="px-bar"><div ${L ? 'data-bar' : 'data-xp-fill'} style="width:${L ? 0 : (PLAYER.xp / PLAYER.xpMax) * 100}%"></div></div>
   ${L ? lessonBody() : taskText()}<div class="px-msg" data-msg></div>
   <div class="px-done" data-done hidden>${L ? lessonDone() : `${doneStar}<div class="px-done-text"><b>ГОТОВО!</b><div class="px-chips"><span>Точність <b data-done-acc></b></span><span>Знаків за хвилину <b data-done-speed></b></span></div></div><button class="px-btn" data-again>Ще раз</button>`}</div></div>
-  ${keysPanel({ layout: L ? L.layout : 'ua', demo: !L })}`);
+  ${keysPanel({ layout: L ? L.layout : 'ua', demo: !L, numRow: !!L?.numRow })}`);
 };
 
 const GEMS = [

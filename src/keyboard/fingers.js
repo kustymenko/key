@@ -16,7 +16,7 @@ const byFinger = {
   lr: ['Digit2', 'KeyW', 'KeyS', 'KeyX'],
   lm: ['Digit3', 'KeyE', 'KeyD', 'KeyC'],
   li: ['Digit4', 'Digit5', 'KeyR', 'KeyT', 'KeyF', 'KeyG', 'KeyV', 'KeyB'],
-  th: ['Space'],
+  th: ['Space', 'AltRight'],
   ri: ['Digit6', 'Digit7', 'KeyY', 'KeyU', 'KeyH', 'KeyJ', 'KeyN', 'KeyM'],
   rm: ['Digit8', 'KeyI', 'KeyK', 'Comma'],
   rr: ['Digit9', 'KeyO', 'KeyL', 'Period'],

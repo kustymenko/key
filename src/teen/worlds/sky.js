@@ -137,7 +137,7 @@ const typeTab = () => {
   <div class="sk-bar"><div ${L ? 'data-bar' : 'data-xp-fill'} style="width:${L ? 0 : (PLAYER.xp / PLAYER.xpMax) * 100}%"></div></div>
   ${L ? lessonBody() : taskText()}<div class="sk-msg" data-msg></div>
   <div class="sk-done" data-done hidden>${L ? lessonDone() : `${doneCrystal}<div class="sk-done-text"><b>Вправу пройдено!</b><div class="sk-chips"><span>Точність <b data-done-acc></b></span><span>Знаків за хвилину <b data-done-speed></b></span></div></div><button class="sk-btn" data-again>Ще раз</button>`}</div></div>
-  ${keysPanel({ layout: L ? L.layout : 'ua', demo: !L })}`);
+  ${keysPanel({ layout: L ? L.layout : 'ua', demo: !L, numRow: !!L?.numRow })}`);
 };
 
 const crystal = (r, i) => {

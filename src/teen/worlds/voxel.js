@@ -178,7 +178,7 @@ const typeTab = () => {
     <div class="vx-done" data-done hidden>${L ? lessonDone() : `${doneCube}<div class="vx-done-text"><b>Вправу пройдено!</b>
       <div class="vx-chips"><span>Точність <b data-done-acc></b></span><span>Знаків за хвилину <b data-done-speed></b></span></div></div>
       <button class="vx-btn" data-again>Ще раз</button>`}</div></div>
-  ${keysPanel({ layout: L ? L.layout : 'ua', demo: !L })}`);
+  ${keysPanel({ layout: L ? L.layout : 'ua', demo: !L, numRow: !!L?.numRow })}`);
 };
 
 const rewardCube = (r, i) => {

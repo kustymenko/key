@@ -64,7 +64,7 @@ export function worldsFromLessons(layout, states) {
   let nowSet = false;
   return WORLD_NAMES.map(([name, sub], i) => {
     const ids = groups[i];
-    if (!ids) return { name, sub, state: 'locked', pct: 0 };
+    if (!ids?.length) return { name, sub, state: 'locked', pct: 0 };
     const mine = states.filter((l) => ids.includes(l.id));
     const finished = mine.filter((l) => l.state === 'done' || l.state === 'credited').length;
     const pct = Math.round((finished / mine.length) * 100);
