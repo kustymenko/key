@@ -30,17 +30,18 @@ const IDLE_CAP = 4000; // пауза довша за 4 с у швидкість 
 const KEY_NAMES = {
   '.': 'крапка', ',': 'кома', ';': 'крапка з комою', '/': 'скісна риска', ' ': 'пробіл', ':': 'двокрапка', '?': 'знак питання', '!': 'знак оклику',
   '(': 'ліва дужка', ')': 'права дужка', '"': 'лапки', '-': 'дефіс', "'": 'апостроф', 'ґ': 'літера Ґ', [PARAGRAPH]: 'Enter (новий абзац)',
+  '№': 'знак номера', '%': 'відсоток', '*': 'зірочка', '+': 'плюс', '=': 'дорівнює', '#': 'решітка', $: 'долар', '&': 'амперсанд', '@': 'равлик',
 };
 // на кнопці-підказці апостроф прямий: так само, як на клавіатурі (типографський ’ схожий на кому)
 const keyLabel = (c) => (c === PARAGRAPH ? 'Enter' : isPunctKey(c) ? c : c.toUpperCase());
 // Де клавіша: «Shift + 7», «Alt Gr + Г», «ліворуч від 1» (стандартна розкладка; на деяких ноутбуках може бути інакше)
-const POS = { Backquote: 'ліворуч від 1', Minus: 'праворуч від 0', Quote: 'праворуч від ;', Enter: 'праворуч у ряду з ;' };
+const POS = { Backquote: 'ліворуч від 1', Minus: 'праворуч від 0', Equal: 'праворуч від дефіса', Quote: 'праворуч від ;', Enter: 'праворуч у ряду з ;' };
 const LABELS = { KeyU: 'Г', Slash: '.' };
 export function comboText(ch, layout) {
   const codes = keysFor(ch, layout);
   if (!codes.length) return '';
   const main = codes[0];
-  const label = layout === 'ua' && LABELS[main] ? LABELS[main] : main.startsWith('Digit') ? main.slice(5) : main === 'Semicolon' ? ';' : main === 'Quote' ? '’' : main === 'Slash' ? '/' : '';
+  const label = layout === 'ua' && LABELS[main] ? LABELS[main] : main.startsWith('Digit') ? main.slice(5) : main === 'Semicolon' ? ';' : main === 'Equal' ? '=' : main === 'Quote' ? '’' : main === 'Slash' ? '/' : '';
   if (codes.includes('AltRight')) return `Alt Gr${codes.some((c) => c.startsWith('Shift')) ? ' + Shift' : ''} + ${label}`;
   if (codes.some((c) => c.startsWith('Shift'))) return `Shift + ${label}`;
   return POS[main] ? `клавіша ${POS[main]}` : '';
@@ -71,7 +72,7 @@ export function lessonsListScreen(profile) {
     <b>${l.id}</b><span>${l.label}</span><small>${l.state === 'done' ? starsIcons(l.stars, 3, 22) : stateText(l)}</small></button>`).join('');
   const lang = ['ua', 'en'].map((l) => `<button class="pb-lang" data-set-layout="${l}" aria-pressed="${ctx.layout === l}">${l === 'ua' ? 'УКР' : 'ENG'}</button>`).join('');
   return themeOf(profile.world).frame(ctx, `<div class="pl-step">Швидкий курс · ${ctx.layout === 'ua' ? 'українська' : 'англійська'}</div><h2 class="pl-h">Усі уроки</h2>
-    <div class="lg-grid" style="grid-template-columns:repeat(${ctx.states.length > 12 ? 6 : 4}, 1fr)">${cards}</div>
+    <div class="lg-grid${ctx.states.length > 18 ? ' is-many' : ''}" style="grid-template-columns:repeat(${ctx.states.length > 12 ? 6 : 4}, 1fr)">${cards}</div>
     <div class="pl-actions"><div class="pb-langs" role="group" aria-label="Мова курсу">${lang}</div><a class="pl-btn" href="#teen">До світу</a></div>`);
 }
 
@@ -171,6 +172,7 @@ export function mountLesson(app, route, state) {
   function showIntro(step) {
     run.ex = null;
     const isMarks = !!step.marks;
+    const isDigits = !!step.digits;
     // знак із підписом, як його набрати: «?» — Shift + 7, «Ґ» — Alt Gr + Г
     const cap = (k) => `<span class="li-key ${isMarks ? 'has-how' : ''}" aria-label="${KEY_NAMES[k] ?? k}">${keyLabel(k)}${isMarks ? `<small>${comboText(k, layout)}</small>` : ''}</span>`;
     const caps = step.shift
@@ -179,10 +181,12 @@ export function mountLesson(app, route, state) {
     const names = isMarks ? step.keys.map((k) => KEY_NAMES[k]).filter(Boolean).join(', ') : '';
     const note = step.shift
       ? 'Велика літера: Shift однією рукою, літера — другою. Літери лівої руки — з правим Shift, правої руки — з лівим.'
+      : isDigits
+        ? 'Цифри — у верхньому ряду. Кожну цифру натискай тим самим пальцем, що й літеру під нею. Спершу знайди клавішу поглядом, потім спробуй не дивитись.'
       : isMarks
         ? `Знайди на клавіатурі: ${names}.${step.keys.some((k) => keysFor(k, layout).some((c) => c.startsWith('Shift'))) ? ' Shift тримай рукою, протилежною до клавіші.' : ''}${step.moved ? ` ${MOVED_NOTE}` : ''}`
         : `Нові клавіші підсвічені на клавіатурі. Кожну натискай своїм пальцем${quick ? '' : ': схема долонь покаже, яким'}.`;
-    const title = step.shift ? 'Великі літери' : isMarks ? (step.keys[0] === PARAGRAPH ? 'Новий абзац' : step.keys.length > 1 ? 'Нові знаки' : 'Новий знак') : 'Нові клавіші';
+    const title = step.shift ? 'Великі літери' : isDigits ? 'Нові цифри' : isMarks ? (step.keys[0] === PARAGRAPH ? 'Новий абзац' : step.keys.length > 1 ? 'Нові знаки' : 'Новий знак') : 'Нові клавіші';
     q('[data-lines]').innerHTML = '';
     q('[data-ld]').innerHTML = `<div class="li"><div class="li-title">${title}</div><div class="li-keys">${caps}</div><p>${note}</p></div>
       <div class="ld-btns"><button class="pl-btn primary" data-act="start">Почати</button></div>`;
@@ -205,7 +209,7 @@ export function mountLesson(app, route, state) {
       ? `<div class="ld-stars">${starsIcons(stars, 3, 34)}</div><h2 class="ld-h">${credited ? 'Зараховано з першої спроби!' : 'Урок пройдено!'}</h2>`
       : `<h2 class="ld-h">Ще трохи точності</h2><p class="ld-p">Для наступного уроку потрібно ${PASS_ACC}%. Спробуй ще раз: спокійно, без поспіху.</p>`;
     const nextBtn = pass && next && next.id !== lesson.id ? `<a class="pl-btn primary" href="#teen/lesson/${next.id}" data-next>Далі: урок ${next.id}</a>` : '';
-    const doneAll = pass && !next ? '<p class="ld-p">Усі уроки цієї мови пройдено: літери, знаки й абзаци. Цифри — наступна частина курсу.</p>' : '';
+    const doneAll = pass && !next ? '<p class="ld-p">Усі уроки цієї мови пройдено: літери, знаки, абзаци, цифри й символи.</p>' : '';
     return `<div class="ld-main">${head}${chips}${doneAll}</div>
       <div class="ld-btns">${nextBtn}<button class="pl-btn ${nextBtn ? '' : 'primary'}" data-act="again">${icons.replay(22)}<span>Ще раз</span></button><a class="pl-btn" href="#teen">До світу</a></div>`;
   }
@@ -247,7 +251,9 @@ export function mountLesson(app, route, state) {
     // Enter — це частина вправи лише в абзацах (кінець абзацу); в інших вправах його ігноруємо, як і раніше
     const paragraphText = run.ex.text.includes(PARAGRAPH);
     if (isParagraphKey(key) && !paragraphText) return;
-    if (kind === 'wrong-layout') { msg(layoutHint(layout)); return; }
+    // Shift + цифра дає інший символ, коли ввімкнена не та мова: «#» замість «№» (укр.), «№» замість «#» (англ.) — це не помилка учня
+    const otherLang = (layout === 'ua' && /^[#$^&@]$/.test(key)) || (layout === 'en' && key === '№');
+    if (kind === 'wrong-layout' || otherLang) { msg(layoutHint(layout)); return; }
     if (!isParagraphKey(key) && key.length !== 1) return;
     // «ё» на місці апострофа — стара розкладка (Windows XP): не помилка учня, а підказка дорослому
     if (isYo(key) && normChar(currentChar(run.ex)) === "'") {

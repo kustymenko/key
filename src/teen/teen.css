@@ -166,6 +166,12 @@ button.cm-link { background: transparent; border: 0; cursor: pointer; }
 .cn-pixel .lg-card { border-radius: 0; }
 .cn-sky .lg-card { border-radius: 20px; }
 .lg-card:disabled { cursor: default; }
+/* Більше 18 уроків (після Етапу Т5 їх 24): картки компактніші, щоб чотири ряди вміщались у кожному світі */
+.lg-grid.is-many { gap: 10px; }
+.lg-grid.is-many .lg-card { padding: 7px 14px; min-height: 76px; }
+.lg-grid.is-many .lg-card b { font-size: 25px; }
+.lg-grid.is-many .lg-card span { font-size: 16px; }
+.lg-grid.is-many .lg-card small { font-size: 15px; }
 
 /* Панель «Далі: урок» на карті */
 .pb { position: absolute; z-index: 3; display: flex; align-items: center; gap: 12px; padding: 0 14px; height: 84px; }
