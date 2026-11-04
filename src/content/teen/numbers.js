@@ -185,16 +185,20 @@ const EN_SIGNS = S('symbols', `
   The new cafe sells fruit & nuts in small paper bags.
   Lena & Oleh prepared a short talk about volcanoes.
   Rules & answers are printed on the last page of the booklet.
-  Tickets are 3 @ $4, so the total is $12.
-  Pens cost 5 @ $2 each in the school shop.
-  Buy 4 @ $3 and pay $12 in total.
-  We sold 6 @ $5, which made $30 for the class fund.
-  Apples are 8 @ $1 today, so eight apples cost $8.
-  Pencils were 10 @ $1, so we paid $10 for the set.
-  Stickers are 3 @ $2, so three stickers cost $6.
-  Bananas were 7 @ $1 at the market today.
-  Maps cost 2 @ $5, so the pair costs $10.
-  Cards were 9 @ $2 in the shop by the bridge.
+  Pens cost $2 each in the school shop.
+  A ticket to the museum costs $6 for students.
+  Apples are $1 today, so eight apples cost $8.
+  We sold maps for $5 each and made $30 for the class fund.
+  Write to olena@example.com if you have a question about the club.
+  Send your answer to tom@example.com before Friday.
+  The class address is class6@example.com, and anyone can write there.
+  Ask Anna by email: anna@example.com.
+  Our teacher wrote: send the file to maks@example.com by noon.
+  Please write to team5@example.com and add your name at the end.
+  The quiz answers go to sofia@example.com, not to the old address.
+  The letter from kate@example.com arrived at 9:30 this morning.
+  My new address is max2025@example.com, and I check it every day.
+  Send the photos to club@example.com and write the date in the subject.
   A star * next to a word means there is a note below.
   The table marks unfinished results with a star *.
   In this example, 6 * 7 means six times seven.

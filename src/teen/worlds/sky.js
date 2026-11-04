@@ -1,6 +1,6 @@
 // Концепція 3 «Небесні острови»: нічний космос, острови з гострих граней (low-poly), скляні панелі, кристали-нагороди.
 // Усе намальовано кодом: власні форми, власні кольори.
-import { TABS, avatarControls, settingsRows, hideHelperButton, homeButton, playBar } from '../screens/controls.js';
+import { TABS, avatarControls, settingsRows, hideHelperButton, homeButton, playBar, rewardNote } from '../screens/controls.js';
 import { taskText, keysPanel } from '../screens/typing.js';
 import { hintToggle, lessonBody, lessonDone } from '../screens/lessonView.js';
 import { HERO_OPTIONS as AV_OPTIONS, DEFAULT_HERO } from '../logic/profile.js';
@@ -43,6 +43,8 @@ export function heroG(ox, oy, k = 1, hero = av) {
   g += T(ring[5], ring[0], hc, hair) + T(ring[0], ring[1], hc, shade(hair, 0.8));
   if (hat === 'cap') g += T([22, 24], [78, 24], [50, 4], suit) + T([22, 24], [50, 4], [30, 10], shade(suit, 1.2)) + T([60, 24], [92, 28], [60, 18], shade(suit, 0.7));
   if (hat === 'crown') g += T([28, 16], [72, 16], [72, 4], '#ffc531') + T([28, 16], [72, 4], [28, 4], '#ffe08a') + T([28, 4], [36, -10], [44, 4], '#ffc531') + T([44, 4], [50, -12], [56, 4], '#ffe08a') + T([56, 4], [64, -10], [72, 4], '#ffc531');
+  if (hat === 'headset') g += T([24, 36], [28, 14], [36, 12], '#2a3050') + T([28, 14], [50, 4], [50, 10], '#3a4270') + T([50, 4], [72, 14], [50, 10], '#2a3050') + T([64, 12], [72, 14], [76, 36], '#3a4270') + T([16, 30], [28, 28], [26, 52], '#6a76b8') + T([72, 28], [84, 30], [74, 52], '#4a5388');
+  if (hat === 'beanie') g += T([24, 20], [76, 20], [50, 2], shade(suit, 1.2)) + T([24, 20], [50, 2], [36, 10], shade(suit, 1.4)) + T([22, 20], [78, 20], [74, 28], '#e9f4ff') + T([22, 20], [74, 28], [26, 28], '#c9d9ee') + T([44, 2], [56, 2], [50, -9], '#ffffff');
   if (hat === 'tuft') g += T([40, 12], [46, -12], [52, 12], hair) + T([50, 12], [58, -8], [62, 14], shade(hair, 1.3)) + T([32, 14], [36, -4], [44, 12], shade(hair, 0.8));
   return g;
 }
@@ -147,7 +149,7 @@ const crystal = (r, i) => {
     ${r.got ? '' : '<rect x="21" y="26" width="18" height="15" rx="3" fill="#dcd9ff"/><path d="M26 26v-5a4 4 0 0 1 8 0v5" fill="none" stroke="#dcd9ff" stroke-width="3.5"/>'}</svg>`;
 };
 const rewardsTab = () => shell('rewards', `<section class="sk-glass sk-shelf"><h2>Мої кристали <small>${REWARDS.filter((r) => r.got).length} з ${REWARDS.length}</small></h2>
-  <div class="sk-grid">${REWARDS.map((r, i) => `<div class="sk-reward ${r.got ? 'is-got' : ''}">${crystal(r, i)}<span>${r.name}</span></div>`).join('')}</div></section>`);
+  <div class="sk-grid">${REWARDS.map((r, i) => `<div class="sk-reward ${r.got ? 'is-got' : ''}">${crystal(r, i)}<span>${r.name}</span>${rewardNote(r)}</div>`).join('')}</div></section>`);
 
 
 // Рамка для екранів вступного тесту: тло, «Додому» і панель світу; вміст (inner) малює спільний код
@@ -162,3 +164,11 @@ export const screen = (tab, ctx) => {
   useCtx(ctx);
   try { return ({ world: worldTab, avatar: avatarTab, type: typeTab, lesson: typeTab, rewards: rewardsTab }[tab] ?? worldTab)(); } finally { [C, PLAYER, WORLDS, QUESTS, REWARDS, av] = saved; }
 };
+
+// Після вправи: оновити рівень і кільце досвіду на екрані, не перемальовуючи його
+export function setXp(root, { level, xp, xpMax }) {
+  root.querySelectorAll('[data-level]').forEach((e) => { e.textContent = level; });
+  root.querySelectorAll('[data-xp-text]').forEach((e) => { e.textContent = `${xp} / ${xpMax}`; });
+  const circ = 2 * Math.PI * 30;
+  root.querySelectorAll('[data-ring]').forEach((el) => el.setAttribute('stroke-dasharray', `${(circ * (xp / xpMax)).toFixed(1)} ${circ.toFixed(1)}`));
+}

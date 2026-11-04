@@ -9,8 +9,8 @@ export const WORLD_SHORT = { voxel: 'Кубічний', pixel: 'Піксель',
 // Вигляд героя: індекси варіантів (кольори й форми — це дані, малює кожен світ по-своєму)
 export const HERO_OPTIONS = {
   skin: { label: 'Колір шкіри', vals: ['#f3cfae', '#dba57b', '#aa7149', '#6d4527'] },
-  outfit: { label: 'Одяг', vals: ['#e4572e', '#2e86de', '#2fa866', '#8e5bd1', '#f0a020'] },
-  hat: { label: 'Головний убір', vals: ['none', 'cap', 'crown', 'tuft'], names: ['Без', 'Кепка', 'Корона', 'Чуб'] },
+  outfit: { label: 'Одяг', vals: ['#e4572e', '#2e86de', '#2fa866', '#8e5bd1', '#f0a020', '#17a2b8', '#e8548e', '#4a5160'], names: ['Червоний', 'Синій', 'Зелений', 'Фіолетовий', 'Жовтий', 'Бірюзовий', 'Рожевий', 'Графітовий'] },
+  hat: { label: 'Головний убір', vals: ['none', 'cap', 'crown', 'tuft', 'headset', 'beanie'], names: ['Без', 'Кепка', 'Корона', 'Чуб', 'Навушники', 'Шапка'] },
 };
 export const DEFAULT_HERO = { skin: 1, outfit: 1, hat: 1 };
 
@@ -24,7 +24,7 @@ export function cleanHero(h) {
   return out;
 }
 
-// Рівні й досвід. Поки досвід лише зберігається (нараховувати його почнемо з Етапу Т6): 500 за рівень.
+// Рівні й досвід (нараховується в game.js, Етап Т6): 500 за рівень.
 export const XP_PER_LEVEL = 500;
 export function levelInfo(totalXp) {
   const t = Number.isFinite(totalXp) && totalXp > 0 ? Math.floor(totalXp) : 0;

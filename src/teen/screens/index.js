@@ -6,6 +6,7 @@ import { teenContext } from './context.js';
 import { mountTyping } from './typing.js';
 import { worldPickHtml } from './pick.js';
 import { placementScreen, mountPlacement } from './placement.js';
+import { worldsScreen } from './worlds.js';
 import { lessonScreen, lessonsListScreen, mountLesson, mountLessonsList } from './lesson.js';
 
 const TAB_IDS = ['world', 'avatar', 'type', 'rewards'];
@@ -15,7 +16,7 @@ export function teenRoute(name) {
   const [root, tab = 'world', arg] = name.split('/');
   if (root !== 'teen') return null;
   if (tab === 'lesson') return arg === undefined || /^\d+$/.test(arg) ? { tab, id: arg === undefined ? null : Number(arg) } : null;
-  return ['pick', 'start', 'test', 'lessons'].includes(tab) || TAB_IDS.includes(tab) ? { tab } : null;
+  return ['pick', 'start', 'test', 'lessons', 'worlds'].includes(tab) || TAB_IDS.includes(tab) ? { tab } : null;
 }
 
 export function teenScreen(route, profile) {
@@ -23,6 +24,7 @@ export function teenScreen(route, profile) {
   if (route.tab === 'start' || route.tab === 'test') return placementScreen(profile);
   if (route.tab === 'lesson') return lessonScreen(profile, route.id);
   if (route.tab === 'lessons') return lessonsListScreen(profile);
+  if (route.tab === 'worlds') return worldsScreen(profile);
   return themeOf(profile.world).screen(route.tab, teenContext(profile));
 }
 
@@ -43,6 +45,11 @@ export function mountTeen(app, route, state) {
       return state.go('teen');
     }
     const opt = e.target.closest('[data-opt]');
+    if (opt?.classList.contains('is-locked')) { // закритий предмет: лише підказка, як його відкрити
+      const info = app.querySelector('[data-lockinfo]');
+      if (info) info.textContent = opt.dataset.lock;
+      return;
+    }
     if (opt) {
       const hero = { ...p.hero, [opt.dataset.opt]: Number(opt.dataset.val) };
       store.update(p.id, { hero });

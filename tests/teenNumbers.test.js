@@ -84,7 +84,9 @@ describe('банк текстів з цифрами й символами', () =
   it('лише літери мови, цифри, пробіл і вивчені знаки; без посилань, пошти, довгих номерів і чужих символів', () => {
     for (const layout of LAYOUTS) for (const e of all(layout)) {
       for (const ch of e.t) expect(ALLOWED_MARKS.has(ch) || (layout === 'ua' ? UA : EN).has(ch.toLowerCase()), `${layout}: «${ch}» у «${e.t}»`).toBe(true);
-      expect(e.t, e.t).not.toMatch(/https?|www|\S@\S|\d{5,}|[«»—–“”‘’]/);
+      expect(e.t, e.t).not.toMatch(/https?|www|\d{5,}|[«»—–“”‘’]/);
+      // пошта — лише вигадана, на домені example.com
+      for (const m of e.t.matchAll(/\S*@\S*/g)) expect(m[0], e.t).toMatch(/^[a-z0-9]+@example\.com[.,:]?$/);
       expect(e.t).toBe(e.t.trim());
       expect(e.t).not.toMatch(/ {2}/);
       if (layout === 'ua') expect(e.t, e.t).not.toMatch(/[a-z]/i);

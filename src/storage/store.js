@@ -2,6 +2,7 @@ import { awardBadges } from './badges.js';
 import { WORLD_IDS, cleanHero } from '../teen/logic/profile.js';
 import { cleanPlacement } from '../teen/logic/placement.js';
 import { cleanTeenProgress } from '../teen/logic/progress.js';
+import { cleanGame, allowedHero, applyRun, snapshot, dayKey } from '../teen/logic/game.js';
 
 // Профілі й прогрес у localStorage. Кожне звернення — в try/catch:
 // якщо сховище недоступне (приватне вікно, заборона, переповнення), тренажер працює далі, але без збереження.
@@ -47,6 +48,7 @@ export function cleanProfile(p) {
     helperHidden: !!p.helperHidden,
     xp: num(p.xp),
     placement: cleanPlacement(p.placement), // розміщення за вступним тестом (5–6 клас)
+    game: cleanGame(p.game), // квести дня, найкращі результати, нагороди (5–6 клас, Етап Т6)
     teen: cleanTeenProgress(p.teen), // пройдені уроки швидкого курсу 5–6 класів: { ua: { id: { stars, acc, cpm, by } }, en: {} }
     resume: p.resume && typeof p.resume === 'object' && Array.isArray(p.resume.steps) ? p.resume : null,
   };
@@ -110,7 +112,7 @@ export function createStore(storage = safeStorage()) {
       if (LEVELS.includes(patch.level)) p.level = patch.level;
       if (LAYOUTS.includes(patch.layout)) p.layout = patch.layout;
       if (WORLD_IDS.includes(patch.world)) p.world = patch.world;
-      if (patch.hero) p.hero = cleanHero(patch.hero);
+      if (patch.hero) p.hero = allowedHero(p, cleanHero(patch.hero)); // закриті предмети не приймаються
       if (typeof patch.helperHidden === 'boolean') p.helperHidden = patch.helperHidden;
       if (patch.placement) p.placement = cleanPlacement(patch.placement) ?? p.placement;
       save();
@@ -156,6 +158,18 @@ export function createStore(storage = safeStorage()) {
       return true;
     },
 
+    // Урок 5–6 класу закінчено: зараховуємо урок (якщо пройдено), досвід, квести дня, нагороди. Нічого не віднімається.
+    // run: { layout, lessonId, stars, acc, cpm, by, typed, errors, steps, words }. Повертає підсумок для екрана результату.
+    finishTeenRun(id, run, today = dayKey()) {
+      const p = find(id);
+      if (!p) return null;
+      const before = snapshot(p);
+      if (run.stars > 0) api.finishTeenLesson(id, { layout: run.layout, lessonId: run.lessonId, stars: run.stars, acc: run.acc, cpm: run.cpm, by: run.by });
+      const res = applyRun(p, { ...run, pass: run.stars > 0 }, today, before);
+      save();
+      return res;
+    },
+
     // Гру зіграно: запам'ятовуємо найкращий результат (порівняння лише з самим собою); record — чи побито
     saveGame(id, kind, layout, score) {
       const p = find(id);
@@ -172,7 +186,8 @@ export function createStore(storage = safeStorage()) {
     resetProgress(id) {
       const p = find(id);
       if (!p) return;
-      Object.assign(p, cleanProfile({ id: p.id, name: p.name, avatar: p.avatar, level: p.level, layout: p.layout, world: p.world, hero: p.hero, helperHidden: p.helperHidden })); // teen і placement скидаються разом із прогресом
+      Object.assign(p, cleanProfile({ id: p.id, name: p.name, avatar: p.avatar, level: p.level, layout: p.layout, world: p.world, hero: p.hero, helperHidden: p.helperHidden })); // teen, placement і game скидаються разом із прогресом
+      p.hero = allowedHero(p, p.hero); // предмети, що були нагородами, знову закриті
       save();
     },
 
