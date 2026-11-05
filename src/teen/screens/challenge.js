@@ -74,7 +74,7 @@ export function mountChallenge(app, route, state) {
     q('[data-bar]').style.width = '0%';
     q('[data-ld]').innerHTML = `<div class="ld-main"><ul class="ch-goals" aria-label="Цілі: медаль за швидкість і точність разом">${goals}</ul>
       <p class="ld-p ch-p">${best} Точність важливіша: друкуй чисто. Підказок немає. Таймер почнеться з першої літери.</p></div>
-      <div class="ld-btns"><button class="pl-btn primary" data-act="start">Почати</button><div class="pb-langs" role="group" aria-label="Мова випробування">${lang}</div><a class="pl-btn" href="#teen/board">${boardLinkLabel()}</a><a class="pl-btn" href="#teen">До світу</a></div>`;
+      <div class="ld-btns"><button class="pl-btn primary" data-act="start">Почати</button><div class="pb-langs" role="group" aria-label="Мова випробування">${lang}</div><div class="ld-row"><a class="pl-btn" href="#teen/board">${boardLinkLabel()}</a><a class="pl-btn" href="#teen">До світу</a></div></div>`;
     q('[data-done]').hidden = false;
     q('[data-ld] [data-act="start"]')?.focus?.();
     msg('');

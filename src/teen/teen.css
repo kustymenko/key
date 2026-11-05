@@ -145,6 +145,7 @@ button.cm-link { background: transparent; border: 0; cursor: pointer; }
 .ld-chips span { border: 2px solid currentColor; border-radius: 10px; padding: 3px 12px; font-size: 20px; }
 .ld-chips b { margin-left: 4px; font-size: 24px; }
 .ld-btns { display: grid; gap: 10px; justify-items: stretch; }
+.ld-row { display: flex; gap: 10px; }
 .ld-btns .pl-btn { min-height: 52px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; padding: 0 22px; }
 .li { display: grid; gap: 8px; }
 .li-title { font-size: 22px; font-weight: 800; opacity: .7; }
