@@ -73,8 +73,8 @@ export function mountChallenge(app, route, state) {
     q('[data-time]').textContent = clock(CHALLENGE_MS);
     q('[data-bar]').style.width = '0%';
     q('[data-ld]').innerHTML = `<div class="ld-main"><ul class="ch-goals" aria-label="Цілі: медаль за швидкість і точність разом">${goals}</ul>
-      <p class="ld-p ch-p">${best} Точність важливіша: друкуй чисто. Підказок немає. Таймер почнеться з першої літери. <a class="ch-link" href="#teen/board">${boardLinkLabel()}</a></p></div>
-      <div class="ld-btns"><button class="pl-btn primary" data-act="start">Почати</button><div class="pb-langs" role="group" aria-label="Мова випробування">${lang}</div><a class="pl-btn" href="#teen">До світу</a></div>`;
+      <p class="ld-p ch-p">${best} Точність важливіша: друкуй чисто. Підказок немає. Таймер почнеться з першої літери.</p></div>
+      <div class="ld-btns"><button class="pl-btn primary" data-act="start">Почати</button><div class="pb-langs" role="group" aria-label="Мова випробування">${lang}</div><a class="pl-btn" href="#teen/board">${boardLinkLabel()}</a><a class="pl-btn" href="#teen">До світу</a></div>`;
     q('[data-done]').hidden = false;
     q('[data-ld] [data-act="start"]')?.focus?.();
     msg('');

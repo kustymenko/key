@@ -232,3 +232,27 @@ describe('екрани уроку в усіх трьох світах', () => {
     expect(teenScreen(teenRoute('teen'), st.get(p.id))).not.toContain('pb-go');
   });
 });
+
+describe('Правки навігації карти: справжні кнопки, а не дрібні посилання', () => {
+  it('«Усі уроки» і «Світи» — кнопки в усіх світах; «Випробування» лише коли відкрите (і з уроками попереду, і без)', () => {
+    for (const world of WORLD_IDS) {
+      const st = createStore(memory());
+      const p = st.create({ name: 'Остап', avatar: 'fox', level: '5', world });
+      st.update(p.id, { placement: { kind: 'zero', source: 'skip', at: 1 } });
+      const closed = teenScreen(teenRoute('teen'), st.get(p.id));
+      expect(closed, `${world}: закрите`).toMatch(/class="pb-btn" href="#teen\/lessons"/);
+      expect(closed).toMatch(/class="pb-btn" href="#teen\/worlds"/);
+      expect(closed).not.toContain('#teen/challenge');
+      expect(closed).not.toContain('pb-list');
+      st.update(p.id, { challengeOpen: true }); // відкрив дорослий
+      const open = teenScreen(teenRoute('teen'), st.get(p.id));
+      expect(open, `${world}: відкрите, уроки ще є`).toContain('pb-go');
+      expect(open.match(/href="#teen\/challenge"/g)).toHaveLength(1);
+      for (const id of TEEN_COURSE.ua.map((l) => l.id)) st.finishTeenLesson(p.id, { layout: 'ua', lessonId: id, stars: 3, acc: 99, cpm: 100 });
+      const done = teenScreen(teenRoute('teen'), st.get(p.id));
+      expect(done).not.toContain('pb-go');
+      expect(done.match(/href="#teen\/challenge"/g)).toHaveLength(1); // одна кнопка, не дубль
+      expect(done).toMatch(/class="pb-btn" href="#teen\/worlds"/);
+    }
+  });
+});

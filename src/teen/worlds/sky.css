@@ -97,7 +97,7 @@
 .cn-sky .wt { --wt-accent: var(--sk-aqua); }
 .cn-sky .wt-shot { border-radius: 14px; border-color: var(--sk-edge); }
 .sk-adult-row { margin-top: 12px; text-align: right; }
-.sk-adult { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px; border-radius: 22px; border: 1.5px dashed var(--sk-edge); color: var(--sk-soft); font: 800 18px 'Exo 2', sans-serif; text-decoration: none; }
+.sk-adult { display: inline-flex; align-items: center; gap: 8px; height: 48px; padding: 0 18px; border-radius: 22px; border: 1.5px dashed var(--sk-edge); color: var(--sk-soft); font: 800 18px 'Exo 2', sans-serif; text-decoration: none; }
 .sk-adult:hover { background: rgb(255 255 255 / .12); color: #fff; }
 .cn-sky.is-tab-type .sk-home { grid-auto-flow: column; width: auto; height: 56px; margin: 0 0 0 8px; padding: 0 16px; align-items: center; gap: 8px; border-radius: 28px; }
 .cn-sky.is-tab-type .sk-home svg { width: 24px; height: 24px; }
@@ -119,6 +119,6 @@
 .sk-chips b { margin-left: 4px; font-size: 24px; }
 
 /* Панель «Далі: урок» */
-.sk-play { left: 160px; top: 22px; width: 860px; height: 76px; background: var(--sk-glass); border: 1.5px solid var(--sk-edge); border-radius: 38px; backdrop-filter: blur(10px); color: var(--sk-ink); font-family: 'Exo 2', sans-serif; --pb-accent: var(--sk-aqua); --pb-ink: #0b1030; padding: 0 20px; }
-.sk-play .pb-lang, .sk-play .pb-go, .sk-play .pb-list { font-family: 'Exo 2', sans-serif; border-radius: 24px; }
+.sk-play { left: 160px; top: 22px; width: 860px; background: var(--sk-glass); border: 1.5px solid var(--sk-edge); border-radius: 38px; backdrop-filter: blur(10px); color: var(--sk-ink); font-family: 'Exo 2', sans-serif; --pb-accent: var(--sk-aqua); --pb-ink: #0b1030; padding: 0 20px; }
+.sk-play .pb-lang, .sk-play .pb-go, .sk-play .pb-btn { font-family: 'Exo 2', sans-serif; border-radius: 24px; }
 .cn-sky .ld-btns .pl-btn.primary { --pl-accent: #2b3a4a; --pl-ink: #fff; }
