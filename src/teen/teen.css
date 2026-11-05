@@ -128,7 +128,7 @@ button.cm-link { background: transparent; border: 0; cursor: pointer; }
 .ll-ch.is-done { opacity: .4; }
 .ll-ch.is-current { outline: 4px solid currentColor; outline-offset: -2px; background: rgb(128 128 128 / .2); }
 .ll-next { opacity: .5; }
-.ll-hint { min-height: 44px; padding: 0 16px; border: 3px solid currentColor; border-radius: 10px; background: transparent; color: inherit; font: 800 18px var(--font); cursor: pointer; }
+.ll-hint { min-height: 48px; padding: 0 16px; border: 3px solid currentColor; border-radius: 10px; background: transparent; color: inherit; font: 800 18px var(--font); cursor: pointer; }
 .ll-hint[aria-pressed='true'] { background: #2b3a4a; border-color: #2b3a4a; color: #fff; }
 .cn-pixel .ll-hint { border-radius: 0; }
 .cn-sky .ll-hint { border-radius: 22px; }
@@ -145,6 +145,7 @@ button.cm-link { background: transparent; border: 0; cursor: pointer; }
 .ld-chips span { border: 2px solid currentColor; border-radius: 10px; padding: 3px 12px; font-size: 20px; }
 .ld-chips b { margin-left: 4px; font-size: 24px; }
 .ld-btns { display: grid; gap: 10px; justify-items: stretch; }
+.ld-row { display: flex; gap: 10px; }
 .ld-btns .pl-btn { min-height: 52px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; padding: 0 22px; }
 .li { display: grid; gap: 8px; }
 .li-title { font-size: 22px; font-weight: 800; opacity: .7; }
@@ -174,16 +175,20 @@ button.cm-link { background: transparent; border: 0; cursor: pointer; }
 .lg-grid.is-many .lg-card small { font-size: 15px; }
 
 /* Панель «Далі: урок» на карті */
-.pb { position: absolute; z-index: 3; display: flex; align-items: center; gap: 12px; padding: 0 14px; height: 84px; }
+.pb { position: absolute; z-index: 3; display: flex; flex-direction: column; justify-content: center; gap: 8px; padding: 8px 14px; }
+.pb-main { display: flex; align-items: center; gap: 12px; min-height: 52px; }
+.pb-nav { display: flex; gap: 10px; }
 .pb-text { flex: 1; min-width: 0; display: grid; }
 .pb-text small { font-size: 15px; font-weight: 800; opacity: .7; line-height: 1.1; }
 .pb-text b { font-size: 18px; line-height: 1.15; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .pb-langs { display: flex; gap: 4px; }
-.pb-lang { min-width: 52px; min-height: 44px; padding: 0 8px; border: 3px solid currentColor; border-radius: 10px; background: transparent; color: inherit; font: 800 17px var(--font); cursor: pointer; }
+.pb-lang { min-width: 52px; min-height: 48px; padding: 0 8px; border: 3px solid currentColor; border-radius: 10px; background: transparent; color: inherit; font: 800 17px var(--font); cursor: pointer; }
 .pb-lang[aria-pressed='true'] { background: var(--pb-accent, #2b3a4a); border-color: var(--pb-accent, #2b3a4a); color: var(--pb-ink, #fff); }
-.pb-go, .pb-chal, .pb-list { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; padding: 0 18px; border: 3px solid currentColor; border-radius: 10px; color: inherit; text-decoration: none; font: 800 20px var(--font); white-space: nowrap; }
+.pb-go, .pb-chal, .pb-btn { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; padding: 0 18px; border: 3px solid currentColor; border-radius: 10px; color: inherit; text-decoration: none; font: 800 20px var(--font); white-space: nowrap; }
 .pb-go, .pb-chal { background: var(--pb-accent, #2b3a4a); border-color: var(--pb-accent, #2b3a4a); color: var(--pb-ink, #fff); }
-.pb-list { padding: 0 12px; font-size: 17px; border-color: transparent; text-decoration: underline; }
+.pb-btn { flex: 1 1 0; padding: 0 12px; font-size: 18px; background: transparent; }
+.pb-btn:hover { background: rgb(128 128 128 / .18); }
+.pb-nav .pb-chal { background: transparent; color: inherit; border-color: currentColor; }
 
 /* Картка уроку: поточний рядок великий, наступний дрібніший; підказка внизу окремим рядком */
 .ll { gap: 0; font-size: 38px; line-height: 1.2; min-height: 84px; margin-top: 4px; }
@@ -217,10 +222,8 @@ button.cm-link { background: transparent; border: 0; cursor: pointer; }
 .cn [data-opt].is-locked svg { color: #1b2430; }
 .cn .opt-hat.is-locked { display: inline-flex; align-items: center; gap: 6px; }
 .cn [data-lockinfo] { display: block; margin-top: 6px; font-size: 15px; font-weight: 700; opacity: .9; line-height: 1.2; font-family: var(--font); }
-.cn [data-opt].opt-hat { padding: 0 8px; min-width: 0; font-size: 15px; }
-.pb-links { display: grid; justify-items: start; }
-.pb-links .pb-list { min-height: 28px; padding: 0 6px; font-size: 16px; }
-.cn [data-opt].opt-outfit, .cn [data-opt].opt-skin { min-width: 44px; width: 44px; height: 44px; }
+.cn [data-opt].opt-hat { padding: 0 8px; min-width: 48px; font-size: 15px; }
+.cn [data-opt].opt-outfit, .cn [data-opt].opt-skin { min-width: 48px; width: 48px; height: 48px; }
 .cn-pixel .ld-h { color: #14122a; }
 .cn .opt-hat.is-locked { gap: 4px; }
 .cn .is-locked[data-opt] { cursor: help; }
@@ -282,6 +285,7 @@ button.cm-link { background: transparent; border: 0; cursor: pointer; }
 .bd-bars li { flex: 1; min-width: 0; display: grid; justify-items: center; gap: 2px; padding: 3px 0; border: 2px solid transparent; border-radius: 8px; font-size: 14px; }
 .bd-bars li.is-last { border-color: currentColor; }
 .bd-bars b { font-size: 16px; }
+.bd-bars small { font-size: 14px; }
 .bd-bars i { display: block; width: 70%; background: currentColor; opacity: .55; border-radius: 3px 3px 0 0; }
 .bd-bars li.is-last i { opacity: 1; }
 .bd-rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
@@ -294,4 +298,3 @@ button.cm-link { background: transparent; border: 0; cursor: pointer; }
 .bd-place { font-weight: 800; font-size: 22px; }
 .bd-cpm b { font-size: 22px; }
 .bd-acc { min-width: 48px; text-align: right; }
-.ch-link { margin-left: 10px; font-weight: 800; color: inherit; text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }

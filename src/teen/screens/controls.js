@@ -43,9 +43,12 @@ export const playBar = (cls, ctx) => {
   const n = ctx.next;
   const label = n ? `${n.quick ? 'Швидка перевірка · ' : ''}Урок ${n.id} · ${n.title}` : ctx.challenge?.open ? 'Випробування на час · 2 хвилини' : 'Усі уроки цієї мови пройдено';
   const lang = ['ua', 'en'].map((l) => `<button class="pb-lang" data-set-layout="${l}" aria-pressed="${ctx.layout === l}">${l === 'ua' ? 'УКР' : 'ENG'}</button>`).join('');
-  return `<div class="pb ${cls}-play"><div class="pb-text"><small>${n ? 'Далі' : 'Чудово'}</small><b>${label}</b></div>
-    <div class="pb-langs" role="group" aria-label="Мова курсу">${lang}</div>
-    ${n ? `<a class="pb-go" href="#teen/lesson">Грай</a>` : ctx.challenge?.open ? `<a class="pb-chal" href="#teen/challenge">Випробування</a>` : ''}<div class="pb-links"><a class="pb-list" href="#teen/lessons">Усі уроки</a><a class="pb-list" href="#teen/worlds">Світи</a></div></div>`;
+  // Верхній рядок: що далі, мова, головна кнопка. Нижній: справжні кнопки «Усі уроки», «Світи» і (якщо відкрито) «Випробування», а не дрібні посилання
+  const main = n ? `<a class="pb-go" href="#teen/lesson">Грай</a>` : ctx.challenge?.open ? `<a class="pb-chal" href="#teen/challenge">Випробування</a>` : '';
+  const chal = n && ctx.challenge?.open ? `<a class="pb-btn pb-chal" href="#teen/challenge">Випробування</a>` : '';
+  return `<div class="pb ${cls}-play"><div class="pb-main"><div class="pb-text"><small>${n ? 'Далі' : 'Чудово'}</small><b>${label}</b></div>
+    <div class="pb-langs" role="group" aria-label="Мова курсу">${lang}</div>${main}</div>
+    <nav class="pb-nav" aria-label="Розділи курсу"><a class="pb-btn" href="#teen/lessons">Усі уроки</a><a class="pb-btn" href="#teen/worlds">Світи</a>${chal}</nav></div>`;
 };
 
 // Кнопка «сховати» біля помічника

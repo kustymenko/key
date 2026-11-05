@@ -106,13 +106,13 @@
 .px-lvl { gap: 14px; padding: 0 16px; }
 .px-who { display: grid; gap: 2px; }
 .px-name { font: 800 18px/1.1 var(--font); max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.px-rank { font: 400 12px 'Press Start 2P'; color: #b7b0e6; }
+.px-rank { font: 400 14px 'Press Start 2P'; color: #b7b0e6; }
 .px-rank b { color: var(--px-cyan); }
 .px-lvl { font-size: 14px; }
 .px-xp i { width: 14px; }
 .px-wardrobe .px-opt, .px-btn { font: 800 17px var(--font); }
 .px-adult-row { margin-top: 14px; text-align: right; }
-.px-adult { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; font: 800 17px var(--font); color: #b7b0e6; text-decoration: none; }
+.px-adult { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 16px; font: 800 17px var(--font); color: #b7b0e6; text-decoration: none; }
 .px-adult:hover { color: #fff; background: var(--px-panel2); }
 .cn-pixel .wt { --wt-accent: var(--px-gold); }
 .cn-pixel .wt-shot { border-radius: 0; }
@@ -140,7 +140,7 @@
 .px-chips span { margin: 4px 4px 4px 0; padding: 6px 14px; background: #fff; color: #1b2430; font: 800 20px var(--font); box-shadow: 0 -3px 0 #1b1740, 0 3px 0 #1b1740, -3px 0 0 #1b1740, 3px 0 0 #1b1740; }
 .px-chips b { margin-left: 4px; }
 .px-chips { margin-top: 12px; }
-.px-task-tag { position: static; display: block; padding: 0; margin: -4px 0 8px; background: none; color: #5b5880; font-size: 12px; }
+.px-task-tag { position: static; display: block; padding: 0; margin: -4px 0 8px; background: none; color: #5b5880; font-size: 14px; }
 /* Панель «Герой» вміщується з запасом до нижнього краю */
 .px-wardrobe { top: 100px; padding: 14px 26px 16px; }
 .px-wardrobe .px-group { margin-top: 4px; }
@@ -148,8 +148,8 @@
 .px-wardrobe .px-adult-row { margin-top: 6px; }
 
 /* Панель «Далі: урок» */
-.px-play { left: 28px; top: 112px; width: 760px; margin: 4px; background: var(--px-panel); color: var(--px-edge); box-shadow: 0 -4px 0 0 var(--px-edge), 0 4px 0 0 var(--px-edge), -4px 0 0 0 var(--px-edge), 4px 0 0 0 var(--px-edge), 0 8px 0 4px #07061a; --pb-accent: var(--px-pink); --pb-ink: #14122a; height: 76px; }
-.px-play .pb-lang, .px-play .pb-go, .px-play .pb-list { border-radius: 0; }
+.px-play { left: 28px; top: 112px; width: 700px; margin: 4px; background: var(--px-panel); color: var(--px-edge); box-shadow: 0 -4px 0 0 var(--px-edge), 0 4px 0 0 var(--px-edge), -4px 0 0 0 var(--px-edge), 4px 0 0 0 var(--px-edge), 0 8px 0 4px #07061a; --pb-accent: var(--px-pink); --pb-ink: #14122a; }
+.px-play .pb-lang, .px-play .pb-go, .px-play .pb-btn { border-radius: 0; }
 .cn-pixel .ll { font-family: var(--font); }
 .cn-pixel .ld-btns .pl-btn.primary { --pl-accent: var(--px-pink); --pl-ink: #14122a; }
 .px-play .pb-text, .px-play .pb-text b, .px-play .pb-text small { font-family: var(--font); }
